@@ -59,3 +59,5 @@ def find_attendee():
 		'lastname': a['lastname']} for a in attendees]
 	print time.time() - t2
 	return json.dumps(result)
+
+app.run(debug = True)
