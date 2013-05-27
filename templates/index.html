@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+<head>
+	<title>Welcome!</title>
+	<link rel="stylesheet" href="/static/common.css">
+	<script src="/static/search.js" type="text/javascript" charset="utf-8" async defer></script>
+	<script src="/static/index.js" type="text/javascript" charset="utf-8" async defer></script>
+</head>
+<body onload="bodyLoaded();">
+	<div class="centerSearchBox">
+		Введіть дані учасника: <input type="search" id="searchBox"/>
+	</div>
+	<div id="results" class="centerSearchBox">
+		<table>
+			<caption>Результати пошуку</caption>
+			<thead>
+				<tr>
+					<th>Ім’я</th>
+				</tr>
+			</thead>
+			<tbody id="searchResultsBody">
+			</tbody>
+		</table>
+	</div>
+</body>
+</html>
