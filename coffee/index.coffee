@@ -7,6 +7,7 @@ class Index
 		searchbox = new window.SearchBox(searchBoxInput, @searchRequested)
 
 	searchRequested: (searchTerm) =>
+		document.getElementById('imgSearchLoader').style.visibility = 'visible'
 		if @searching
 			@searchRequest.abort()
 			# return
@@ -23,6 +24,7 @@ class Index
 			@clearSearchResults()
 			@populateSearchResults(result)
 			@searching = false
+			document.getElementById('imgSearchLoader').style.visibility = 'hidden'
 
 	clearSearchResults: () =>
 		while (@tableBody.firstChild)
@@ -37,11 +39,13 @@ class Index
 
 	createAttendeeRow: (attendee) =>
 		tr = document.createElement 'tr'
-		td = document.createElement 'td'
-		td.appendChild document.createTextNode("#{attendee.lastname} #{attendee.firstname} #{attendee.middlename}")
-		tr.appendChild td
+		
 		td = document.createElement 'td'
 		td.appendChild document.createTextNode(attendee.city)
+		tr.appendChild td
+
+		td = document.createElement 'td'
+		td.appendChild document.createTextNode("#{attendee.lastname} #{attendee.firstname} #{attendee.middlename}")
 		tr.appendChild td
 		return tr
 

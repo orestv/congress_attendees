@@ -1,6 +1,6 @@
 .centerSearchBoxContainer {
 	margin: auto;
-	width: 40%;
+	width: 60%;
 	margin-top: 1cm;
 	margin-bottom: 1cm;
 	text-align: center
@@ -9,6 +9,11 @@
 .centerResultTableContainer {
 	margin: auto;
 	width: 80%;
+}
+
+#imgSearchLoader {
+	margin: auto;
+	display: block;
 }
 
 #searchBox {
