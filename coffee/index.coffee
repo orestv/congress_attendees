@@ -40,6 +40,9 @@ class Index
 		td = document.createElement 'td'
 		td.appendChild document.createTextNode("#{attendee.lastname} #{attendee.firstname} #{attendee.middlename}")
 		tr.appendChild td
+		td = document.createElement 'td'
+		td.appendChild document.createTextNode(attendee.city)
+		tr.appendChild td
 		return tr
 
 window.bodyLoaded = () ->

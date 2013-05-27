@@ -3,9 +3,8 @@ import pymongo
 import json
 import model
 import time
-from bson import BSON
-from bson import json_util
 from flask.ext.pymongo import PyMongo
+from icu import UnicodeString
 
 app = Flask(__name__)
 app.config['MONGO_HOST'] = 'ds027688.mongolab.com'
@@ -53,11 +52,15 @@ def find_attendee():
 
 	print time.time() - t1
 	t2 = time.time()
+
 	result = [{'id': str(a['_id']), 
 		'firstname': a['firstname'], 
 		'middlename': a['middlename'], 
-		'lastname': a['lastname']} for a in attendees]
-	print time.time() - t2
+		'lastname': a['lastname'],
+		'city': a['city']} for a in attendees]
+
+	result.sort(key=lambda attendee: attendee['lastname'])
+	print 'Time spent forming result: %f' % (time.time() - t2)
 	return json.dumps(result)
 
 app.run(debug = True)

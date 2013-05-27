@@ -1,4 +1,26 @@
-.centerSearchBox {
+.centerSearchBoxContainer {
 	margin: auto;
-	width: 60%;
+	width: 40%;
+	margin-top: 1cm;
+	margin-bottom: 1cm;
+	text-align: center
+}
+
+.centerResultTableContainer {
+	margin: auto;
+	width: 80%;
+}
+
+#searchBox {
+	font-size: 2.5em
+}
+
+#searchResultTable tbody td {
+	padding: 10px;
+	border-bottom: 1px solid gray
+}
+
+#searchResultTable tbody tr:hover {
+	background-color: #C5C5C5;
+	cursor: s-resize;
 }

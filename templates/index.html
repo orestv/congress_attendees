@@ -7,16 +7,16 @@
 	<script src="/static/index.js" type="text/javascript" charset="utf-8" async defer></script>
 </head>
 <body onload="bodyLoaded();">
-	<div class="centerSearchBox">
-		Введіть дані учасника: <input type="search" id="searchBox"/>
+	<div class="centerSearchBoxContainer">
+		<input type="search" id="searchBox"/>
 	</div>
-	<div id="results" class="centerSearchBox">
-		<table>
-			<caption>Результати пошуку</caption>
+	<div id="results" class="centerResultTableContainer">
+		<table width="100%" id="searchResultTable">
 			<thead>
 				<tr>
 					<th>Ім’я</th>
-				</tr>
+					<th>Місто</th>
+				</tr>				
 			</thead>
 			<tbody id="searchResultsBody">
 			</tbody>
