@@ -5,7 +5,7 @@
 
   root = typeof exports !== "undefined" && exports !== null ? exports : this;
 
-  SEARCH_TIMEOUT = 200;
+  SEARCH_TIMEOUT = 30;
 
   root.SearchBox = (function() {
 

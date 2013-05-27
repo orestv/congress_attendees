@@ -25,6 +25,7 @@
     }
 
     Index.prototype.searchRequested = function(searchTerm) {
+      document.getElementById('imgSearchLoader').style.visibility = 'visible';
       if (this.searching) {
         this.searchRequest.abort();
       }
@@ -42,7 +43,8 @@
         result = JSON.parse(this.searchRequest.responseText);
         this.clearSearchResults();
         this.populateSearchResults(result);
-        return this.searching = false;
+        this.searching = false;
+        return document.getElementById('imgSearchLoader').style.visibility = 'hidden';
       }
     };
 
@@ -73,6 +75,9 @@
     Index.prototype.createAttendeeRow = function(attendee) {
       var td, tr;
       tr = document.createElement('tr');
+      td = document.createElement('td');
+      td.appendChild(document.createTextNode(attendee.city));
+      tr.appendChild(td);
       td = document.createElement('td');
       td.appendChild(document.createTextNode("" + attendee.lastname + " " + attendee.firstname + " " + attendee.middlename));
       tr.appendChild(td);
