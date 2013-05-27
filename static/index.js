@@ -6,6 +6,8 @@
   Index = (function() {
 
     function Index() {
+      this.attendeeRowClicked = __bind(this.attendeeRowClicked, this);
+
       this.createAttendeeRow = __bind(this.createAttendeeRow, this);
 
       this.populateSearchResults = __bind(this.populateSearchResults, this);
@@ -18,6 +20,7 @@
 
       var searchBoxInput, searchbox;
       this.searching = false;
+      this.nextSearch = null;
       this.tableBody = document.getElementById('searchResultsBody');
       searchBoxInput = document.getElementById('searchBox');
       searchBoxInput.focus();
@@ -25,9 +28,22 @@
     }
 
     Index.prototype.searchRequested = function(searchTerm) {
+      var term,
+        _this = this;
+      if (searchTerm === '' && this.searching) {
+        this.nextSearch = null;
+        this.searchRequest.abort();
+        this.searching = false;
+        document.getElementById('imgSearchLoader').style.visibility = 'hidden';
+        return;
+      }
       document.getElementById('imgSearchLoader').style.visibility = 'visible';
       if (this.searching) {
-        this.searchRequest.abort();
+        term = searchTerm;
+        this.nextSearch = function() {
+          return _this.searchRequested(term);
+        };
+        return;
       }
       this.searching = true;
       this.searchRequest = new XMLHttpRequest();
@@ -44,7 +60,11 @@
         this.clearSearchResults();
         this.populateSearchResults(result);
         this.searching = false;
-        return document.getElementById('imgSearchLoader').style.visibility = 'hidden';
+        document.getElementById('imgSearchLoader').style.visibility = 'hidden';
+        if (this.nextSearch != null) {
+          this.nextSearch();
+          return this.nextSearch = null;
+        }
       }
     };
 
@@ -73,7 +93,8 @@
     };
 
     Index.prototype.createAttendeeRow = function(attendee) {
-      var td, tr;
+      var td, tr,
+        _this = this;
       tr = document.createElement('tr');
       td = document.createElement('td');
       td.appendChild(document.createTextNode(attendee.city));
@@ -81,7 +102,14 @@
       td = document.createElement('td');
       td.appendChild(document.createTextNode("" + attendee.lastname + " " + attendee.firstname + " " + attendee.middlename));
       tr.appendChild(td);
+      tr.onclick = function() {
+        return _this.attendeeRowClicked(attendee.id);
+      };
       return tr;
+    };
+
+    Index.prototype.attendeeRowClicked = function(id) {
+      return alert(id);
     };
 
     return Index;
