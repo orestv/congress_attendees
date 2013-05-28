@@ -17,6 +17,5 @@ def find_attendees(db, search_term):
 
 	query = {'$and': word_queries}
 	attendees = db.attendees
-	cursor = attendees.find(query, limit=15)
-	cursor.sort([('lastname', ASCENDING), ('city', ASCENDING)])
+	cursor = attendees.find(query)
 	return cursor

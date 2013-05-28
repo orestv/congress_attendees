@@ -3,24 +3,43 @@
 <head>
     <title>Welcome!</title>
     <link rel="stylesheet" href="/static/common.css">
+    <link rel="stylesheet" href="/static/index.css">
     <script src="/static/search.js" type="text/javascript" charset="utf-8" async defer></script>
     <script src="/static/index.js" type="text/javascript" charset="utf-8" async defer></script>
 </head>
 <body onload="bodyLoaded();">
-    <div class="centerSearchBoxContainer">
-        <input type="search" id="searchBox"/> <img src="/static/ajax-loader.gif" alt="" id="imgSearchLoader" style="visibility: hidden;">
+    <div id="searchListContainer">
+        <div class="centerContainer">
+            <input type="search" id="searchBox"/>
+            <img src="/static/ajax-loader.gif" alt="" id="imgSearchLoader" style="visibility: hidden;"></div>
+        <div id="results" class="centerResultTableContainer">
+            <table width="100%" id="searchResultTable">
+                <thead>
+                    <tr>
+                        <th width="30%">Місто</th>
+                        <th>Ім’я</th>
+                    </tr>
+                </thead>
+                <tbody id="searchResultsBody"></tbody>
+            </table>
+        </div>
     </div>
-    <div id="results" class="centerResultTableContainer">
-        <table width="100%" id="searchResultTable">
-            <thead>
+    <div id="attendeeEditorContainer" style="display: none" class="centerContainer">
+        <table width="100%" id="attendeeEditorTable">
+            <tbody>
                 <tr>
-                    <th width="30%">Місто</th>
-                    <th>Ім’я</th>
-                </tr>               
-            </thead>
-            <tbody id="searchResultsBody">
+                    <td>
+                        Прізвище
+                    </td>
+                    <td><input type="text" id="txtLastname"></td>
+                </tr>
+                <tr>
+                    <td>Ім’я</td>
+                    <td><input type="text" id="txtFirstname"></td>
+                </tr>
             </tbody>
         </table>
+        <input type="button" id="btnRegisterAttendee" value="Зареєструвати"/>
     </div>
 </body>
 </html>
