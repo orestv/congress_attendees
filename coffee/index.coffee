@@ -52,22 +52,38 @@ class Index
 
 	createAttendeeRow: (attendee) =>
 		tr = document.createElement 'tr'
-		
-		td = document.createElement 'td'
-		td.appendChild document.createTextNode(attendee.city)
-		tr.appendChild td
-
-		td = document.createElement 'td'
-		td.appendChild document.createTextNode("#{attendee.lastname} #{attendee.firstname} #{attendee.middlename}")
-		tr.appendChild td
-
 		tr.onclick = () =>
 			@attendeeRowClicked attendee.id
-
+		@appendCell(tr, attendee.city)
+		attendeeName = "#{attendee.lastname} #{attendee.firstname} #{attendee.middlename}"
+		@appendCell(tr, attendeeName)
 		return tr
 
 	attendeeRowClicked: (id) =>
-		alert id 
+		new AttendeeEditor(id).show()
+
+	appendCell: (tr, text) ->
+		td = document.createElement 'td'
+		td.appendChild document.createTextNode(text)
+		tr.appendChild td
+		return td
+
+class AttendeeEditor
+	constructor: (@attendeeId) ->
+		@editorContainer = document.getElementById 'attendeeEditorContainer'
+		document.getElementById('btnRegisterAttendee').onclick = @registerAttendee
+
+	show: () =>
+		document.getElementById('searchListContainer').style.display = 'none'
+		@editorContainer.style.display = 'block'
+
+	hide: () =>
+		document.getElementById('searchListContainer').style.display = 'block'
+		@editorContainer.style.display = 'none'
+
+	registerAttendee: () =>
+		@hide()
+
 
 window.bodyLoaded = () ->
 	window.Page = new Index()

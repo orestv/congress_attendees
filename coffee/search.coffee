@@ -1,6 +1,6 @@
 root = exports ? this
 
-SEARCH_TIMEOUT = 1
+SEARCH_TIMEOUT = 400
 
 class root.SearchBox
 
