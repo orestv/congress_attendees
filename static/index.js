@@ -21,6 +21,7 @@
       var searchBoxInput, searchbox;
       this.searching = false;
       this.nextSearch = null;
+      this.table = document.getElementById('searchResultsTable');
       this.tableBody = document.getElementById('searchResultsBody');
       searchBoxInput = document.getElementById('searchBox');
       searchBoxInput.focus();
@@ -70,6 +71,7 @@
 
     Index.prototype.clearSearchResults = function() {
       var _results;
+      this.table.style.visibility = 'hidden';
       _results = [];
       while (this.tableBody.firstChild) {
         _results.push(this.tableBody.removeChild(this.tableBody.firstChild));
@@ -89,7 +91,10 @@
         attendee = results[_i];
         _fn(attendee);
       }
-      return this.tableBody.appendChild(frag);
+      this.tableBody.appendChild(frag);
+      if (results.length > 0) {
+        return this.table.style.visibility = 'visible';
+      }
     };
 
     Index.prototype.createAttendeeRow = function(attendee) {
