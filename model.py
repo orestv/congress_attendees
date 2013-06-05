@@ -25,19 +25,17 @@ def find_attendees(db, search_term):
     words.sort(key=len, reverse=True)
     search_fields = {'lastname': 4, 'city': 3, 'firstname': 2, 'middlename': 1}
 
-    word_cursors = []
+    conditions = []
     for word in words:
         word_condition = [get_find_term(field, word)
                           for field in search_fields]
-        word_query = {'$or': word_condition}
-        cursor = db.attendees.find(word_query)
-        word_cursors.append(cursor)
+        conditions.append({'$or': word_condition})
 
-    all_attendees = []
-    for cursor in word_cursors:
-        all_attendees.append([attendee for attendee in cursor])
-    attendees = reduce(intersect_attendees, all_attendees)
+    query = {'$and': conditions}
+    cursor = db.attendees.find(query)
+    attendees = [attendee for attendee in cursor]
 
+    #sort by priority
     for attendee in attendees:
         attendee['priority'] = 0
         for field in search_fields:
