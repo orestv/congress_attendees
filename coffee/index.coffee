@@ -2,6 +2,7 @@ class Index
 	constructor: () ->
 		@searching = false
 		@nextSearch = null
+		@table = document.getElementById('searchResultsTable')
 		@tableBody = document.getElementById('searchResultsBody')
 		searchBoxInput = document.getElementById('searchBox')
 		searchBoxInput.focus()
@@ -40,8 +41,9 @@ class Index
 				@nextSearch = null
 
 	clearSearchResults: () =>
+		@table.style.visibility = 'hidden'
 		while (@tableBody.firstChild)
-			@tableBody.removeChild(@tableBody.firstChild)
+			@tableBody.removeChild(@tableBody.firstChild)	
 
 	populateSearchResults: (results) =>		
 		@tableBody = document.getElementById('searchResultsBody')
@@ -49,6 +51,8 @@ class Index
 		for attendee in results then do (attendee) =>
 			frag.appendChild @createAttendeeRow attendee
 		@tableBody.appendChild(frag)
+		if results.length > 0
+			@table.style.visibility = 'visible'
 
 	createAttendeeRow: (attendee) =>
 		tr = document.createElement 'tr'
