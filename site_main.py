@@ -30,6 +30,7 @@ def find_attendee():
         return '{}'
     db = get_db()
     attendees = model.find_attendees(db, searchTerm)
+    attendees = attendees[:30]
     for attendee in attendees:
         attendee['_id'] = str(attendee['_id'])
     return json.dumps(attendees)

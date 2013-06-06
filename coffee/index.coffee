@@ -56,15 +56,21 @@ class Index
 
 	createAttendeeRow: (attendee) =>
 		tr = document.createElement 'tr'
-		tr.onclick = () =>
-			@attendeeRowClicked attendee.id
 		@appendCell(tr, attendee.city)
 		attendeeName = "#{attendee.lastname} #{attendee.firstname} #{attendee.middlename}"
 		@appendCell(tr, attendeeName)
+		td = document.createElement 'td'
+		button = document.createElement 'input'
+		button.type = 'button'
+		button.value = 'Зареєструвати'
+		button.onclick = =>
+			@attendeeRowClicked attendee
+		td.appendChild button
+		tr.appendChild td
 		return tr
 
-	attendeeRowClicked: (id) =>
-		new AttendeeEditor(id).show()
+	attendeeRowClicked: (attendee) =>
+		new AttendeeEditor(attendee).show()
 
 	appendCell: (tr, text) ->
 		td = document.createElement 'td'
@@ -73,19 +79,63 @@ class Index
 		return td
 
 class AttendeeEditor
-	constructor: (@attendeeId) ->
+
+	fields: {
+		'txtFirstname': 'firstname',
+		'txtLastname': 'lastname',
+		'txtMiddlename': 'middlename',
+		'txtCity': 'city'
+	}
+
+	constructor: (@attendee) ->
 		@editorContainer = document.getElementById 'attendeeEditorContainer'
 		document.getElementById('btnRegisterAttendee').onclick = @registerAttendee
+		document.getElementById('btnBackToList').onclick = @backToList
+		document.getElementById('btnUpdateInfo').onclick = @updateInfo
+		document.getElementById('btnSaveInfoUpdate').onclick = @saveInfoUpdate
+		document.getElementById('btnCancelInfoUpdate').onclick = @cancelInfoUpdate
 
 	show: () =>
 		document.getElementById('searchListContainer').style.display = 'none'
 		@editorContainer.style.display = 'block'
+		@setEditorsEnabled false
+		@fill()
+
+	fill: () =>
+		for inputId, objectKey of @fields
+			input = document.getElementById(inputId)
+			if input?
+				input.value = @attendee[objectKey]
 
 	hide: () =>
 		document.getElementById('searchListContainer').style.display = 'block'
 		@editorContainer.style.display = 'none'
 
+	setEditorsEnabled: (enabled) ->
+		for inputId of @fields
+			input = document.getElementById(inputId)
+			if input?
+				input.disabled = not enabled
+
+	updateInfo: () =>
+		@setEditorsEnabled true
+		document.getElementById('dvUpdateInfo').style.display = 'none'
+		document.getElementById('dvUpdateInfoSaveCancel').style.display = 'block'
+
+	cancelInfoUpdate: () =>
+		@setEditorsEnabled false
+		document.getElementById('dvUpdateInfo').style.display = 'block'
+		document.getElementById('dvUpdateInfoSaveCancel').style.display = 'none'
+
+	saveInfoUpdate: () =>
+		@setEditorsEnabled false
+		document.getElementById('dvUpdateInfo').style.display = 'block'
+		document.getElementById('dvUpdateInfoSaveCancel').style.display = 'none'
+
 	registerAttendee: () =>
+		@hide()
+
+	backToList: () =>
 		@hide()
 
 
