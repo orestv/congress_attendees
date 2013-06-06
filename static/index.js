@@ -98,15 +98,21 @@
     };
 
     Index.prototype.createAttendeeRow = function(attendee) {
-      var attendeeName, tr,
+      var attendeeName, button, td, tr,
         _this = this;
       tr = document.createElement('tr');
-      tr.onclick = function() {
-        return _this.attendeeRowClicked(attendee);
-      };
       this.appendCell(tr, attendee.city);
       attendeeName = "" + attendee.lastname + " " + attendee.firstname + " " + attendee.middlename;
       this.appendCell(tr, attendeeName);
+      td = document.createElement('td');
+      button = document.createElement('input');
+      button.type = 'button';
+      button.value = 'Зареєструвати';
+      button.onclick = function() {
+        return _this.attendeeRowClicked(attendee);
+      };
+      td.appendChild(button);
+      tr.appendChild(td);
       return tr;
     };
 

@@ -56,11 +56,17 @@ class Index
 
 	createAttendeeRow: (attendee) =>
 		tr = document.createElement 'tr'
-		tr.onclick = () =>
-			@attendeeRowClicked attendee
 		@appendCell(tr, attendee.city)
 		attendeeName = "#{attendee.lastname} #{attendee.firstname} #{attendee.middlename}"
 		@appendCell(tr, attendeeName)
+		td = document.createElement 'td'
+		button = document.createElement 'input'
+		button.type = 'button'
+		button.value = 'Зареєструвати'
+		button.onclick = =>
+			@attendeeRowClicked attendee
+		td.appendChild button
+		tr.appendChild td
 		return tr
 
 	attendeeRowClicked: (attendee) =>
