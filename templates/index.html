@@ -25,6 +25,9 @@
         </div>
     </div>
     <div id="attendeeEditorContainer" style="display: none" class="centerContainer">
+        <div style="width: 100%; text-align: left">
+            <input type="button" id="btnBackToList" value="<<< Назад">
+        </div>
         <table width="100%" id="attendeeEditorTable">
             <tbody>
                 <tr>
@@ -32,10 +35,27 @@
                         Прізвище
                     </td>
                     <td><input type="text" id="txtLastname"></td>
+                    <td rowspan="4">
+                        <div id="dvUpdateInfo">
+                            <input type="button" id="btnUpdateInfo" value="Змінити"/>
+                        </div>
+                        <div id="dvUpdateInfoSaveCancel" style="display: none">                            
+                            <input type="button" id="btnSaveInfoUpdate" value="Зберегти">
+                            <input type="button" id="btnCancelInfoUpdate" value="Відмінити">
+                        </div>
+                    </td>
                 </tr>
                 <tr>
                     <td>Ім’я</td>
                     <td><input type="text" id="txtFirstname"></td>
+                </tr>
+                <tr>
+                    <td>По батькові</td>
+                    <td><input type="text" id="txtMiddlename"></td>
+                </tr>
+                <tr>
+                    <td>Місто</td>
+                    <td><input type="text" id="txtCity"></td>
                 </tr>
             </tbody>
         </table>
