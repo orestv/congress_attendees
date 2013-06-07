@@ -147,12 +147,6 @@
 
       this.registerAttendee = __bind(this.registerAttendee, this);
 
-      this.saveInfoUpdate = __bind(this.saveInfoUpdate, this);
-
-      this.cancelInfoUpdate = __bind(this.cancelInfoUpdate, this);
-
-      this.updateInfo = __bind(this.updateInfo, this);
-
       this.hide = __bind(this.hide, this);
 
       this.fill = __bind(this.fill, this);
@@ -162,15 +156,11 @@
       this.editorContainer = document.getElementById('attendeeEditorContainer');
       document.getElementById('btnRegisterAttendee').onclick = this.registerAttendee;
       document.getElementById('btnBackToList').onclick = this.backToList;
-      document.getElementById('btnUpdateInfo').onclick = this.updateInfo;
-      document.getElementById('btnSaveInfoUpdate').onclick = this.saveInfoUpdate;
-      document.getElementById('btnCancelInfoUpdate').onclick = this.cancelInfoUpdate;
     }
 
     AttendeeEditor.prototype.show = function() {
       document.getElementById('searchListContainer').style.display = 'none';
       this.editorContainer.style.display = 'block';
-      this.setEditorsEnabled(false);
       return this.fill();
     };
 
@@ -193,38 +183,6 @@
     AttendeeEditor.prototype.hide = function() {
       document.getElementById('searchListContainer').style.display = 'block';
       return this.editorContainer.style.display = 'none';
-    };
-
-    AttendeeEditor.prototype.setEditorsEnabled = function(enabled) {
-      var input, inputId, _results;
-      _results = [];
-      for (inputId in this.fields) {
-        input = document.getElementById(inputId);
-        if (input != null) {
-          _results.push(input.disabled = !enabled);
-        } else {
-          _results.push(void 0);
-        }
-      }
-      return _results;
-    };
-
-    AttendeeEditor.prototype.updateInfo = function() {
-      this.setEditorsEnabled(true);
-      document.getElementById('dvUpdateInfo').style.display = 'none';
-      return document.getElementById('dvUpdateInfoSaveCancel').style.display = 'block';
-    };
-
-    AttendeeEditor.prototype.cancelInfoUpdate = function() {
-      this.setEditorsEnabled(false);
-      document.getElementById('dvUpdateInfo').style.display = 'block';
-      return document.getElementById('dvUpdateInfoSaveCancel').style.display = 'none';
-    };
-
-    AttendeeEditor.prototype.saveInfoUpdate = function() {
-      this.setEditorsEnabled(false);
-      document.getElementById('dvUpdateInfo').style.display = 'block';
-      return document.getElementById('dvUpdateInfoSaveCancel').style.display = 'none';
     };
 
     AttendeeEditor.prototype.registerAttendee = function() {

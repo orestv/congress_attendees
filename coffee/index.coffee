@@ -91,14 +91,10 @@ class AttendeeEditor
 		@editorContainer = document.getElementById 'attendeeEditorContainer'
 		document.getElementById('btnRegisterAttendee').onclick = @registerAttendee
 		document.getElementById('btnBackToList').onclick = @backToList
-		document.getElementById('btnUpdateInfo').onclick = @updateInfo
-		document.getElementById('btnSaveInfoUpdate').onclick = @saveInfoUpdate
-		document.getElementById('btnCancelInfoUpdate').onclick = @cancelInfoUpdate
 
 	show: () =>
 		document.getElementById('searchListContainer').style.display = 'none'
 		@editorContainer.style.display = 'block'
-		@setEditorsEnabled false
 		@fill()
 
 	fill: () =>
@@ -110,27 +106,6 @@ class AttendeeEditor
 	hide: () =>
 		document.getElementById('searchListContainer').style.display = 'block'
 		@editorContainer.style.display = 'none'
-
-	setEditorsEnabled: (enabled) ->
-		for inputId of @fields
-			input = document.getElementById(inputId)
-			if input?
-				input.disabled = not enabled
-
-	updateInfo: () =>
-		@setEditorsEnabled true
-		document.getElementById('dvUpdateInfo').style.display = 'none'
-		document.getElementById('dvUpdateInfoSaveCancel').style.display = 'block'
-
-	cancelInfoUpdate: () =>
-		@setEditorsEnabled false
-		document.getElementById('dvUpdateInfo').style.display = 'block'
-		document.getElementById('dvUpdateInfoSaveCancel').style.display = 'none'
-
-	saveInfoUpdate: () =>
-		@setEditorsEnabled false
-		document.getElementById('dvUpdateInfo').style.display = 'block'
-		document.getElementById('dvUpdateInfoSaveCancel').style.display = 'none'
 
 	registerAttendee: () =>
 		@hide()
