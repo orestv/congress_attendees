@@ -5,6 +5,7 @@ import model
 import time
 from flask.ext.pymongo import PyMongo
 from icu import Locale, Collator
+import locale
 
 app = Flask(__name__)
 
@@ -30,6 +31,9 @@ def find_attendee():
         return '{}'
     db = get_db()
     attendees = model.find_attendees(db, searchTerm)
+    locale.setlocale(locale.LC_ALL, 'uk_UA.UTF-8')
+    attendees.sort(key=lambda attendee: attendee['lastname'],
+        cmp = locale.strcoll)
     attendees = attendees[:30]
     for attendee in attendees:
         attendee['_id'] = str(attendee['_id'])

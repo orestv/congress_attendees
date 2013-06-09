@@ -20,10 +20,12 @@ def intersect_attendees(a, b):
     return result
 
 
-def find_attendees(db, search_term):
+def find_attendees(db, search_term, search_by_city = False):
     words = search_term.split(' ')
     words.sort(key=len, reverse=True)
-    search_fields = {'lastname': 4, 'city': 3, 'firstname': 2, 'middlename': 1}
+    search_fields = ['lastname', 'firstname', 'middlename']
+    if search_by_city:
+        search_fields.append('city')
 
     conditions = []
     for word in words:
@@ -32,19 +34,6 @@ def find_attendees(db, search_term):
         conditions.append({'$or': word_condition})
 
     query = {'$and': conditions}
-    cursor = db.attendees.find(query)
+    cursor = db.attendees.find(query, fields=['firstname', 'lastname', 'middlename', 'city'])
     attendees = [attendee for attendee in cursor]
-
-    #sort by priority
-    for attendee in attendees:
-        attendee['priority'] = 0
-        for field in search_fields:
-            for word in words:
-                r = get_word_regexp(word.upper())
-                if r.match(attendee[field].upper()):
-                    attendee['priority'] = attendee[
-                        'priority'] + search_fields[field]
-                    break
-    attendees.sort(key=lambda attendee: attendee['priority'], reverse=True)
-
     return attendees
