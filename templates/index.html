@@ -16,8 +16,15 @@
             <table width="100%" id="searchResultsTable" style="visibility: hidden">
                 <thead>
                     <tr>
+                        <td colspan="3" style="border-bottom: 1px solid black">
+                            <div id="dvFoundCount" class="AttendeeSearchStatus">Знайдено учасників: <span id="spFoundCount"></span></div>
+                            <div id="dvNoneFound" class="AttendeeSearchStatus">Учасників не знайдено</div>
+                        </td>
+                    </tr>
+                    <tr>
                         <th width="30%">Місто</th>
                         <th>Ім’я</th>
+                        <th>Дії</th>
                     </tr>
                 </thead>
                 <tbody id="searchResultsBody"></tbody>

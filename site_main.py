@@ -32,11 +32,12 @@ def find_attendee():
     db = get_db()
     attendees = model.find_attendees(db, searchTerm)
     locale.setlocale(locale.LC_ALL, 'uk_UA.UTF-8')
+    attendee_count = len(attendees)
     attendees.sort(cmp = model.compare_attendees)
     attendees = attendees[:30]
     for attendee in attendees:
         attendee['_id'] = str(attendee['_id'])
-
-    return json.dumps(attendees)
+    result = {'count': attendee_count, 'attendees': attendees}
+    return json.dumps(result)
 
 app.run(debug=True)

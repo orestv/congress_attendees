@@ -9,15 +9,15 @@ class Index
 		searchbox = new window.SearchBox(searchBoxInput, @searchRequested)
 
 	searchRequested: (searchTerm) =>
-		if searchTerm == '' and @searching
+		if searchTerm == ''# and @searching
 			@nextSearch = null
 			@searchRequest.abort()
 			@searching = false
 			document.getElementById('imgSearchLoader').style.visibility = 'hidden'
+			@clearSearchResults()
 			return
 		document.getElementById('imgSearchLoader').style.visibility = 'visible'
 		if @searching
-			# @searchRequest.abort()
 			term = searchTerm
 			@nextSearch = () =>
 				@searchRequested term
@@ -43,16 +43,25 @@ class Index
 	clearSearchResults: () =>
 		@table.style.visibility = 'hidden'
 		while (@tableBody.firstChild)
-			@tableBody.removeChild(@tableBody.firstChild)	
+			@tableBody.removeChild(@tableBody.firstChild)
 
-	populateSearchResults: (results) =>		
+	populateSearchResults: (results) =>
 		@tableBody = document.getElementById('searchResultsBody')
 		frag = document.createDocumentFragment()
-		for attendee in results then do (attendee) =>
-			frag.appendChild @createAttendeeRow attendee
+		attendees = results['attendees']
+		attendee_count = results['count']
+		if attendee_count > 0
+			for attendee in attendees then do (attendee) =>
+				frag.appendChild @createAttendeeRow attendee
 		@tableBody.appendChild(frag)
-		if results.length > 0
-			@table.style.visibility = 'visible'
+		if attendee_count > 0
+			document.getElementById('dvNoneFound').style.display = 'none'
+			document.getElementById('dvFoundCount').style.display = 'block'
+			document.getElementById('spFoundCount').innerText = attendee_count
+		else
+			document.getElementById('dvNoneFound').style.display = 'block'
+			document.getElementById('dvFoundCount').style.display = 'none'
+		@table.style.visibility = 'visible'
 
 	createAttendeeRow: (attendee) =>
 		tr = document.createElement 'tr'
