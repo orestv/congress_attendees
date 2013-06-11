@@ -31,11 +31,12 @@
     Index.prototype.searchRequested = function(searchTerm) {
       var term,
         _this = this;
-      if (searchTerm === '' && this.searching) {
+      if (searchTerm === '') {
         this.nextSearch = null;
         this.searchRequest.abort();
         this.searching = false;
         document.getElementById('imgSearchLoader').style.visibility = 'hidden';
+        this.clearSearchResults();
         return;
       }
       document.getElementById('imgSearchLoader').style.visibility = 'visible';
@@ -80,21 +81,31 @@
     };
 
     Index.prototype.populateSearchResults = function(results) {
-      var attendee, frag, _fn, _i, _len,
+      var attendee, attendee_count, attendees, frag, _fn, _i, _len,
         _this = this;
       this.tableBody = document.getElementById('searchResultsBody');
       frag = document.createDocumentFragment();
-      _fn = function(attendee) {
-        return frag.appendChild(_this.createAttendeeRow(attendee));
-      };
-      for (_i = 0, _len = results.length; _i < _len; _i++) {
-        attendee = results[_i];
-        _fn(attendee);
+      attendees = results['attendees'];
+      attendee_count = results['count'];
+      if (attendee_count > 0) {
+        _fn = function(attendee) {
+          return frag.appendChild(_this.createAttendeeRow(attendee));
+        };
+        for (_i = 0, _len = attendees.length; _i < _len; _i++) {
+          attendee = attendees[_i];
+          _fn(attendee);
+        }
       }
       this.tableBody.appendChild(frag);
-      if (results.length > 0) {
-        return this.table.style.visibility = 'visible';
+      if (attendee_count > 0) {
+        document.getElementById('dvNoneFound').style.display = 'none';
+        document.getElementById('dvFoundCount').style.display = 'block';
+        document.getElementById('spFoundCount').innerText = attendee_count;
+      } else {
+        document.getElementById('dvNoneFound').style.display = 'block';
+        document.getElementById('dvFoundCount').style.display = 'none';
       }
+      return this.table.style.visibility = 'visible';
     };
 
     Index.prototype.createAttendeeRow = function(attendee) {
