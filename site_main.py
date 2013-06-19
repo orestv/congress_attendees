@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from flask import Flask, render_template, _app_ctx_stack, request
 import pymongo
 import json
@@ -21,7 +22,13 @@ def get_db():
 @app.route('/')
 @app.route('/index')
 def index():
-    return render_template('index.html')
+    fields = [{'caption': u'Прізвище', 'type': 'text', 'input_id': 'txtLastname'},
+              {'caption': u'Ім’я', 'type': 'text', 'input_id': 'txtFirstname'},
+              {'caption': u'По батькові', 'type': 'text', 'input_id': 'txtMiddlename'},
+              {'caption': u'Місто', 'type': 'text', 'input_id': 'txtCity'},
+              {'caption': u'Телефон', 'type': 'tel', 'input_id': 'txtPhone'},
+              {'caption': u'Спеціальність', 'type': 'text', 'input_id': 'txtField'}]
+    return render_template('index.html', fields=fields)
 
 def find_attendees_by_word(search_term):
     if not search_term:

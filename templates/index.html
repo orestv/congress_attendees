@@ -37,28 +37,12 @@
         </div>
         <table width="100%" id="attendeeEditorTable">
             <tbody>
-                <tr>
-                    <td>
-                        Прізвище
-                    </td>
-                    <td><input type="text" id="txtLastname" disabled></td>
-                </tr>
-                <tr>
-                    <td>Ім’я</td>
-                    <td><input type="text" id="txtFirstname" disabled></td>
-                </tr>
-                <tr>
-                    <td>По батькові</td>
-                    <td><input type="text" id="txtMiddlename" disabled></td>
-                </tr>
-                <tr>
-                    <td>Місто</td>
-                    <td><input type="text" id="txtCity" disabled></td>
-                </tr>
-                <tr>
-                    <td>Телефон</td>
-                    <td><input type="tel" id="txtPhone" disabled></td>
-                </tr>
+                {% for field in fields %}
+                    <tr>
+                        <td>{{field.caption}}</td>
+                        <td><input type="{{field.type}}" id="{{field.input_id}}" disabled></td>
+                    </tr>
+                {% endfor %}
             </tbody>
         </table>
         <input type="button" id="btnRegisterAttendee" value="Зареєструвати"/>

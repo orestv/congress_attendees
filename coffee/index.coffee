@@ -94,7 +94,8 @@ class AttendeeEditor
 		'txtLastname': 'lastname',
 		'txtMiddlename': 'middlename',
 		'txtCity': 'city',
-		'txtPhone': 'phone'
+		'txtPhone': 'phone',
+		'txtField': 'field'
 	}
 
 	constructor: (@attendee) ->
