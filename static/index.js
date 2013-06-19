@@ -150,7 +150,8 @@
       'txtLastname': 'lastname',
       'txtMiddlename': 'middlename',
       'txtCity': 'city',
-      'txtPhone': 'phone'
+      'txtPhone': 'phone',
+      'txtField': 'field'
     };
 
     function AttendeeEditor(attendee) {
