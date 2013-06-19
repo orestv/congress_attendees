@@ -50,7 +50,7 @@
       this.searching = true;
       this.searchRequest = new XMLHttpRequest();
       this.searchRequest.onreadystatechange = this.processSearchRequest;
-      this.searchRequest.open('GET', "/find_attendee?s=" + searchTerm, true);
+      this.searchRequest.open('GET', "/attendees?s=" + searchTerm, true);
       this.searchRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
       return this.searchRequest.send(null);
     };
@@ -149,7 +149,8 @@
       'txtFirstname': 'firstname',
       'txtLastname': 'lastname',
       'txtMiddlename': 'middlename',
-      'txtCity': 'city'
+      'txtCity': 'city',
+      'txtPhone': 'phone'
     };
 
     function AttendeeEditor(attendee) {
@@ -162,6 +163,8 @@
 
       this.fill = __bind(this.fill, this);
 
+      this.fetch = __bind(this.fetch, this);
+
       this.show = __bind(this.show, this);
 
       this.editorContainer = document.getElementById('attendeeEditorContainer');
@@ -172,7 +175,20 @@
     AttendeeEditor.prototype.show = function() {
       document.getElementById('searchListContainer').style.display = 'none';
       this.editorContainer.style.display = 'block';
-      return this.fill();
+      return this.fetch();
+    };
+
+    AttendeeEditor.prototype.fetch = function() {
+      var _this = this;
+      this.request = new XMLHttpRequest();
+      this.request.onreadystatechange = function() {
+        if (_this.request.readyState === 4) {
+          _this.attendee = JSON.parse(_this.request.responseText);
+          return _this.fill();
+        }
+      };
+      this.request.open('GET', "/attendees?id=" + this.attendee._id, true);
+      return this.request.send(null);
     };
 
     AttendeeEditor.prototype.fill = function() {

@@ -25,7 +25,7 @@ class Index
 		@searching = true
 		@searchRequest = new XMLHttpRequest()
 		@searchRequest.onreadystatechange = @processSearchRequest
-		@searchRequest.open('GET', "/find_attendee?s=#{searchTerm}", true)
+		@searchRequest.open('GET', "/attendees?s=#{searchTerm}", true)
 		@searchRequest.setRequestHeader("Content-type","application/x-www-form-urlencoded");
 		@searchRequest.send(null)
 
@@ -93,7 +93,8 @@ class AttendeeEditor
 		'txtFirstname': 'firstname',
 		'txtLastname': 'lastname',
 		'txtMiddlename': 'middlename',
-		'txtCity': 'city'
+		'txtCity': 'city',
+		'txtPhone': 'phone'
 	}
 
 	constructor: (@attendee) ->
@@ -104,7 +105,16 @@ class AttendeeEditor
 	show: () =>
 		document.getElementById('searchListContainer').style.display = 'none'
 		@editorContainer.style.display = 'block'
-		@fill()
+		@fetch()
+
+	fetch: () =>
+		@request = new XMLHttpRequest()
+		@request.onreadystatechange = () =>
+			if @request.readyState == 4
+				@attendee = JSON.parse(@request.responseText)
+				@fill()
+		@request.open('GET', "/attendees?id=#{@attendee._id}", true)
+		@request.send(null)
 
 	fill: () =>
 		for inputId, objectKey of @fields
