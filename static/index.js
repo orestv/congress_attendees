@@ -100,7 +100,7 @@
       if (attendee_count > 0) {
         document.getElementById('dvNoneFound').style.display = 'none';
         document.getElementById('dvFoundCount').style.display = 'block';
-        document.getElementById('spFoundCount').innerText = attendee_count;
+        document.getElementById('spFoundCount').textContent = attendee_count;
       } else {
         document.getElementById('dvNoneFound').style.display = 'block';
         document.getElementById('dvFoundCount').style.display = 'none';
