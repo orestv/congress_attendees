@@ -3,6 +3,7 @@ import re
 from flask.ext.pymongo import PyMongo
 from flask.ext.pymongo import ASCENDING, DESCENDING
 import locale
+from bson import ObjectId
 
 def get_word_regexp(word):
     return re.compile('^%s' % word, re.IGNORECASE)
@@ -25,6 +26,10 @@ def compare_attendees(a1, a2):
         if compare_result:
             return compare_result
     return 0
+
+def find_attendee(db, id):
+    cursor = db.attendees.find({'_id': ObjectId(id)})
+    return cursor
 
 def find_attendees(db, search_term, search_by_city = False):
     words = search_term.split(' ')

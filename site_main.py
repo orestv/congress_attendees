@@ -23,14 +23,11 @@ def get_db():
 def index():
     return render_template('index.html')
 
-
-@app.route('/find_attendee')
-def find_attendee():
-    searchTerm = request.args.get('s', '')
-    if not searchTerm:
-        return '{}'
+def find_attendees_by_word(search_term):
+    if not search_term:
+        return {}
     db = get_db()
-    attendees = model.find_attendees(db, searchTerm)
+    attendees = model.find_attendees(db, search_term)
     locale.setlocale(locale.LC_ALL, 'uk_UA.UTF-8')
     attendee_count = len(attendees)
     attendees.sort(cmp = model.compare_attendees)
@@ -38,4 +35,23 @@ def find_attendee():
     for attendee in attendees:
         attendee['_id'] = str(attendee['_id'])
     result = {'count': attendee_count, 'attendees': attendees}
+    return result
+
+def find_attendee_by_id(id):
+    cursor = model.find_attendee(get_db(), id)
+    if not cursor:
+        return {}
+    attendee = cursor[0]
+    attendee['_id'] = str(attendee['_id'])
+    return attendee
+
+@app.route('/attendees')
+def attendees():
+    result = {}
+    search_term = request.args.get('s', None)
+    if search_term:
+        result = find_attendees_by_word(search_term)
+    id = request.args.get('id', None)
+    if id:
+        result = find_attendee_by_id(id)
     return json.dumps(result)
