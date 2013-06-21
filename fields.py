@@ -10,5 +10,11 @@ INFO_FIELDS = [
 ]
 
 ATTEND_FIELDS = [
-	{}
+	{'caption': u'Обід 19.09', 'id': 'dinner_19_09'},
+	{'caption': u'Обід 20.09', 'id': 'dinner_20_09'},
+	{'caption': u'Екскурсія 19.09, 11:00', 'id': 'excursion_19_09_1100'},
+	{'caption': u'Екскурсія 19.09, 12:00', 'id': 'excursion_19_09_1200'},
+	{'caption': u'Екскурсія 20.09, 11:00', 'id': 'excursion_20_09_1100'},
+	{'caption': u'Екскурсія 20.09, 12:00', 'id': 'excursion_20_09_1200'},
+	{'caption': u'Урочиста вечеря 19.09', 'id': 'ceremony_19_09'}
 ]

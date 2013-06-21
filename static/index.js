@@ -160,6 +160,10 @@
 
       this.registerAttendee = __bind(this.registerAttendee, this);
 
+      this.saveEvents = __bind(this.saveEvents, this);
+
+      this.getEventsData = __bind(this.getEventsData, this);
+
       this.hide = __bind(this.hide, this);
 
       this.clear = __bind(this.clear, this);
@@ -196,28 +200,36 @@
     };
 
     AttendeeEditor.prototype.fill = function() {
-      var input, inputId, objectKey, _ref, _results;
+      var eventId, input, inputId, objectKey, _i, _len, _ref, _ref1, _results;
       _ref = this.fields;
-      _results = [];
       for (inputId in _ref) {
         objectKey = _ref[inputId];
         input = document.getElementById(inputId);
         if (input != null) {
-          _results.push(input.value = this.attendee[objectKey]);
-        } else {
-          _results.push(void 0);
+          input.value = this.attendee[objectKey];
         }
+      }
+      _ref1 = this.attendee['attended_events'];
+      _results = [];
+      for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+        eventId = _ref1[_i];
+        _results.push(document.getElementById(eventId).checked = true);
       }
       return _results;
     };
 
     AttendeeEditor.prototype.clear = function() {
-      var inputId, objectKey, _ref, _results;
+      var checkbox, inputId, objectKey, _i, _len, _ref, _ref1, _results;
       _ref = this.fields;
-      _results = [];
       for (inputId in _ref) {
         objectKey = _ref[inputId];
-        _results.push(document.getElementById(inputId).value = '');
+        document.getElementById(inputId).value = '';
+      }
+      _ref1 = document.getElementsByName('events');
+      _results = [];
+      for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+        checkbox = _ref1[_i];
+        _results.push(checkbox.checked = false);
       }
       return _results;
     };
@@ -227,7 +239,36 @@
       return this.editorContainer.style.display = 'none';
     };
 
+    AttendeeEditor.prototype.getEventsData = function() {
+      var cb, eventCheckboxes, result;
+      eventCheckboxes = document.getElementsByName('events');
+      result = [
+        (function() {
+          var _i, _len, _results;
+          _results = [];
+          for (_i = 0, _len = eventCheckboxes.length; _i < _len; _i++) {
+            cb = eventCheckboxes[_i];
+            if (cb.checked) {
+              _results.push(cb.id);
+            }
+          }
+          return _results;
+        })()
+      ];
+      console.log(result);
+      return result;
+    };
+
+    AttendeeEditor.prototype.saveEvents = function() {
+      var saveRequest, selectedEvents;
+      selectedEvents = this.getEventsData();
+      saveRequest = new XMLHttpRequest();
+      saveRequest.open('PUT', "/attendees?id=" + this.attendee._id + "&events=" + selectedEvents, false);
+      return saveRequest.send(null);
+    };
+
     AttendeeEditor.prototype.registerAttendee = function() {
+      this.saveEvents();
       return this.hide();
     };
 

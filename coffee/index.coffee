@@ -123,15 +123,32 @@ class AttendeeEditor
 			input = document.getElementById(inputId)
 			if input?
 				input.value = @attendee[objectKey]
+		for eventId in @attendee['attended_events']
+			document.getElementById(eventId).checked = true
 	clear: () =>
 		for inputId, objectKey of @fields
 			document.getElementById(inputId).value = ''
+		for checkbox in document.getElementsByName('events')
+			checkbox.checked = false
 
 	hide: () =>
 		document.getElementById('searchListContainer').style.display = 'block'
 		@editorContainer.style.display = 'none'
 
+	getEventsData: () =>
+		eventCheckboxes = document.getElementsByName('events')
+		result = [cb.id for cb in eventCheckboxes when cb.checked]
+		console.log result
+		return result
+
+	saveEvents: () =>
+		selectedEvents = @getEventsData()
+		saveRequest = new XMLHttpRequest()
+		saveRequest.open('PUT', "/attendees?id=#{@attendee._id}&events=#{selectedEvents}", false)
+		saveRequest.send(null)
+
 	registerAttendee: () =>
+		@saveEvents()
 		@hide()
 
 	backToList: () =>
