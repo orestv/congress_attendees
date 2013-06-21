@@ -7,6 +7,7 @@ import time
 from flask.ext.pymongo import PyMongo
 from icu import Locale, Collator
 import locale
+import fields
 
 app = Flask(__name__)
 
@@ -22,13 +23,13 @@ def get_db():
 @app.route('/')
 @app.route('/index')
 def index():
-    fields = [{'caption': u'Прізвище', 'type': 'text', 'input_id': 'txtLastname'},
-              {'caption': u'Ім’я', 'type': 'text', 'input_id': 'txtFirstname'},
-              {'caption': u'По батькові', 'type': 'text', 'input_id': 'txtMiddlename'},
-              {'caption': u'Місто', 'type': 'text', 'input_id': 'txtCity'},
-              {'caption': u'Телефон', 'type': 'tel', 'input_id': 'txtPhone'},
-              {'caption': u'Спеціальність', 'type': 'text', 'input_id': 'txtField'}]
-    return render_template('index.html', fields=fields)
+    # fields = [{'caption': u'Прізвище', 'type': 'text', 'input_id': 'txtLastname'},
+    #           {'caption': u'Ім’я', 'type': 'text', 'input_id': 'txtFirstname'},
+    #           {'caption': u'По батькові', 'type': 'text', 'input_id': 'txtMiddlename'},
+    #           {'caption': u'Місто', 'type': 'text', 'input_id': 'txtCity'},
+    #           {'caption': u'Телефон', 'type': 'tel', 'input_id': 'txtPhone'},
+    #           {'caption': u'Спеціальність', 'type': 'text', 'input_id': 'txtField'}]
+    return render_template('index.html', fields=fields.INFO_FIELDS)
 
 def find_attendees_by_word(search_term):
     if not search_term:
