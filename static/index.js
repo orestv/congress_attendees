@@ -162,6 +162,8 @@
 
       this.hide = __bind(this.hide, this);
 
+      this.clear = __bind(this.clear, this);
+
       this.fill = __bind(this.fill, this);
 
       this.fetch = __bind(this.fetch, this);
@@ -176,6 +178,7 @@
     AttendeeEditor.prototype.show = function() {
       document.getElementById('searchListContainer').style.display = 'none';
       this.editorContainer.style.display = 'block';
+      this.clear();
       return this.fetch();
     };
 
@@ -204,6 +207,17 @@
         } else {
           _results.push(void 0);
         }
+      }
+      return _results;
+    };
+
+    AttendeeEditor.prototype.clear = function() {
+      var inputId, objectKey, _ref, _results;
+      _ref = this.fields;
+      _results = [];
+      for (inputId in _ref) {
+        objectKey = _ref[inputId];
+        _results.push(document.getElementById(inputId).value = '');
       }
       return _results;
     };

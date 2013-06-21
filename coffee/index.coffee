@@ -106,6 +106,7 @@ class AttendeeEditor
 	show: () =>
 		document.getElementById('searchListContainer').style.display = 'none'
 		@editorContainer.style.display = 'block'
+		@clear()
 		@fetch()
 
 	fetch: () =>
@@ -122,6 +123,9 @@ class AttendeeEditor
 			input = document.getElementById(inputId)
 			if input?
 				input.value = @attendee[objectKey]
+	clear: () =>
+		for inputId, objectKey of @fields
+			document.getElementById(inputId).value = ''
 
 	hide: () =>
 		document.getElementById('searchListContainer').style.display = 'block'
