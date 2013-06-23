@@ -65,6 +65,10 @@ def attendees():
             if events:
                 events = events.split(',')
                 model.set_attendee_events(get_db(), id, events)
+            registered = request.args.get('registered', None)
+            if registered is not None:
+                registered = bool(registered)
+                model.set_attendee_registered(get_db(), id, registered)
         else:
             result = find_attendee_by_id(id)
     return json.dumps(result)

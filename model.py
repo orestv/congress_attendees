@@ -31,15 +31,17 @@ def get_events(db):
     return db.events.find()
 
 def set_attendee_events(db, attendee_id, event_ids):
-    print 'Setting attendee events to ', event_ids
     event_objids = [ObjectId(id) for id in event_ids]
     event_cursor = db.events.find({'_id': {'$in': event_objids}})
     valid_event_objids = [event for event in event_cursor]
     valid_event_ids = [str(event['_id']) for event in valid_event_objids]
-    print 'Valid event ids: ', valid_event_ids
     attendee_id = ObjectId(attendee_id)
     db.attendees.update({'_id': attendee_id},
         {'$set': {'attended_events': valid_event_ids}})
+
+def set_attendee_registered(db, attendee_id, registered):
+    db.attendees.update({'_id': ObjectId(attendee_id)}, 
+        {'$set': {'registered': registered}})
 
 def find_attendee(db, id):
     cursor = db.attendees.find({'_id': ObjectId(id)})
@@ -59,6 +61,6 @@ def find_attendees(db, search_term, search_by_city = False):
         conditions.append({'$or': word_condition})
 
     query = {'$and': conditions}
-    cursor = db.attendees.find(query, fields=['firstname', 'lastname', 'middlename', 'city'])
+    cursor = db.attendees.find(query, fields=['firstname', 'lastname', 'middlename', 'city', 'registered'])
     attendees = [attendee for attendee in cursor]
     return attendees

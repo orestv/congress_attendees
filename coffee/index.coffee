@@ -71,15 +71,29 @@ class Index
 		td = document.createElement 'td'
 		button = document.createElement 'input'
 		button.type = 'button'
-		button.value = 'Зареєструвати'
+		if not attendee.registered?
+			button.value = 'Зареєструвати'
+		else
+			button.value = 'Змінити інформацію'
 		button.onclick = =>
-			@attendeeRowClicked attendee
+			@editAttendee attendee
+			@selectedAttendeeRow = tr
 		td.appendChild button
 		tr.appendChild td
 		return tr
 
-	attendeeRowClicked: (attendee) =>
+	editAttendee: (attendee) =>
 		new AttendeeEditor(attendee).show()
+
+	updateEditedAttendee: (attendeeId) =>
+		request = new XMLHttpRequest()
+		request.onreadystatechange = () =>
+			if request.readyState == 4
+				attendee = JSON.parse(request.responseText)
+				newRow = @createAttendeeRow(attendee)
+				@tableBody.replaceChild(newRow, @selectedAttendeeRow)
+		request.open('GET', "/attendees?id=#{attendeeId}", true)
+		request.send(null)
 
 	appendCell: (tr, text) ->
 		td = document.createElement 'td'
@@ -144,11 +158,12 @@ class AttendeeEditor
 	saveEvents: () =>
 		selectedEvents = @getEventsData()
 		saveRequest = new XMLHttpRequest()
-		saveRequest.open('PUT', "/attendees?id=#{@attendee._id}&events=#{selectedEvents}", false)
+		saveRequest.open('PUT', "/attendees?id=#{@attendee._id}&events=#{selectedEvents}&registered=1", false)
 		saveRequest.send(null)
 
 	registerAttendee: () =>
 		@saveEvents()
+		Page.updateEditedAttendee(@attendee._id)
 		@hide()
 
 	backToList: () =>
