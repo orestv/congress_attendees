@@ -6,7 +6,9 @@
   Index = (function() {
 
     function Index() {
-      this.attendeeRowClicked = __bind(this.attendeeRowClicked, this);
+      this.updateEditedAttendee = __bind(this.updateEditedAttendee, this);
+
+      this.editAttendee = __bind(this.editAttendee, this);
 
       this.createAttendeeRow = __bind(this.createAttendeeRow, this);
 
@@ -118,17 +120,38 @@
       td = document.createElement('td');
       button = document.createElement('input');
       button.type = 'button';
-      button.value = 'Зареєструвати';
+      if (!(attendee.registered != null)) {
+        button.value = 'Зареєструвати';
+      } else {
+        button.value = 'Змінити інформацію';
+      }
       button.onclick = function() {
-        return _this.attendeeRowClicked(attendee);
+        _this.editAttendee(attendee);
+        return _this.selectedAttendeeRow = tr;
       };
       td.appendChild(button);
       tr.appendChild(td);
       return tr;
     };
 
-    Index.prototype.attendeeRowClicked = function(attendee) {
+    Index.prototype.editAttendee = function(attendee) {
       return new AttendeeEditor(attendee).show();
+    };
+
+    Index.prototype.updateEditedAttendee = function(attendeeId) {
+      var request,
+        _this = this;
+      request = new XMLHttpRequest();
+      request.onreadystatechange = function() {
+        var attendee, newRow;
+        if (request.readyState === 4) {
+          attendee = JSON.parse(request.responseText);
+          newRow = _this.createAttendeeRow(attendee);
+          return _this.tableBody.replaceChild(newRow, _this.selectedAttendeeRow);
+        }
+      };
+      request.open('GET', "/attendees?id=" + attendeeId, true);
+      return request.send(null);
     };
 
     Index.prototype.appendCell = function(tr, text) {
@@ -160,7 +183,13 @@
 
       this.registerAttendee = __bind(this.registerAttendee, this);
 
+      this.saveEvents = __bind(this.saveEvents, this);
+
+      this.getEventsData = __bind(this.getEventsData, this);
+
       this.hide = __bind(this.hide, this);
+
+      this.clear = __bind(this.clear, this);
 
       this.fill = __bind(this.fill, this);
 
@@ -176,6 +205,7 @@
     AttendeeEditor.prototype.show = function() {
       document.getElementById('searchListContainer').style.display = 'none';
       this.editorContainer.style.display = 'block';
+      this.clear();
       return this.fetch();
     };
 
@@ -193,17 +223,36 @@
     };
 
     AttendeeEditor.prototype.fill = function() {
-      var input, inputId, objectKey, _ref, _results;
+      var eventId, input, inputId, objectKey, _i, _len, _ref, _ref1, _results;
       _ref = this.fields;
-      _results = [];
       for (inputId in _ref) {
         objectKey = _ref[inputId];
         input = document.getElementById(inputId);
         if (input != null) {
-          _results.push(input.value = this.attendee[objectKey]);
-        } else {
-          _results.push(void 0);
+          input.value = this.attendee[objectKey];
         }
+      }
+      _ref1 = this.attendee['attended_events'];
+      _results = [];
+      for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+        eventId = _ref1[_i];
+        _results.push(document.getElementById(eventId).checked = true);
+      }
+      return _results;
+    };
+
+    AttendeeEditor.prototype.clear = function() {
+      var checkbox, inputId, objectKey, _i, _len, _ref, _ref1, _results;
+      _ref = this.fields;
+      for (inputId in _ref) {
+        objectKey = _ref[inputId];
+        document.getElementById(inputId).value = '';
+      }
+      _ref1 = document.getElementsByName('events');
+      _results = [];
+      for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+        checkbox = _ref1[_i];
+        _results.push(checkbox.checked = false);
       }
       return _results;
     };
@@ -213,7 +262,37 @@
       return this.editorContainer.style.display = 'none';
     };
 
+    AttendeeEditor.prototype.getEventsData = function() {
+      var cb, eventCheckboxes, result;
+      eventCheckboxes = document.getElementsByName('events');
+      result = [
+        (function() {
+          var _i, _len, _results;
+          _results = [];
+          for (_i = 0, _len = eventCheckboxes.length; _i < _len; _i++) {
+            cb = eventCheckboxes[_i];
+            if (cb.checked) {
+              _results.push(cb.id);
+            }
+          }
+          return _results;
+        })()
+      ];
+      console.log(result);
+      return result;
+    };
+
+    AttendeeEditor.prototype.saveEvents = function() {
+      var saveRequest, selectedEvents;
+      selectedEvents = this.getEventsData();
+      saveRequest = new XMLHttpRequest();
+      saveRequest.open('PUT', "/attendees?id=" + this.attendee._id + "&events=" + selectedEvents + "&registered=1", false);
+      return saveRequest.send(null);
+    };
+
     AttendeeEditor.prototype.registerAttendee = function() {
+      this.saveEvents();
+      Page.updateEditedAttendee(this.attendee._id);
       return this.hide();
     };
 

@@ -35,16 +35,33 @@
         <div style="width: 100%; text-align: left">
             <input type="button" id="btnBackToList" value="<<< Назад">
         </div>
-        <table width="100%" id="attendeeEditorTable">
-            <tbody>
-                {% for field in fields %}
-                    <tr>
-                        <td>{{field.caption}}</td>
-                        <td><input type="{{field.type}}" id="{{field.input_id}}" disabled></td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <div class="attendeeEditorColumn">
+            <table class="attendeeEditorTable">
+                <tbody>
+                    {% for field in fields %}
+                        <tr>
+                            <td>{{field.caption}}</td>
+                            <td><input type="{{field.type}}" id="{{field.input_id}}" disabled></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="attendeeEditorColumn">
+            <table class="attendeeEditorTable">
+                <tbody>
+                    {% for event in events %}
+                        <tr>
+                            <td>
+                                <label for="{{event._id}}">{{event.caption}}</label>
+                            </td>
+                            <td><input type="checkbox" id="{{event._id}}" name="events"/></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div style="clear: both"></div>
         <input type="button" id="btnRegisterAttendee" value="Зареєструвати"/>
     </div>
 </body>

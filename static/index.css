@@ -12,12 +12,18 @@
 	border-bottom: 1px solid gray
 }
 
-#attendeeEditorTable {
-	font-size: 1.5em;
+.attendeeEditorTable {
+	width: 100%;
 }
 
 .AttendeeSearchStatus {
 	font-size: 1.2em;
 	width: 100%;
 	text-align: center;
+}
+
+.attendeeEditorColumn {
+	width: 40%;
+	float: left;
+	height: 100%;
 }

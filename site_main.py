@@ -7,6 +7,7 @@ import time
 from flask.ext.pymongo import PyMongo
 from icu import Locale, Collator
 import locale
+import fields
 
 app = Flask(__name__)
 
@@ -18,17 +19,15 @@ print mongo
 def get_db():
     return mongo.db
 
-
 @app.route('/')
 @app.route('/index')
 def index():
-    fields = [{'caption': u'Прізвище', 'type': 'text', 'input_id': 'txtLastname'},
-              {'caption': u'Ім’я', 'type': 'text', 'input_id': 'txtFirstname'},
-              {'caption': u'По батькові', 'type': 'text', 'input_id': 'txtMiddlename'},
-              {'caption': u'Місто', 'type': 'text', 'input_id': 'txtCity'},
-              {'caption': u'Телефон', 'type': 'tel', 'input_id': 'txtPhone'},
-              {'caption': u'Спеціальність', 'type': 'text', 'input_id': 'txtField'}]
-    return render_template('index.html', fields=fields)
+    events_cursor = model.get_events(get_db())
+    events = []
+    for event in events_cursor:
+        event['_id'] = str(event['_id'])
+        events.append(event)
+    return render_template('index.html', fields=fields.INFO_FIELDS, events = events)
 
 def find_attendees_by_word(search_term):
     if not search_term:
@@ -52,7 +51,7 @@ def find_attendee_by_id(id):
     attendee['_id'] = str(attendee['_id'])
     return attendee
 
-@app.route('/attendees')
+@app.route('/attendees', methods=['GET', 'POST', 'PUT'])
 def attendees():
     result = {}
     search_term = request.args.get('s', None)
@@ -60,5 +59,16 @@ def attendees():
         result = find_attendees_by_word(search_term)
     id = request.args.get('id', None)
     if id:
-        result = find_attendee_by_id(id)
+        print 'Request method: ', request.method
+        if request.method == 'PUT':
+            events = request.args.get('events', None)
+            if events:
+                events = events.split(',')
+                model.set_attendee_events(get_db(), id, events)
+            registered = request.args.get('registered', None)
+            if registered is not None:
+                registered = bool(registered)
+                model.set_attendee_registered(get_db(), id, registered)
+        else:
+            result = find_attendee_by_id(id)
     return json.dumps(result)
