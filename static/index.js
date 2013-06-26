@@ -117,6 +117,9 @@
       this.appendCell(tr, attendee.city);
       attendeeName = "" + attendee.lastname + " " + attendee.firstname + " " + attendee.middlename;
       this.appendCell(tr, attendeeName);
+      if ((attendee.registered != null) && attendee.registered) {
+        tr.className = 'registered';
+      }
       td = document.createElement('td');
       button = document.createElement('input');
       button.type = 'button';
@@ -135,7 +138,9 @@
     };
 
     Index.prototype.editAttendee = function(attendee) {
-      return new AttendeeEditor(attendee).show();
+      if (!attendee.registered || confirm('Цей учасник вже зареєстрований. Ви справді бажаєте змінити його дані?')) {
+        return new AttendeeEditor(attendee).show();
+      }
     };
 
     Index.prototype.updateEditedAttendee = function(attendeeId) {

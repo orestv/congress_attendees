@@ -68,6 +68,8 @@ class Index
 		@appendCell(tr, attendee.city)
 		attendeeName = "#{attendee.lastname} #{attendee.firstname} #{attendee.middlename}"
 		@appendCell(tr, attendeeName)
+		if attendee.registered? and attendee.registered
+			tr.className = 'registered'
 		td = document.createElement 'td'
 		button = document.createElement 'input'
 		button.type = 'button'
@@ -83,7 +85,8 @@ class Index
 		return tr
 
 	editAttendee: (attendee) =>
-		new AttendeeEditor(attendee).show()
+		if not attendee.registered or confirm('Цей учасник вже зареєстрований. Ви справді бажаєте змінити його дані?')
+			new AttendeeEditor(attendee).show()
 
 	updateEditedAttendee: (attendeeId) =>
 		request = new XMLHttpRequest()

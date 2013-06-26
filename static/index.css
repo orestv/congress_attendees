@@ -9,7 +9,8 @@
 
 #searchResultsTable tbody td {
 	padding: 10px;
-	border-bottom: 1px solid gray
+	border-bottom: 1px solid gray;
+	text-align: center;
 }
 
 .attendeeEditorTable {
@@ -26,4 +27,8 @@
 	width: 40%;
 	float: left;
 	height: 100%;
+}
+
+tr.registered {
+	color: #80D080;
 }
