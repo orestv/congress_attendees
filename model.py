@@ -40,7 +40,7 @@ def set_attendee_events(db, attendee_id, event_ids):
         {'$set': {'attended_events': valid_event_ids}})
 
 def set_attendee_registered(db, attendee_id, registered):
-    db.attendees.update({'_id': ObjectId(attendee_id)}, 
+    db.attendees.update({'_id': ObjectId(attendee_id)},
         {'$set': {'registered': registered}})
 
 def find_attendee(db, id):
