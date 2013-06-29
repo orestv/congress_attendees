@@ -10,6 +10,8 @@
 
       this.editAttendee = __bind(this.editAttendee, this);
 
+      this.editAttendeeClicked = __bind(this.editAttendeeClicked, this);
+
       this.createAttendeeRow = __bind(this.createAttendeeRow, this);
 
       this.populateSearchResults = __bind(this.populateSearchResults, this);
@@ -20,7 +22,7 @@
 
       this.searchRequested = __bind(this.searchRequested, this);
 
-      var searchBoxInput, searchbox;
+      var attendee, searchBoxInput, searchbox;
       this.searching = false;
       this.nextSearch = null;
       this.table = document.getElementById('searchResultsTable');
@@ -28,12 +30,21 @@
       searchBoxInput = document.getElementById('searchBox');
       searchBoxInput.focus();
       searchbox = new window.SearchBox(searchBoxInput, this.searchRequested);
+      if (localStorage.selectedAttendeeJSON != null) {
+        attendee = JSON.parse(localStorage.selectedAttendeeJSON);
+        this.editAttendee(attendee);
+      }
+      if (localStorage.searchQuery != null) {
+        searchBoxInput.value = localStorage.searchQuery;
+        this.searchRequested(localStorage.searchQuery);
+      }
     }
 
-    Index.prototype.searchRequested = function(searchTerm) {
+    Index.prototype.searchRequested = function(searchQuery) {
       var term,
         _this = this;
-      if (searchTerm === '') {
+      if (searchQuery === '') {
+        localStorage.removeItem('searchQuery');
         this.nextSearch = null;
         this.searchRequest.abort();
         this.searching = false;
@@ -41,9 +52,10 @@
         this.clearSearchResults();
         return;
       }
+      localStorage.searchQuery = searchQuery;
       document.getElementById('imgSearchLoader').style.visibility = 'visible';
       if (this.searching) {
-        term = searchTerm;
+        term = searchQuery;
         this.nextSearch = function() {
           return _this.searchRequested(term);
         };
@@ -52,7 +64,7 @@
       this.searching = true;
       this.searchRequest = new XMLHttpRequest();
       this.searchRequest.onreadystatechange = this.processSearchRequest;
-      this.searchRequest.open('GET', "/attendees?s=" + searchTerm, true);
+      this.searchRequest.open('GET', "/attendees?s=" + searchQuery, true);
       this.searchRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
       return this.searchRequest.send(null);
     };
@@ -129,7 +141,7 @@
         button.value = 'Змінити інформацію';
       }
       button.onclick = function() {
-        _this.editAttendee(attendee);
+        _this.editAttendeeClicked(attendee);
         return _this.selectedAttendeeRow = tr;
       };
       td.appendChild(button);
@@ -137,10 +149,15 @@
       return tr;
     };
 
-    Index.prototype.editAttendee = function(attendee) {
+    Index.prototype.editAttendeeClicked = function(attendee) {
       if (!attendee.registered || confirm('Цей учасник вже зареєстрований. Ви справді бажаєте змінити його дані?')) {
-        return new AttendeeEditor(attendee).show();
+        localStorage.selectedAttendeeJSON = JSON.stringify(attendee);
+        return this.editAttendee(attendee);
       }
+    };
+
+    Index.prototype.editAttendee = function(attendee) {
+      return new AttendeeEditor(attendee).show();
     };
 
     Index.prototype.updateEditedAttendee = function(attendeeId) {
@@ -264,7 +281,8 @@
 
     AttendeeEditor.prototype.hide = function() {
       document.getElementById('searchListContainer').style.display = 'block';
-      return this.editorContainer.style.display = 'none';
+      this.editorContainer.style.display = 'none';
+      return localStorage.removeItem('selectedAttendeeJSON');
     };
 
     AttendeeEditor.prototype.getEventsData = function() {

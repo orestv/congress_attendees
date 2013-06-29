@@ -7,25 +7,33 @@ class Index
 		searchBoxInput = document.getElementById('searchBox')
 		searchBoxInput.focus()
 		searchbox = new window.SearchBox(searchBoxInput, @searchRequested)
+		if localStorage.selectedAttendeeJSON?
+			attendee = JSON.parse(localStorage.selectedAttendeeJSON)
+			@editAttendee attendee
+		if localStorage.searchQuery?
+			searchBoxInput.value = localStorage.searchQuery
+			@searchRequested localStorage.searchQuery
 
-	searchRequested: (searchTerm) =>
-		if searchTerm == ''# and @searching
+	searchRequested: (searchQuery) =>		
+		if searchQuery == ''
+			localStorage.removeItem('searchQuery')
 			@nextSearch = null
 			@searchRequest.abort()
 			@searching = false
 			document.getElementById('imgSearchLoader').style.visibility = 'hidden'
 			@clearSearchResults()
 			return
+		localStorage.searchQuery = searchQuery
 		document.getElementById('imgSearchLoader').style.visibility = 'visible'
 		if @searching
-			term = searchTerm
+			term = searchQuery
 			@nextSearch = () =>
 				@searchRequested term
 			return
 		@searching = true
 		@searchRequest = new XMLHttpRequest()
 		@searchRequest.onreadystatechange = @processSearchRequest
-		@searchRequest.open('GET', "/attendees?s=#{searchTerm}", true)
+		@searchRequest.open('GET', "/attendees?s=#{searchQuery}", true)
 		@searchRequest.setRequestHeader("Content-type","application/x-www-form-urlencoded");
 		@searchRequest.send(null)
 
@@ -78,15 +86,19 @@ class Index
 		else
 			button.value = 'Змінити інформацію'
 		button.onclick = =>
-			@editAttendee attendee
+			@editAttendeeClicked attendee
 			@selectedAttendeeRow = tr
 		td.appendChild button
 		tr.appendChild td
 		return tr
 
-	editAttendee: (attendee) =>
+	editAttendeeClicked: (attendee) =>
 		if not attendee.registered or confirm('Цей учасник вже зареєстрований. Ви справді бажаєте змінити його дані?')
-			new AttendeeEditor(attendee).show()
+			localStorage.selectedAttendeeJSON = JSON.stringify(attendee)
+			@editAttendee attendee
+
+	editAttendee: (attendee) =>
+		new AttendeeEditor(attendee).show()
 
 	updateEditedAttendee: (attendeeId) =>
 		request = new XMLHttpRequest()
@@ -151,6 +163,7 @@ class AttendeeEditor
 	hide: () =>
 		document.getElementById('searchListContainer').style.display = 'block'
 		@editorContainer.style.display = 'none'
+		localStorage.removeItem('selectedAttendeeJSON')
 
 	getEventsData: () =>
 		eventCheckboxes = document.getElementsByName('events')
