@@ -104,7 +104,7 @@ class Index
 		request = new XMLHttpRequest()
 		request.onreadystatechange = () =>
 			if request.readyState == 4
-				attendee = JSON.parse(request.responseText)
+				attendee = JSON.parse(request.responseText).attendee
 				newRow = @createAttendeeRow(attendee)
 				@tableBody.replaceChild(newRow, @selectedAttendeeRow)
 		request.open('GET', "/attendees?id=#{attendeeId}", true)
@@ -142,9 +142,11 @@ class AttendeeEditor
 		@request = new XMLHttpRequest()
 		@request.onreadystatechange = () =>
 			if @request.readyState == 4
-				@attendee = JSON.parse(@request.responseText)
+				response = JSON.parse(@request.responseText)
+				@attendee = response.attendee
+				@events = response.events
 				@fill()
-		@request.open('GET', "/attendees?id=#{@attendee._id}", true)
+		@request.open('GET', "/attendees?id=#{@attendee._id.$oid}", true)
 		@request.send(null)
 
 	fill: () =>
@@ -152,8 +154,15 @@ class AttendeeEditor
 			input = document.getElementById(inputId)
 			if input?
 				input.value = @attendee[objectKey]
-		for eventId in @attendee['attended_events']
-			document.getElementById(eventId).checked = true
+		for evt in @attendee['attended_events']
+			document.getElementById(evt['id']).checked = true
+		for evt in @events
+			if evt.limit?
+				document.getElementById("dvLimit_#{evt._id.$oid}").style.display = 'block'
+				document.getElementById("spLimit_#{evt._id.$oid}").innerText = evt.limit
+				document.getElementById("spAttendees_#{evt._id.$oid}").innerText = evt.attendees
+			else
+				document.getElementById("dvLimit_#{evt._id.$oid}").style.display = 'none'
 	clear: () =>
 		for inputId, objectKey of @fields
 			document.getElementById(inputId).value = ''
@@ -168,18 +177,17 @@ class AttendeeEditor
 	getEventsData: () =>
 		eventCheckboxes = document.getElementsByName('events')
 		result = [cb.id for cb in eventCheckboxes when cb.checked]
-		console.log result
 		return result
 
 	saveEvents: () =>
 		selectedEvents = @getEventsData()
 		saveRequest = new XMLHttpRequest()
-		saveRequest.open('PUT', "/attendees?id=#{@attendee._id}&events=#{selectedEvents}&registered=1", false)
+		saveRequest.open('PUT', "/attendees?id=#{@attendee._id.$oid}&events=#{selectedEvents}&registered=1", false)
 		saveRequest.send(null)
 
 	registerAttendee: () =>
 		@saveEvents()
-		Page.updateEditedAttendee(@attendee._id)
+		Page.updateEditedAttendee(@attendee._id.$oid)
 		@hide()
 
 	backToList: () =>

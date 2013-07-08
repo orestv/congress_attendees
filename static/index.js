@@ -167,7 +167,7 @@
       request.onreadystatechange = function() {
         var attendee, newRow;
         if (request.readyState === 4) {
-          attendee = JSON.parse(request.responseText);
+          attendee = JSON.parse(request.responseText).attendee;
           newRow = _this.createAttendeeRow(attendee);
           return _this.tableBody.replaceChild(newRow, _this.selectedAttendeeRow);
         }
@@ -235,17 +235,20 @@
       var _this = this;
       this.request = new XMLHttpRequest();
       this.request.onreadystatechange = function() {
+        var response;
         if (_this.request.readyState === 4) {
-          _this.attendee = JSON.parse(_this.request.responseText);
+          response = JSON.parse(_this.request.responseText);
+          _this.attendee = response.attendee;
+          _this.events = response.events;
           return _this.fill();
         }
       };
-      this.request.open('GET', "/attendees?id=" + this.attendee._id, true);
+      this.request.open('GET', "/attendees?id=" + this.attendee._id.$oid, true);
       return this.request.send(null);
     };
 
     AttendeeEditor.prototype.fill = function() {
-      var eventId, input, inputId, objectKey, _i, _len, _ref, _ref1, _results;
+      var evt, input, inputId, objectKey, _i, _j, _len, _len1, _ref, _ref1, _ref2, _results;
       _ref = this.fields;
       for (inputId in _ref) {
         objectKey = _ref[inputId];
@@ -255,10 +258,21 @@
         }
       }
       _ref1 = this.attendee['attended_events'];
-      _results = [];
       for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
-        eventId = _ref1[_i];
-        _results.push(document.getElementById(eventId).checked = true);
+        evt = _ref1[_i];
+        document.getElementById(evt['id']).checked = true;
+      }
+      _ref2 = this.events;
+      _results = [];
+      for (_j = 0, _len1 = _ref2.length; _j < _len1; _j++) {
+        evt = _ref2[_j];
+        if (evt.limit != null) {
+          document.getElementById("dvLimit_" + evt._id.$oid).style.display = 'block';
+          document.getElementById("spLimit_" + evt._id.$oid).innerText = evt.limit;
+          _results.push(document.getElementById("spAttendees_" + evt._id.$oid).innerText = evt.attendees);
+        } else {
+          _results.push(document.getElementById("dvLimit_" + evt._id.$oid).style.display = 'none');
+        }
       }
       return _results;
     };
@@ -301,7 +315,6 @@
           return _results;
         })()
       ];
-      console.log(result);
       return result;
     };
 
@@ -309,13 +322,13 @@
       var saveRequest, selectedEvents;
       selectedEvents = this.getEventsData();
       saveRequest = new XMLHttpRequest();
-      saveRequest.open('PUT', "/attendees?id=" + this.attendee._id + "&events=" + selectedEvents + "&registered=1", false);
+      saveRequest.open('PUT', "/attendees?id=" + this.attendee._id.$oid + "&events=" + selectedEvents + "&registered=1", false);
       return saveRequest.send(null);
     };
 
     AttendeeEditor.prototype.registerAttendee = function() {
       this.saveEvents();
-      Page.updateEditedAttendee(this.attendee._id);
+      Page.updateEditedAttendee(this.attendee._id.$oid);
       return this.hide();
     };
 

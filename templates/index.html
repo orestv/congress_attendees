@@ -56,6 +56,12 @@
                                 <label for="{{event._id}}">{{event.caption}}</label>
                             </td>
                             <td><input type="checkbox" id="{{event._id}}" name="events"/></td>
+                            <td>
+                                <div id="dvLimit_{{event._id}}" style="display: none">
+                                    Обмеження: <span id="spLimit_{{event._id}}"></span>,
+                                    зареєстровано: <span id="spAttendees_{{event._id}}"></span>
+                                </div>
+                            </td>
                         </tr>
                     {% endfor %}
                 </tbody>
