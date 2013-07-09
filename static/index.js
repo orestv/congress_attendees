@@ -268,8 +268,8 @@
         evt = _ref2[_j];
         if (evt.limit != null) {
           document.getElementById("dvLimit_" + evt._id.$oid).style.display = 'block';
-          document.getElementById("spLimit_" + evt._id.$oid).innerText = evt.limit;
-          _results.push(document.getElementById("spAttendees_" + evt._id.$oid).innerText = evt.attendees);
+          document.getElementById("spLimit_" + evt._id.$oid).textContent = evt.limit;
+          _results.push(document.getElementById("spAttendees_" + evt._id.$oid).textContent = evt.attendees);
         } else {
           _results.push(document.getElementById("dvLimit_" + evt._id.$oid).style.display = 'none');
         }
