@@ -42,10 +42,10 @@ def create_attendee(cursor, firstname, middlename, lastname):
 EVENTS = [
 	{'caption': u'Обід 19.09'},
 	{'caption': u'Обід 20.09'},
-	{'caption': u'Екскурсія 19.09, 11:00', 'limit': 40},
-	{'caption': u'Екскурсія 19.09, 12:00', 'limit': 40},
-	{'caption': u'Екскурсія 20.09, 11:00', 'limit': 40},
-	{'caption': u'Екскурсія 20.09, 12:00', 'limit': 40},
+	{'caption': u'Екскурсія 19.09, 11:00', 'limit': 5},
+	{'caption': u'Екскурсія 19.09, 12:00', 'limit': 7},
+	{'caption': u'Екскурсія 20.09, 11:00', 'limit': 3},
+	{'caption': u'Екскурсія 20.09, 12:00', 'limit': 4},
 	{'caption': u'Урочиста вечеря 19.09'}
 ]
 
