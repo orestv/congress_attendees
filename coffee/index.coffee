@@ -159,8 +159,8 @@ class AttendeeEditor
 		for evt in @events
 			if evt.limit?
 				document.getElementById("dvLimit_#{evt._id.$oid}").style.display = 'block'
-				document.getElementById("spLimit_#{evt._id.$oid}").innerText = evt.limit
-				document.getElementById("spAttendees_#{evt._id.$oid}").innerText = evt.attendees
+				document.getElementById("spLimit_#{evt._id.$oid}").textContent = evt.limit
+				document.getElementById("spAttendees_#{evt._id.$oid}").textContent = evt.attendees
 			else
 				document.getElementById("dvLimit_#{evt._id.$oid}").style.display = 'none'
 	clear: () =>
