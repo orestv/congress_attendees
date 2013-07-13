@@ -26,10 +26,12 @@ class Index
 		localStorage.searchQuery = searchQuery
 		document.getElementById('imgSearchLoader').style.visibility = 'visible'
 		if @searching
-			term = searchQuery
-			@nextSearch = () =>
-				@searchRequested term
-			return
+			# @searching = false
+			@searchRequest.abort()
+			# term = searchQuery
+			# @nextSearch = () =>
+			# 	@searchRequested term
+			# return
 		@searching = true
 		@searchRequest = new XMLHttpRequest()
 		@searchRequest.onreadystatechange = @processSearchRequest
