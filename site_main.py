@@ -1,24 +1,47 @@
 # -*- coding: utf-8 -*-
-from flask import Flask, render_template, _app_ctx_stack, request
+from flask import Flask, render_template, _app_ctx_stack, request, url_for, redirect, flash
 import pymongo
 import json
-import model
+import model, users
 import time
 from flask.ext.pymongo import PyMongo
 from icu import Locale, Collator
 import locale
 import fields
 from bson import json_util
+import flask.ext.login as flask_login
 
 app = Flask(__name__)
 
-app.config['MONGO_DBNAME'] = 'congress'
+app.config.from_pyfile('config.cfg')
 mongo = PyMongo(app)
+
+login_manager = flask_login.LoginManager()
+login_manager.init_app(app)
 
 def get_db():
     return mongo.db
 
+@login_manager.user_loader
+def load_user(uid):
+    return users.get_user_by_id(get_db(), uid.encode('utf-8'))
+
 @app.route('/')
+@app.route('/login', methods=['GET'])
+def root():
+    return render_template('login.html')
+
+@app.route('/login', methods=['POST'])
+def login_request():
+    login, password = request.form.get('login'), request.form.get('password')
+    user = users.get_user_by_credentials(get_db(), login, password)
+    if user:
+        flask_login.login_user(user)
+        return redirect(url_for('index'))
+    else:
+        flash(u'Логін чи пароль невірні!')
+        return redirect(url_for('root'))
+
 @app.route('/index')
 def index():
     events_cursor = model.get_events(get_db())

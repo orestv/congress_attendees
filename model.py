@@ -49,7 +49,6 @@ def set_attendee_events(db, attendee_id, event_ids):
     attendee = db.attendees.find_one({'_id': attendee_id}, fields=['attended_events'])
 
     old_valid_events = attendee['attended_events']
-    print old_valid_events
     old_valid_event_ids = [str(event['id']) for event in old_valid_events]
 
     unchanged_events = [event for event in old_valid_events if event['id'] in new_valid_event_ids]
