@@ -8,7 +8,7 @@ class User:
         self.is_admin = is_admin
 
     def is_authenticated(self):
-        return true
+        return True
 
     def is_active(self):
         return True
