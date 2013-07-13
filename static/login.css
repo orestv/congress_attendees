@@ -1,0 +1,10 @@
+.loginBlock {
+	border: 1px solid gray;
+	margin: auto;
+	margin-top: 10%;
+	width: 40%;
+}
+
+.loginError {
+	color: red;
+}

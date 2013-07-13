@@ -1,0 +1,45 @@
+﻿<!doctype html>
+<html>
+<head>
+	<title>Login</title>
+	<link rel="stylesheet" href="/static/login.css">
+	<script src="/static/login.js" type="text/javascript" charset="utf-8" async defer></script>
+</head>
+<body onload="bodyLoaded();">	
+	<form action="/login" method="POST" accept-charset="utf-8" id="frmLogin">
+		<div class="loginBlock">
+			<table>
+					<tbody>						
+						<tr>
+							<td>Логін:</td>
+							<td>
+								<input type="text" name="login" value="rostykv" id="txtLogin" tabstop="1" required="required">
+							</td>
+							<td colspan="2"></td>
+						</tr>
+						<tr>
+							<td>Пароль:</td>
+							<td>
+								<input type="password" name="password" value="123" id="txtPassword" tabstop="2" required="required">
+							</td>
+							<td>
+								<input type="submit" value="Вхід" tabstop="3" id="btnLogin">
+							</td>
+							<td>
+								{% with messages = get_flashed_messages() %}
+									{% if messages %}
+										{% for message in messages %}
+											<div class="loginError">
+												{{ message }}
+											</div>
+										{% endfor %}
+									{% endif %}
+								{% endwith %}
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+	</form>
+</body>
+</html>

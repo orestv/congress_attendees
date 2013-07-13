@@ -80,6 +80,12 @@ if __name__ == '__main__':
 
 	db.events.drop()
 	db.events.insert(EVENTS)
+
+	db.users.drop()
+	user = {'login': u'rostykv',
+		'password': u'123',
+		'admin': True}
+	db.users.insert(user)
 	conn.close()
 	# try:
 	# 	con = db_connect()
