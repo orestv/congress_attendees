@@ -75,7 +75,8 @@ class Index
 
 	createAttendeeRow: (attendee) =>
 		tr = document.createElement 'tr'
-		@appendCell(tr, attendee.city)
+		city = if attendee.city? then attendee.city else 'N/A'
+		@appendCell(tr, city)
 		attendeeName = "#{attendee.lastname} #{attendee.firstname} #{attendee.middlename}"
 		@appendCell(tr, attendeeName)
 		if attendee.registered? and attendee.registered
@@ -125,8 +126,8 @@ class AttendeeEditor
 		'txtLastname': 'lastname',
 		'txtMiddlename': 'middlename',
 		'txtCity': 'city',
-		'txtPhone': 'phone',
-		'txtField': 'field'
+		'txtPhone': 'personal_phone',
+		'txtPosition': 'position'
 	}
 
 	constructor: (@attendee) ->
