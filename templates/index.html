@@ -9,6 +9,11 @@
 </head>
 <body onload="bodyLoaded();">
     <a href="/logout" title="">Вихід</a>
+    {% if user.is_admin %}
+        <a style="float: right" href="/dashboard" title="">
+            Адміністрування
+        </a>
+    {% endif %}
     <div id="searchListContainer">
         <div class="centerContainer">
             <input type="search" id="searchBox"/>

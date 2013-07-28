@@ -1,0 +1,51 @@
+<html>
+<head>
+	<title>Dashboard</title>
+	<link rel="stylesheet" href="/static/dashboard.css">
+	<script src="/static/dashboard.js" type="text/javascript" charset="utf-8" async defer></script>
+</head>
+<body onload="bodyLoaded();">
+	<div id="dvEvents" style="float: left">
+		<table class="dashboardTable">
+			<caption><h3>Події</h3></caption>
+			<thead>
+				<tr>
+					<th>Назва</th>
+					<th>Учасники</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for event in events %}
+					<tr>
+						<td> {{ event.caption }} </td>
+						<td>
+							<a href="#" onclick="Page.showEventAttendees('{{event._id}}', '{{event.caption}}')">
+							{% if event.limit %}
+								{{ event.attendee_count }}/{{ event.limit }}
+							{% else %}
+								{{ event.attendee_count }}
+							{% endif %}
+							</a>
+						</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+	<div id="dvEventAttendees" style="float: left; display: none">
+		<table class="dashboardTable">
+			<caption>
+					<h3>Учасники "<span id="spEventName"></span>"</h3>
+					<input type="button" value="Сховати"/>
+				</caption>
+			<thead>
+				<tr>
+					<th>Учасник</th>
+				</tr>
+			</thead>
+			<tbody id="eventAttendeesTbody">
+			</tbody>
+		</table>
+	</div>
+</body>
+</html>

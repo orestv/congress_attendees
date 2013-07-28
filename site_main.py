@@ -25,7 +25,6 @@ def get_db():
 
 @login_manager.user_loader
 def load_user(uid):
-    print uid
     return users.get_user_by_id(get_db(), uid.encode('utf-8'))
 
 @app.route('/')
@@ -52,7 +51,10 @@ def index():
     for event in events_cursor:
         event['_id'] = str(event['_id'])
         events.append(event)
-    return render_template('index.html', fields=fields.INFO_FIELDS, events = events)
+    return render_template('index.html', 
+        fields=fields.INFO_FIELDS, 
+        events = events, 
+        user = flask_login.current_user)
 
 @app.route('/attendees', methods=['PUT'])
 @flask_login.login_required
@@ -73,10 +75,15 @@ def update_attendee():
 def attendees():
     result = {}
     search_term = request.args.get('s', None)
+    event_id = request.args.get('eventId', None)
+    id = request.args.get('id', None)
     if search_term:
         result = find_attendees_by_word(search_term)
-    id = request.args.get('id', None)
-    if id:
+    elif event_id:
+        result = model.get_event_attendees(get_db(), event_id)
+        result = [r for r in result]
+        print result
+    elif id:
         attendee = find_attendee_by_id(id)
         events_db = model.get_events(get_db())
         events = []
@@ -86,6 +93,17 @@ def attendees():
             events.append(event)
         result = {'attendee': attendee, 'events': events}
     return json.dumps(result, default=json_util.default)
+
+@app.route('/dashboard')
+@flask_login.login_required
+def dashboard():
+    if not flask_login.current_user.is_admin:
+        return login_manager.unauthorized()
+    events_cursor = model.get_events(get_db())
+    events = list(events_cursor)
+    for event in events:
+        event['attendee_count'] = model.get_event_attendees_count(get_db(), event['_id'])
+    return render_template('dashboard.html', events = events)
 
 @app.route('/logout')
 def logout():

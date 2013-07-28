@@ -16,9 +16,6 @@ class User:
     def is_anonymous(self):
         return False
 
-    def is_admin(self):
-        return self.is_admin
-
     def get_id(self):
         return unicode(self.uid)
 
