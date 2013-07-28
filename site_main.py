@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*
 from flask import Flask, render_template, _app_ctx_stack, request, url_for, redirect, flash
 import pymongo
 import json

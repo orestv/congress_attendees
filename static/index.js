@@ -117,10 +117,11 @@
     };
 
     Index.prototype.createAttendeeRow = function(attendee) {
-      var attendeeName, button, td, tr,
+      var attendeeName, button, city, td, tr,
         _this = this;
       tr = document.createElement('tr');
-      this.appendCell(tr, attendee.city);
+      city = attendee.city != null ? attendee.city : 'N/A';
+      this.appendCell(tr, city);
       attendeeName = "" + attendee.lastname + " " + attendee.firstname + " " + attendee.middlename;
       this.appendCell(tr, attendeeName);
       if ((attendee.registered != null) && attendee.registered) {
@@ -189,8 +190,8 @@
       'txtLastname': 'lastname',
       'txtMiddlename': 'middlename',
       'txtCity': 'city',
-      'txtPhone': 'phone',
-      'txtField': 'field'
+      'txtPhone': 'personal_phone',
+      'txtPosition': 'position'
     };
 
     function AttendeeEditor(attendee) {
