@@ -5,7 +5,8 @@
 	<script src="/static/dashboard.js" type="text/javascript" charset="utf-8" async defer></script>
 </head>
 <body onload="bodyLoaded();">
-	<div id="dvEvents" style="float: left">
+	<a href="/" style="float: left;">Головна</a>
+	<div id="dvEvents" style="float: left;">
 		<table class="dashboardTable">
 			<caption><h3>Події</h3></caption>
 			<thead>
@@ -19,13 +20,17 @@
 					<tr>
 						<td> {{ event.caption }} </td>
 						<td>
-							<a href="#" onclick="Page.showEventAttendees('{{event._id}}', '{{event.caption}}')">
+							{% if event.attendee_count > 0 %}
+								<a href="#" onclick="Page.showEventAttendees('{{event._id}}', '{{event.caption}}')">
+							{% endif %}
 							{% if event.limit %}
-								{{ event.attendee_count }}/{{ event.limit }}
+								{{ event.attendee_count }} / {{ event.limit }}
 							{% else %}
 								{{ event.attendee_count }}
 							{% endif %}
-							</a>
+							{% if event.attendee_count > 0 %}
+								</a>
+							{% endif %}
 						</td>
 					</tr>
 				{% endfor %}
@@ -36,7 +41,7 @@
 		<table class="dashboardTable">
 			<caption>
 					<h3>Учасники "<span id="spEventName"></span>"</h3>
-					<input type="button" value="Сховати"/>
+					<input type="button" value="Сховати" id="btnEventAttendeesHide"/>
 				</caption>
 			<thead>
 				<tr>

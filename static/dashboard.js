@@ -11,7 +11,7 @@
       this.clearEventAttendees = __bind(this.clearEventAttendees, this);
 
       this.showEventAttendees = __bind(this.showEventAttendees, this);
-
+      document.getElementById('btnEventAttendeesHide').onclick = this.clearEventAttendees;
     }
 
     Dashboard.prototype.showEventAttendees = function(eventId, eventCaption) {

@@ -1,5 +1,6 @@
 class Dashboard
 	constructor: () ->
+		document.getElementById('btnEventAttendeesHide').onclick = @clearEventAttendees
 
 	showEventAttendees: (eventId, eventCaption) =>
 		@clearEventAttendees()
