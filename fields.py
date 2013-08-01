@@ -5,8 +5,9 @@ INFO_FIELDS = [
     {'caption': u'Ім’я', 'type': 'text', 'input_id': 'txtFirstname'},
     {'caption': u'По батькові', 'type': 'text', 'input_id': 'txtMiddlename'},
     {'caption': u'Місто', 'type': 'text', 'input_id': 'txtCity'},
-    {'caption': u'Телефон', 'type': 'tel', 'input_id': 'txtPhone'},
-    {'caption': u'Спеціальність', 'type': 'text', 'input_id': 'txtPosition'}
+    {'caption': u'Організація', 'type': 'text', 'input_id': 'txtOrganization'},
+    {'caption': u'Спеціальність', 'type': 'text', 'input_id': 'txtPosition'},
+    {'caption': u'Телефон', 'type': 'tel', 'input_id': 'txtPhone'}
 ]
 
 ATTEND_FIELDS = [

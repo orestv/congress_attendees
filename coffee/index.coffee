@@ -127,7 +127,8 @@ class AttendeeEditor
 		'txtMiddlename': 'middlename',
 		'txtCity': 'city',
 		'txtPhone': 'personal_phone',
-		'txtPosition': 'position'
+		'txtPosition': 'position',
+		'txtOrganization': 'organization'
 	}
 
 	constructor: (@attendee) ->
