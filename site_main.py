@@ -63,7 +63,7 @@ def index():
 @flask_login.login_required
 def update_attendee():
     id = request.args.get('id', None)
-    events = request.args.get('events', None)
+    events = request.form.get('events', None)
     if events is not None:
         events = events.split(',') if events else []
         model.set_attendee_events(get_db(), id, events)
