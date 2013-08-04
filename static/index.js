@@ -152,7 +152,8 @@
     };
 
     Index.prototype.editAttendee = function(attendee) {
-      return new AttendeeEditor(attendee).show();
+      this.editor = new AttendeeEditor(attendee);
+      return this.editor.show();
     };
 
     Index.prototype.updateEditedAttendee = function(attendeeId) {
@@ -207,6 +208,8 @@
 
       this.getEventsData = __bind(this.getEventsData, this);
 
+      this.infoInputKeyPressed = __bind(this.infoInputKeyPressed, this);
+
       this.hide = __bind(this.hide, this);
 
       this.clear = __bind(this.clear, this);
@@ -253,6 +256,7 @@
         input = document.getElementById(inputId);
         if (input != null) {
           input.value = this.attendee[objectKey];
+          input.onkeyup = this.infoInputKeyPressed;
         }
       }
       _ref1 = this.attendee['attended_events'];
@@ -276,11 +280,13 @@
     };
 
     AttendeeEditor.prototype.clear = function() {
-      var checkbox, inputId, objectKey, _i, _len, _ref, _ref1, _results;
+      var checkbox, input, inputId, objectKey, _i, _len, _ref, _ref1, _results;
       _ref = this.fields;
       for (inputId in _ref) {
         objectKey = _ref[inputId];
-        document.getElementById(inputId).value = '';
+        input = document.getElementById(inputId);
+        input.value = '';
+        input.style.backgroundColor = 'white';
       }
       _ref1 = document.getElementsByName('events');
       _results = [];
@@ -295,6 +301,18 @@
       document.getElementById('searchListContainer').style.display = 'block';
       this.editorContainer.style.display = 'none';
       return localStorage.removeItem('selectedAttendeeJSON');
+    };
+
+    AttendeeEditor.prototype.infoInputKeyPressed = function(event) {
+      var fieldId, fieldValue, input;
+      input = event.currentTarget;
+      fieldId = this.fields[input.id];
+      fieldValue = this.attendee[fieldId];
+      if (fieldValue !== input.value) {
+        return input.style.backgroundColor = '#E0FFE0';
+      } else {
+        return input.style.backgroundColor = 'white';
+      }
     };
 
     AttendeeEditor.prototype.getEventsData = function() {
