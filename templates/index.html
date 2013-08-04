@@ -39,7 +39,7 @@
     </div>
     <div id="attendeeEditorContainer" style="display: none" class="centerContainer">
         <div style="width: 100%; text-align: left">
-            <input type="button" id="btnBackToList" value="<<< Назад">
+            <input type="button" id="btnBackToList" value="<<< Список">
         </div>
         <div class="attendeeEditorColumn">
             <table class="attendeeEditorTable">
@@ -47,7 +47,13 @@
                     {% for field in fields %}
                         <tr>
                             <td>{{field.caption}}</td>
-                            <td><input type="{{field.type}}" id="{{field.input_id}}" disabled></td>
+                            <td>
+                                <input type="{{field.type}}" id="{{field.input_id}}" 
+                                {% if not user.is_admin %}
+                                    disabled
+                                {% endif %}
+                                >
+                            </td>
                         </tr>
                     {% endfor %}
                 </tbody>

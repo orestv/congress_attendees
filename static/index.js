@@ -191,7 +191,8 @@
       'txtMiddlename': 'middlename',
       'txtCity': 'city',
       'txtPhone': 'personal_phone',
-      'txtPosition': 'position'
+      'txtPosition': 'position',
+      'txtOrganization': 'organization'
     };
 
     function AttendeeEditor(attendee) {
@@ -200,7 +201,9 @@
 
       this.registerAttendee = __bind(this.registerAttendee, this);
 
-      this.saveEvents = __bind(this.saveEvents, this);
+      this.register = __bind(this.register, this);
+
+      this.getAttendeeData = __bind(this.getAttendeeData, this);
 
       this.getEventsData = __bind(this.getEventsData, this);
 
@@ -310,19 +313,41 @@
           return _results;
         })()
       ];
-      return result;
+      return result.join(',');
     };
 
-    AttendeeEditor.prototype.saveEvents = function() {
-      var saveRequest, selectedEvents;
+    AttendeeEditor.prototype.getAttendeeData = function() {
+      var input, inputId, objectKey, resultArray, _ref;
+      resultArray = [];
+      _ref = this.fields;
+      for (inputId in _ref) {
+        objectKey = _ref[inputId];
+        input = document.getElementById(inputId);
+        if (input.value === this.attendee[objectKey]) {
+          continue;
+        }
+        resultArray.push("" + objectKey + "=" + input.value);
+      }
+      return resultArray.join('&');
+    };
+
+    AttendeeEditor.prototype.register = function() {
+      var attendeeData, data, saveRequest, selectedEvents;
       selectedEvents = this.getEventsData();
+      attendeeData = this.getAttendeeData();
       saveRequest = new XMLHttpRequest();
-      saveRequest.open('PUT', "/attendees?id=" + this.attendee._id.$oid + "&events=" + selectedEvents + "&registered=1", false);
-      return saveRequest.send(null);
+      saveRequest.open('PUT', "/attendees?id=" + this.attendee._id.$oid + "&registered=1", false);
+      saveRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+      data = "events=" + selectedEvents;
+      if (attendeeData) {
+        data += '&' + attendeeData;
+      }
+      console.log(data);
+      return saveRequest.send(data);
     };
 
     AttendeeEditor.prototype.registerAttendee = function() {
-      this.saveEvents();
+      this.register();
       Page.updateEditedAttendee(this.attendee._id.$oid);
       return this.hide();
     };

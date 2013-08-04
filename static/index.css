@@ -17,6 +17,10 @@
 	width: 100%;
 }
 
+.attendeeEditorTable input {
+	width: 8cm;
+}
+
 .AttendeeSearchStatus {
 	font-size: 1.2em;
 	width: 100%;
@@ -24,7 +28,7 @@
 }
 
 .attendeeEditorColumn {
-	width: 40%;
+	width: 41%;
 	float: left;
 	height: 100%;
 }
