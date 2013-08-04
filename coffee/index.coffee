@@ -101,7 +101,8 @@ class Index
 			@editAttendee attendee
 
 	editAttendee: (attendee) =>
-		new AttendeeEditor(attendee).show()
+		@editor = new AttendeeEditor(attendee)
+		@editor.show()
 
 	updateEditedAttendee: (attendeeId) =>
 		request = new XMLHttpRequest()
@@ -158,6 +159,7 @@ class AttendeeEditor
 			input = document.getElementById(inputId)
 			if input?
 				input.value = @attendee[objectKey]
+				input.onkeyup = @infoInputKeyPressed
 		for evt in @attendee['attended_events']
 			document.getElementById(evt['id']).checked = true
 		for evt in @events
@@ -169,7 +171,9 @@ class AttendeeEditor
 				document.getElementById("dvLimit_#{evt._id.$oid}").style.display = 'none'
 	clear: () =>
 		for inputId, objectKey of @fields
-			document.getElementById(inputId).value = ''
+			input = document.getElementById inputId
+			input.value = ''
+			input.style.backgroundColor = 'white'
 		for checkbox in document.getElementsByName('events')
 			checkbox.checked = false
 
@@ -177,6 +181,15 @@ class AttendeeEditor
 		document.getElementById('searchListContainer').style.display = 'block'
 		@editorContainer.style.display = 'none'
 		localStorage.removeItem('selectedAttendeeJSON')
+
+	infoInputKeyPressed: (event) =>
+		input = event.currentTarget
+		fieldId = @fields[input.id]
+		fieldValue = @attendee[fieldId]
+		if fieldValue != input.value
+			input.style.backgroundColor = '#E0FFE0'
+		else
+			input.style.backgroundColor = 'white'
 
 	getEventsData: () =>
 		eventCheckboxes = document.getElementsByName('events')
