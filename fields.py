@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 
 INFO_FIELDS = [
-	{'caption': u'Прізвище', 'type': 'text', 'input_id': 'txtLastname'},
-    {'caption': u'Ім’я', 'type': 'text', 'input_id': 'txtFirstname'},
-    {'caption': u'По батькові', 'type': 'text', 'input_id': 'txtMiddlename'},
-    {'caption': u'Місто', 'type': 'text', 'input_id': 'txtCity'},
-    {'caption': u'Організація', 'type': 'text', 'input_id': 'txtOrganization'},
-    {'caption': u'Спеціальність', 'type': 'text', 'input_id': 'txtPosition'},
-    {'caption': u'Телефон', 'type': 'tel', 'input_id': 'txtPhone'}
+	{'caption': u'Прізвище', 'type': 'text', 'input_id': 'txtLastname', 'fieldId': 'lastname'},
+    {'caption': u'Ім’я', 'type': 'text', 'input_id': 'txtFirstname', 'fieldId': 'firstname'},
+    {'caption': u'По батькові', 'type': 'text', 'input_id': 'txtMiddlename', 'fieldId': 'middlename'},
+    {'caption': u'Місто', 'type': 'text', 'input_id': 'txtCity', 'fieldId': 'city'},
+    {'caption': u'Організація', 'type': 'text', 'input_id': 'txtOrganization', 'fieldId': 'organization'},
+    {'caption': u'Спеціальність', 'type': 'text', 'input_id': 'txtPosition', 'fieldId': 'position'},
+    {'caption': u'Телефон', 'type': 'tel', 'input_id': 'txtPhone', 'fieldId': 'personal_phone'}
 ]
 
 ATTEND_FIELDS = [
