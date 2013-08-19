@@ -27,10 +27,11 @@
 	text-align: center;
 }
 
-.attendeeEditorColumn {
-	width: 41%;
-	float: left;
-	height: 100%;
+.attendeeEditorBlock {
+	width: 60%;
+	margin-bottom: 1cm;
+	/*float: left;*/
+	/*height: 100%;*/
 }
 
 tr.registered {

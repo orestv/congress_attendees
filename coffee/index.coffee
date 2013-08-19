@@ -7,12 +7,6 @@ class Index
 		searchBoxInput = document.getElementById('searchBox')
 		searchBoxInput.focus()
 		searchbox = new window.SearchBox(searchBoxInput, @searchRequested)
-		if localStorage.selectedAttendeeJSON?
-			attendee = JSON.parse(localStorage.selectedAttendeeJSON)
-			@editAttendee attendee
-		if localStorage.searchQuery?
-			searchBoxInput.value = localStorage.searchQuery
-			@searchRequested localStorage.searchQuery
 
 	searchRequested: (searchQuery) =>		
 		if searchQuery == ''
@@ -163,12 +157,16 @@ class AttendeeEditor
 		for evt in @attendee['attended_events']
 			document.getElementById(evt['id']).checked = true
 		for evt in @events
+			spLimit = document.getElementById("spLimit_#{evt._id.$oid}")
+			spAttendees = document.getElementById("spAttendees_#{evt._id.$oid}")
+			spLimit.style.color = '#000'
+			spAttendees.style.color = '#000'
 			if evt.limit?
-				document.getElementById("dvLimit_#{evt._id.$oid}").style.display = 'block'
-				document.getElementById("spLimit_#{evt._id.$oid}").textContent = evt.limit
-				document.getElementById("spAttendees_#{evt._id.$oid}").textContent = evt.attendees
-			else
-				document.getElementById("dvLimit_#{evt._id.$oid}").style.display = 'none'
+				spLimit.textContent = evt.limit
+				spAttendees.textContent = evt.attendees
+				if evt.attendees >= evt.limit
+					spAttendees.style.color = '#F00'
+					spLimit.style.color = '#F00'
 	clear: () =>
 		for inputId, objectKey of @fields
 			input = document.getElementById inputId

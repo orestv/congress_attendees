@@ -22,7 +22,7 @@
 
       this.searchRequested = __bind(this.searchRequested, this);
 
-      var attendee, searchBoxInput, searchbox;
+      var searchBoxInput, searchbox;
       this.searching = false;
       this.nextSearch = null;
       this.table = document.getElementById('searchResultsTable');
@@ -30,14 +30,6 @@
       searchBoxInput = document.getElementById('searchBox');
       searchBoxInput.focus();
       searchbox = new window.SearchBox(searchBoxInput, this.searchRequested);
-      if (localStorage.selectedAttendeeJSON != null) {
-        attendee = JSON.parse(localStorage.selectedAttendeeJSON);
-        this.editAttendee(attendee);
-      }
-      if (localStorage.searchQuery != null) {
-        searchBoxInput.value = localStorage.searchQuery;
-        this.searchRequested(localStorage.searchQuery);
-      }
     }
 
     Index.prototype.searchRequested = function(searchQuery) {
@@ -249,7 +241,7 @@
     };
 
     AttendeeEditor.prototype.fill = function() {
-      var evt, input, inputId, objectKey, _i, _j, _len, _len1, _ref, _ref1, _ref2, _results;
+      var evt, input, inputId, objectKey, spAttendees, spLimit, _i, _j, _len, _len1, _ref, _ref1, _ref2, _results;
       _ref = this.fields;
       for (inputId in _ref) {
         objectKey = _ref[inputId];
@@ -268,12 +260,21 @@
       _results = [];
       for (_j = 0, _len1 = _ref2.length; _j < _len1; _j++) {
         evt = _ref2[_j];
+        spLimit = document.getElementById("spLimit_" + evt._id.$oid);
+        spAttendees = document.getElementById("spAttendees_" + evt._id.$oid);
+        spLimit.style.color = '#000';
+        spAttendees.style.color = '#000';
         if (evt.limit != null) {
-          document.getElementById("dvLimit_" + evt._id.$oid).style.display = 'block';
-          document.getElementById("spLimit_" + evt._id.$oid).textContent = evt.limit;
-          _results.push(document.getElementById("spAttendees_" + evt._id.$oid).textContent = evt.attendees);
+          spLimit.textContent = evt.limit;
+          spAttendees.textContent = evt.attendees;
+          if (evt.attendees >= evt.limit) {
+            spAttendees.style.color = '#F00';
+            _results.push(spLimit.style.color = '#F00');
+          } else {
+            _results.push(void 0);
+          }
         } else {
-          _results.push(document.getElementById("dvLimit_" + evt._id.$oid).style.display = 'none');
+          _results.push(void 0);
         }
       }
       return _results;
