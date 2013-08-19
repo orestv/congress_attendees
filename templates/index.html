@@ -41,7 +41,7 @@
         <div style="width: 100%; text-align: left">
             <input type="button" id="btnBackToList" value="<<< Список">
         </div>
-        <div class="attendeeEditorColumn">
+        <div class="attendeeEditorBlock">
             <table class="attendeeEditorTable">
                 <tbody>
                     {% for field in fields %}
@@ -59,8 +59,16 @@
                 </tbody>
             </table>
         </div>
-        <div class="attendeeEditorColumn">
+        <div class="attendeeEditorBlock">
             <table class="attendeeEditorTable">
+                <thead>
+                    <tr>
+                        <th>Імпреза</th>
+                        <th>Відвідає?</th>
+                        <th>Зайнято місць</th>
+                        <th>Всього місць</th>
+                    </tr>
+                </thead>
                 <tbody>
                     {% for event in events %}
                         <tr>
@@ -69,11 +77,10 @@
                             </td>
                             <td><input type="checkbox" id="{{event._id}}" name="events"/></td>
                             <td>
-                                <div id="dvLimit_{{event._id}}" style="display: none">
-                                    <span id="spAttendees_{{event._id}}"></span>
-                                    /
-                                    <span id="spLimit_{{event._id}}"></span>
-                                </div>
+                                <span id="spAttendees_{{event._id}}"></span>
+                            </td>
+                            <td>
+                                <span id="spLimit_{{event._id}}"></span>
                             </td>
                         </tr>
                     {% endfor %}
