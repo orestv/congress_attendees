@@ -7,12 +7,6 @@ class Index
 		searchBoxInput = document.getElementById('searchBox')
 		searchBoxInput.focus()
 		searchbox = new window.SearchBox(searchBoxInput, @searchRequested)
-		if localStorage.selectedAttendeeJSON?
-			attendee = JSON.parse(localStorage.selectedAttendeeJSON)
-			@editAttendee attendee
-		if localStorage.searchQuery?
-			searchBoxInput.value = localStorage.searchQuery
-			@searchRequested localStorage.searchQuery
 
 	searchRequested: (searchQuery) =>		
 		if searchQuery == ''

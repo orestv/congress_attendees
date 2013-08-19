@@ -22,7 +22,7 @@
 
       this.searchRequested = __bind(this.searchRequested, this);
 
-      var attendee, searchBoxInput, searchbox;
+      var searchBoxInput, searchbox;
       this.searching = false;
       this.nextSearch = null;
       this.table = document.getElementById('searchResultsTable');
@@ -30,14 +30,6 @@
       searchBoxInput = document.getElementById('searchBox');
       searchBoxInput.focus();
       searchbox = new window.SearchBox(searchBoxInput, this.searchRequested);
-      if (localStorage.selectedAttendeeJSON != null) {
-        attendee = JSON.parse(localStorage.selectedAttendeeJSON);
-        this.editAttendee(attendee);
-      }
-      if (localStorage.searchQuery != null) {
-        searchBoxInput.value = localStorage.searchQuery;
-        this.searchRequested(localStorage.searchQuery);
-      }
     }
 
     Index.prototype.searchRequested = function(searchQuery) {
