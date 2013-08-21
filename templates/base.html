@@ -1,0 +1,23 @@
+<!doctype html>
+<html>
+<head>
+	<title>{% block title %}Система реєстрації учасників VI Конгресу анестезіологів - {% endblock %}</title>
+	{% block head %}
+
+	{% endblock %}
+</head>
+<body>
+	<a href="/logout" title="">Вихід</a> &#8212; {{user.firstname}} {{user.lastname}}
+    {% if user.is_admin %}
+        <a style="float: right" href="/dashboard" title="">
+            Адміністрування
+        </a>
+    {% endif %}
+    <div class="globalTitle">
+    	<h1>Система реєстрації учасників <br>
+    		VI Конгресу анестезіологів</h1>
+    </div>
+    {% block content %}
+    {% endblock %}
+</body>
+</html>

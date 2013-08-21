@@ -6,7 +6,7 @@ class Index
 		@tableBody = document.getElementById('searchResultsBody')
 		searchBoxInput = document.getElementById('searchBox')
 		searchBoxInput.focus()
-		searchbox = new window.SearchBox(searchBoxInput, @searchRequested)
+		searchbox = new window.SearchBox(searchBoxInput, @searchRequested, @editFirstAttendee)
 
 	searchRequested: (searchQuery) =>		
 		if searchQuery == ''
@@ -46,6 +46,7 @@ class Index
 
 	clearSearchResults: () =>
 		@table.style.visibility = 'hidden'
+		@first_attendee = null
 		while (@tableBody.firstChild)
 			@tableBody.removeChild(@tableBody.firstChild)
 
@@ -55,6 +56,7 @@ class Index
 		attendees = results['attendees']
 		attendee_count = results['count']
 		if attendee_count > 0
+			@first_attendee = attendees[0]
 			for attendee in attendees then do (attendee) =>
 				frag.appendChild @createAttendeeRow attendee
 		@tableBody.appendChild(frag)
@@ -93,6 +95,10 @@ class Index
 		if not attendee.registered or confirm('Цей учасник вже зареєстрований. Ви справді бажаєте змінити його дані?')
 			localStorage.selectedAttendeeJSON = JSON.stringify(attendee)
 			@editAttendee attendee
+
+	editFirstAttendee: () =>
+		if @first_attendee?
+			@editAttendee @first_attendee
 
 	editAttendee: (attendee) =>
 		@editor = new AttendeeEditor(attendee)
