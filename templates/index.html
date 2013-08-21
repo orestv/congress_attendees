@@ -1,21 +1,18 @@
-<!doctype html>
-<html>
-<head>
-    <title>Welcome!</title>
+{% extends "base.html" %}
+{% block title %}
+    {{ super() }}
+    Пошук
+{% endblock %}
+{% block head %}
     <link rel="stylesheet" href="/static/common.css">
     <link rel="stylesheet" href="/static/index.css">
     <script src="/static/search.js" type="text/javascript" charset="utf-8" async defer></script>
     <script src="/static/index.js" type="text/javascript" charset="utf-8" async defer></script>
-</head>
-<body onload="bodyLoaded();">
-    <a href="/logout" title="">Вихід</a>
-    {% if user.is_admin %}
-        <a style="float: right" href="/dashboard" title="">
-            Адміністрування
-        </a>
-    {% endif %}
+{% endblock %}
+{% block content %}
     <div id="searchListContainer">
         <div class="centerContainer">
+            (введіть перші букви імені або прізвища)<br>
             <input type="search" id="searchBox"/>
             <img src="/static/ajax-loader.gif" alt="" id="imgSearchLoader" style="visibility: hidden;"></div>
         <div id="results" class="centerResultTableContainer">
@@ -90,5 +87,4 @@
         <div style="clear: both"></div>
         <input type="button" id="btnRegisterAttendee" value="Зареєструвати"/>
     </div>
-</body>
-</html>
+{% endblock %}

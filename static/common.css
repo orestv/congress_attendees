@@ -2,6 +2,12 @@ input {
 	/*font-size: 1.5em;*/
 }
 
+.globalTitle {
+	margin: auto;
+	width: 50%;
+	text-align: center;
+}
+
 .centerContainer {
 	margin: auto;
 	width: 85%;

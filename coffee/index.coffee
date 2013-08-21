@@ -223,8 +223,7 @@ class AttendeeEditor
 	backToList: () =>
 		@hide()
 
-
-window.bodyLoaded = () ->
+window.onload = () ->
 	window.Page = new Index()
 
 search = (text) ->
