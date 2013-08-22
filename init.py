@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 # -*- coding: utf-8 -*-
 import sqlite3 as sql
 import random
@@ -5,7 +8,7 @@ import pymongo
 from pymongo import MongoClient
 import re
 from string import digits
-
+import crypt
 
 def read_names(filename):
 	input_file = open(filename, 'r')
@@ -49,9 +52,8 @@ EVENTS = [
 	{'caption': u'Урочиста вечеря 19.09'}
 ]
 
-if __name__ == '__main__':
-	# conn = pymongo.Connection('mongodb://application:master@ds027688.mongolab.com:027688/congress_new')
-	conn = pymongo.MongoClient()
+
+def init_attendees(conn):
 	db = conn.congress
 	attendees = db.attendees
 	firstnames = read_names('firstnames')
@@ -81,27 +83,27 @@ if __name__ == '__main__':
 	db.events.drop()
 	db.events.insert(EVENTS)
 
+def init_users(conn):
+	db = conn.congress
 	db.users.drop()
-	user = {'login': u'rostykv',
-		'password': u'123',
-		'admin': True}
-	db.users.insert(user)
+	fields = {'firstname': 1, 'lastname': 0, 'login': 2, 'password': 3}
+
+	file_users = open('users_pwds', 'r')
+
+	for line in file_users:
+		line = line.rstrip()
+		line_split = line.split(' ')
+		user = {key : line_split[fields[key]] for key in fields}
+		user['password_hash'] = crypt.crypt(user['password'], 'sha2')
+		user['admin'] = (len(line_split) > 4)
+		del user['password']
+		db.users.insert(user)
+
+	file_users.close()
+
+	# db.users.insert(user)
+
+if __name__ == '__main__':
+	conn = pymongo.MongoClient()
+	init_users(conn)
 	conn.close()
-	# try:
-	# 	con = db_connect()
-	# 	cur = con.cursor()
-	# 	print 'Connected'
-
-		# for i in range(100000):
-		# 	firstname = random.choice(firstnames)
-		# 	lastname = random.choice(lastnames)
-		# 	middlename = generate_middlename(random.choice(firstnames))
-		# 	create_attendee(cur, firstname, middlename, lastname)
-
-	# 	con.commit()
-	# 	print 'Inserted!'
-	# except sql.Error, e:
-	# 	print 'Connection failed: %s' % e.args[0]
-	# finally:
-	# 	con.close()
-	# 	print 'Disconnected!'

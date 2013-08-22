@@ -3,6 +3,7 @@
 
 import model
 from bson import ObjectId
+import crypt
 
 class User:
 
@@ -33,8 +34,8 @@ def get_user_by_id(db, uid):
     return User(str(db_user['_id']), db_user['admin'], db_user['firstname'], db_user['lastname'])
 
 def get_user_by_credentials(db, login, password):
-    db_user = db.users.find_one({'login': login, 'password': password})
-    print login, password, db_user
+    password_hash = crypt.crypt(password, 'sha2')
+    db_user = db.users.find_one({'login': login, 'password_hash': password_hash})
     if not db_user:
         return None
     return User(str(db_user['_id']), db_user['admin'], db_user['firstname'], db_user['lastname'])
