@@ -34,5 +34,5 @@ class Dashboard
 		return tr
 
 
-window.bodyLoaded = () ->
+window.onload = () ->
 	window.Page = new Dashboard()

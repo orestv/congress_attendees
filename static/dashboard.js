@@ -64,7 +64,7 @@
 
   })();
 
-  window.bodyLoaded = function() {
+  window.onload = function() {
     return window.Page = new Dashboard();
   };
 

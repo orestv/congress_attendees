@@ -1,0 +1,25 @@
+<!doctype html>
+<html>
+<head>
+	<title>{% block title %}Система реєстрації учасників VI Конгресу анестезіологів - {% endblock %}</title>
+	{% block head %}
+		<link rel="stylesheet" href="/static/common.css">
+	{% endblock %}
+</head>
+<body>
+	<input type="button" value="Вихід" onclick="window.location.href = '/logout'">
+	{{user.firstname}} {{user.lastname}}
+    {% if user.is_admin %}
+    	<a href="/dashboard" class="customNavigationItem">Адміністрування</a>
+    {% endif %}
+    {% block customNavigation %}
+
+    {% endblock %}
+    <div class="globalTitle">
+    	<h2>Система реєстрації учасників <br>
+    		VI Конгресу анестезіологів</h2>
+    </div>
+    {% block content %}
+    {% endblock %}
+</body>
+</html>

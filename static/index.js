@@ -10,6 +10,8 @@
 
       this.editAttendee = __bind(this.editAttendee, this);
 
+      this.editFirstAttendee = __bind(this.editFirstAttendee, this);
+
       this.editAttendeeClicked = __bind(this.editAttendeeClicked, this);
 
       this.createAttendeeRow = __bind(this.createAttendeeRow, this);
@@ -29,7 +31,7 @@
       this.tableBody = document.getElementById('searchResultsBody');
       searchBoxInput = document.getElementById('searchBox');
       searchBoxInput.focus();
-      searchbox = new window.SearchBox(searchBoxInput, this.searchRequested);
+      searchbox = new window.SearchBox(searchBoxInput, this.searchRequested, this.editFirstAttendee);
     }
 
     Index.prototype.searchRequested = function(searchQuery) {
@@ -47,12 +49,12 @@
       if (this.searching) {
         this.searchRequest.abort();
       }
-      this.searching = true;
       this.searchRequest = new XMLHttpRequest();
       this.searchRequest.onreadystatechange = this.processSearchRequest;
       this.searchRequest.open('GET', "/attendees?s=" + searchQuery, true);
       this.searchRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-      return this.searchRequest.send(null);
+      this.searchRequest.send(null);
+      return this.searching = true;
     };
 
     Index.prototype.processSearchRequest = function() {
@@ -73,6 +75,7 @@
     Index.prototype.clearSearchResults = function() {
       var _results;
       this.table.style.visibility = 'hidden';
+      this.first_attendee = null;
       _results = [];
       while (this.tableBody.firstChild) {
         _results.push(this.tableBody.removeChild(this.tableBody.firstChild));
@@ -88,6 +91,7 @@
       attendees = results['attendees'];
       attendee_count = results['count'];
       if (attendee_count > 0) {
+        this.first_attendee = attendees[0];
         _fn = function(attendee) {
           return frag.appendChild(_this.createAttendeeRow(attendee));
         };
@@ -140,6 +144,12 @@
       if (!attendee.registered || confirm('Цей учасник вже зареєстрований. Ви справді бажаєте змінити його дані?')) {
         localStorage.selectedAttendeeJSON = JSON.stringify(attendee);
         return this.editAttendee(attendee);
+      }
+    };
+
+    Index.prototype.editFirstAttendee = function() {
+      if (this.first_attendee != null) {
+        return this.editAttendee(this.first_attendee);
       }
     };
 
@@ -379,7 +389,7 @@
 
   })();
 
-  window.bodyLoaded = function() {
+  window.onload = function() {
     return window.Page = new Index();
   };
 
