@@ -1,11 +1,19 @@
-<html>
-<head>
-	<title>Dashboard</title>
+{% extends "base.html" %}
+{% block title %}
+	{{ super () }}
+	Адміністрування
+{% endblock %}
+{% block head %}
+	{{ super() }}
 	<link rel="stylesheet" href="/static/dashboard.css">
 	<script src="/static/dashboard.js" type="text/javascript" charset="utf-8" async defer></script>
-</head>
-<body onload="bodyLoaded();">
-	<a href="/" style="float: left;">Головна</a>
+{% endblock %}
+
+{% block customNavigation %}
+	<a href="/" class="customNavigationItem">Головна</a>
+{% endblock %}
+
+{% block content %}
 	<div id="dvEvents" style="float: left;">
 		<table class="dashboardTable">
 			<caption><h3>Події</h3></caption>
@@ -52,5 +60,4 @@
 			</tbody>
 		</table>
 	</div>
-</body>
-</html>
+{% endblock %}

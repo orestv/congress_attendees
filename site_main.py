@@ -118,7 +118,8 @@ def dashboard():
     events = list(events_cursor)
     for event in events:
         event['attendee_count'] = model.get_event_attendees_count(get_db(), event['_id'])
-    return render_template('dashboard.html', events = events)
+    return render_template('dashboard.html', events = events, 
+        user = flask_login.current_user)
 
 @app.route('/logout')
 def logout():
