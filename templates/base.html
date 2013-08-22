@@ -7,11 +7,11 @@
 	{% endblock %}
 </head>
 <body>
-	<a href="/logout" title="">Вихід</a> &#8212; {{user.firstname}} {{user.lastname}}
+	<input type="button" value="Вихід" onclick="window.location.href = '/logout'">
+	{{user.firstname}} {{user.lastname}}
     {% if user.is_admin %}
-        <a style="float: right" href="/dashboard" title="">
-            Адміністрування
-        </a>
+    	<input type="button" style="float: right" value="Адміністрування"
+    		onclick="window.location.href='/dashboard'">
     {% endif %}
     <div class="globalTitle">
     	<h2>Система реєстрації учасників <br>
