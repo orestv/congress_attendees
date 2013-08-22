@@ -49,12 +49,12 @@
       if (this.searching) {
         this.searchRequest.abort();
       }
-      this.searching = true;
       this.searchRequest = new XMLHttpRequest();
       this.searchRequest.onreadystatechange = this.processSearchRequest;
       this.searchRequest.open('GET', "/attendees?s=" + searchQuery, true);
       this.searchRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-      return this.searchRequest.send(null);
+      this.searchRequest.send(null);
+      return this.searching = true;
     };
 
     Index.prototype.processSearchRequest = function() {

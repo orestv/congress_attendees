@@ -20,18 +20,13 @@ class Index
 		localStorage.searchQuery = searchQuery
 		document.getElementById('imgSearchLoader').style.visibility = 'visible'
 		if @searching
-			# @searching = false
 			@searchRequest.abort()
-			# term = searchQuery
-			# @nextSearch = () =>
-			# 	@searchRequested term
-			# return
-		@searching = true
 		@searchRequest = new XMLHttpRequest()
 		@searchRequest.onreadystatechange = @processSearchRequest
 		@searchRequest.open('GET', "/attendees?s=#{searchQuery}", true)
 		@searchRequest.setRequestHeader("Content-type","application/x-www-form-urlencoded");
 		@searchRequest.send(null)
+		@searching = true
 
 	processSearchRequest: () =>
 		if @searchRequest.readyState == 4 && @searchRequest.status == 200
