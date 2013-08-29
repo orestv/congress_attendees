@@ -1,2 +1,2 @@
-window.bodyLoaded = () ->
+window.onload = () ->
 	document.getElementById('txtLogin').focus()
