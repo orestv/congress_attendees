@@ -78,12 +78,9 @@ def update_attendee():
         model.set_attendee_registered(get_db(), id, user_id, registered)
     if flask_login.current_user.is_admin:
         valid_field_ids = [field['fieldId'] for field in fields.INFO_FIELDS]
-        print valid_field_ids
         submitted_field_ids = filter(lambda x : x in request.form, valid_field_ids)
-        print submitted_field_ids
         if submitted_field_ids:
             attendee_info = {field: request.form[field] for field in submitted_field_ids}
-            print attendee_info
             model.set_attendee_info(get_db(), id, attendee_info)
     return json.dumps({})
 
@@ -99,7 +96,6 @@ def attendees():
     elif event_id:
         result = model.get_event_attendees(get_db(), event_id)
         result = [r for r in result]
-        print result
     elif id:
         attendee = find_attendee_by_id(id)
         events_db = model.get_events(get_db())
