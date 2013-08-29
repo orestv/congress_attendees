@@ -95,7 +95,6 @@ def attendees():
         result = find_attendees_by_word(search_term)
     elif event_id:
         result = model.get_event_attendees(get_db(), event_id)
-        result = [r for r in result]
     elif id:
         attendee = find_attendee_by_id(id)
         events_db = model.get_events(get_db())

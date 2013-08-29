@@ -30,6 +30,8 @@ class Dashboard
 		details = "#{attendee.lastname} #{attendee.firstname} #{attendee.middlename}, #{attendee.city}"
 		tdDetails = document.createElement 'td'
 		tdDetails.appendChild document.createTextNode(details)
+		if attendee.queue
+			tr.className = 'queuedAttendee'
 		tr.appendChild tdDetails
 		return tr
 

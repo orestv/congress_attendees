@@ -37,13 +37,23 @@ def get_events(db):
 def get_event_attendees(db, event_id):
     if type(event_id) is not str:
         event_id = str(event_id)
-    return db.attendees.find({'attended_events': 
+    cursor = db.attendees.find({'attended_events': 
         {'$elemMatch': {'id': event_id}}
         }).sort('registered_on', 1)
+    attendees = [a for a in cursor]
+
+    event = db.events.find_one({'_id': ObjectId(event_id)})
+    event_limit = event.get('limit', None)
+
+    if event_limit and event_limit < attendees.count:
+        for attendee in attendees[event_limit:]:
+            attendee['queue'] = True
+
+    return attendees
 
 def get_event_attendees_count(db, event_id):
     event_attendees = get_event_attendees(db, event_id)
-    return event_attendees.count()
+    return len(event_attendees)
 
 def set_attendee_events(db, attendee_id, event_ids):
     now = datetime.datetime.utcnow()
