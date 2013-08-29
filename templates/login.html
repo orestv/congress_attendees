@@ -1,11 +1,14 @@
-﻿<!doctype html>
-<html>
-<head>
-	<title>Login</title>
+﻿{% extends "base.html" %}
+{% block title %}
+	{{ super() }}
+	Вхід
+{% endblock %}
+{% block head %}
+	{{ super() }}
 	<link rel="stylesheet" href="/static/login.css">
 	<script src="/static/login.js" type="text/javascript" charset="utf-8" async defer></script>
-</head>
-<body onload="bodyLoaded();">	
+{% endblock %}
+{% block content %}
 	<form action="/login" method="POST" accept-charset="utf-8" id="frmLogin">
 		<div class="loginBlock">
 			<table>
@@ -41,5 +44,4 @@
 				</table>
 			</div>
 	</form>
-</body>
-</html>
+{% endblock %}

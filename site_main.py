@@ -34,7 +34,8 @@ def load_user(uid):
 @app.route('/login', methods=['GET'])
 def root():
     if not flask_login.current_user.is_authenticated():
-        return render_template('login.html')
+        return render_template('login.html', 
+            user = flask_login.current_user)
     else:
         return redirect(url_for('index'))
 
