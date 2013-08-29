@@ -67,6 +67,7 @@ def index():
 @flask_login.login_required
 def update_attendee():
     id = request.args.get('id', None)
+    user_id = flask_login.current_user.get_id()
     events = request.form.get('events', None)
     if events is not None:
         events = events.split(',') if events else []
@@ -74,7 +75,7 @@ def update_attendee():
     registered = request.args.get('registered', None)
     if registered is not None:
         registered = bool(registered)
-        model.set_attendee_registered(get_db(), id, registered)
+        model.set_attendee_registered(get_db(), id, user_id, registered)
     if flask_login.current_user.is_admin:
         valid_field_ids = [field['fieldId'] for field in fields.INFO_FIELDS]
         print valid_field_ids

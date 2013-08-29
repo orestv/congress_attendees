@@ -37,7 +37,9 @@ def get_events(db):
 def get_event_attendees(db, event_id):
     if type(event_id) is not str:
         event_id = str(event_id)
-    return db.attendees.find({'attended_events': {'$elemMatch': {'id': event_id}}})
+    return db.attendees.find({'attended_events': 
+        {'$elemMatch': {'id': event_id}}
+        }).sort('registered_on', 1)
 
 def get_event_attendees_count(db, event_id):
     event_attendees = get_event_attendees(db, event_id)
@@ -61,9 +63,15 @@ def set_attendee_events(db, attendee_id, event_ids):
     db.attendees.update({'_id': attendee_id},
         {'$set': {'attended_events': all_events}})
 
-def set_attendee_registered(db, attendee_id, registered):
-    db.attendees.update({'_id': ObjectId(attendee_id)},
-        {'$set': {'registered': registered}})
+def set_attendee_registered(db, attendee_id, user_id, registered):
+    cur = db.attendees.find({'_id': ObjectId(attendee_id), 
+        'registered': True})
+    already_registered = (cur.count() > 0)
+    if not already_registered:
+        db.attendees.update({'_id': ObjectId(attendee_id)},
+            {'$set': {'registered': registered, 
+                    'registered_on': datetime.datetime.now(), 
+                    'registered_by': user_id}})
 
 def set_attendee_info(db, attendee_id, info):
     db.attendees.update({'_id': ObjectId(attendee_id)},
