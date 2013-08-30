@@ -1,0 +1,10 @@
+.attendeeEditorTable input {
+	width: 8cm;
+}
+
+.attendeeEditorBlock {
+	width: 60%;
+	margin-bottom: 1cm;
+	/*float: left;*/
+	/*height: 100%;*/
+}

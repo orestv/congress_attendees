@@ -17,22 +17,13 @@
 	width: 100%;
 }
 
-.attendeeEditorTable input {
-	width: 8cm;
-}
-
-.AttendeeSearchStatus {
+.attendeeSearchStatus {
 	font-size: 1.2em;
 	width: 100%;
 	text-align: center;
 }
 
-.attendeeEditorBlock {
-	width: 60%;
-	margin-bottom: 1cm;
-	/*float: left;*/
-	/*height: 100%;*/
-}
+
 
 tr.registered {
 	color: #80D080;

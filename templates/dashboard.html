@@ -6,7 +6,7 @@
 {% block head %}
 	{{ super() }}
 	<link rel="stylesheet" href="/static/dashboard.css">
-	<script src="/static/dashboard.js" type="text/javascript" charset="utf-8" async defer></script>
+	<script src="/static/dashboard.js" type="text/javascript" charset="utf-8" async defer></script>	
 {% endblock %}
 
 {% block customNavigation %}
@@ -14,6 +14,10 @@
 {% endblock %}
 
 {% block content %}
+	<div>
+		<input type="button" name="" value="Додати учасника">
+	</div>
+	<div style="clear:both"></div>
 	<div id="dvEvents" style="float: left;">
 		<table class="dashboardTable">
 			<caption><h3>Події</h3></caption>
