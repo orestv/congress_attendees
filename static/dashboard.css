@@ -11,3 +11,11 @@
 tr.queuedAttendee {
 	color: #AFAFAF;
 }
+
+#attendeeEditorContainer {
+	display: none;
+	margin-left: 1cm;
+	width: 15cm;
+	padding-left: 2cm;
+	border-bottom: 1px solid grey
+}

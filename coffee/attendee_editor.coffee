@@ -10,16 +10,18 @@ class AttendeeEditor
 		'txtOrganization': 'organization'
 	}
 
+	firstInputId = 'txtLastname'
+
 	constructor: (@attendee) ->
 		@editorContainer = document.getElementById 'attendeeEditorContainer'
-		document.getElementById('btnRegisterAttendee').onclick = @registerAttendee
-		document.getElementById('btnBackToList').onclick = @backToList
+		@initInputEvents()
 
 	show: () =>
-		document.getElementById('searchListContainer').style.display = 'none'
 		@editorContainer.style.display = 'block'
 		@clear()
-		@fetch()
+		if @attendee._id?
+			@fetch()
+		document.getElementById(firstInputId).focus()
 
 	fetch: () =>
 		@request = new XMLHttpRequest()
@@ -32,12 +34,23 @@ class AttendeeEditor
 		@request.open('GET', "/attendees?id=#{@attendee._id.$oid}", true)
 		@request.send(null)
 
+	initInputEvents: () ->
+		for inputId, objectKey of @fields
+			input = document.getElementById(inputId)
+			if input?
+				input.onkeyup = @infoInputKeyPressed
+
+	clearInputEvents: () ->
+		for inputId, objectKey of @fields
+			input = document.getElementById(inputId)
+			if input?
+				input.onkeyup = null		
+
 	fill: () =>
 		for inputId, objectKey of @fields
 			input = document.getElementById(inputId)
 			if input?
 				input.value = @attendee[objectKey]
-				input.onkeyup = @infoInputKeyPressed
 		for evt in @attendee['attended_events']
 			document.getElementById(evt['id']).checked = true
 		for evt in @events
@@ -60,14 +73,15 @@ class AttendeeEditor
 			checkbox.checked = false
 
 	hide: () =>
-		document.getElementById('searchListContainer').style.display = 'block'
 		@editorContainer.style.display = 'none'
-		localStorage.removeItem('selectedAttendeeJSON')
+		@clearInputEvents()
 
 	infoInputKeyPressed: (event) =>
 		input = event.currentTarget
 		fieldId = @fields[input.id]
 		fieldValue = @attendee[fieldId]
+		if not fieldValue?
+			fieldValue = ''
 		if fieldValue != input.value
 			input.style.backgroundColor = '#E0FFE0'
 		else
@@ -82,29 +96,12 @@ class AttendeeEditor
 		resultArray = []
 		for inputId, objectKey of @fields
 			input = document.getElementById inputId
-			if input.value == @attendee[objectKey]
+			attendeeValue = @attendee[objectKey]
+			if not attendeeValue?
+				attendeeValue = ''
+			if input.value == attendeeValue
 				continue
 			resultArray.push "#{objectKey}=#{input.value}"
 		return resultArray.join('&')
-
-	register: () =>
-		selectedEvents = @getEventsData()
-		attendeeData = @getAttendeeData()
-		saveRequest = new XMLHttpRequest()
-		saveRequest.open('PUT', "/attendees?id=#{@attendee._id.$oid}&registered=1", false)
-		saveRequest.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-		data = "events=#{selectedEvents}"
-		if attendeeData
-			data += '&' + attendeeData
-		console.log data
-		saveRequest.send(data)
-
-	registerAttendee: () =>
-		@register()
-		Page.updateEditedAttendee(@attendee._id.$oid)
-		@hide()
-
-	backToList: () =>
-		@hide()
 
 window.AttendeeEditor = AttendeeEditor

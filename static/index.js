@@ -6,6 +6,10 @@
   Index = (function() {
 
     function Index() {
+      this.backToList = __bind(this.backToList, this);
+
+      this.registerAttendee = __bind(this.registerAttendee, this);
+
       this.updateEditedAttendee = __bind(this.updateEditedAttendee, this);
 
       this.editAttendee = __bind(this.editAttendee, this);
@@ -32,6 +36,8 @@
       searchBoxInput = document.getElementById('searchBox');
       searchBoxInput.focus();
       searchbox = new window.SearchBox(searchBoxInput, this.searchRequested, this.editFirstAttendee);
+      document.getElementById('btnRegisterAttendee').onclick = this.registerAttendee;
+      document.getElementById('btnBackToList').onclick = this.backToList;
     }
 
     Index.prototype.searchRequested = function(searchQuery) {
@@ -155,6 +161,7 @@
 
     Index.prototype.editAttendee = function(attendee) {
       this.editor = new AttendeeEditor(attendee);
+      document.getElementById('searchListContainer').style.display = 'none';
       return this.editor.show();
     };
 
@@ -172,6 +179,27 @@
       };
       request.open('GET', "/attendees?id=" + attendeeId, true);
       return request.send(null);
+    };
+
+    Index.prototype.registerAttendee = function() {
+      var attendeeData, data, eventsData, request;
+      request = new XMLHttpRequest();
+      eventsData = this.editor.getEventsData();
+      attendeeData = this.editor.getAttendeeData();
+      data = "events=" + eventsData;
+      if (attendeeData) {
+        data += '&' + attendeeData;
+      }
+      request.open('PUT', "/attendees?id=" + this.editor.attendee._id.$oid + "&registered=1", false);
+      request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+      request.send(data);
+      this.updateEditedAttendee(this.editor.attendee._id.$oid);
+      return this.backToList();
+    };
+
+    Index.prototype.backToList = function() {
+      this.editor.hide();
+      return document.getElementById('searchListContainer').style.display = 'block';
     };
 
     Index.prototype.appendCell = function(tr, text) {

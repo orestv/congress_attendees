@@ -8,6 +8,9 @@ class Index
 		searchBoxInput.focus()
 		searchbox = new window.SearchBox(searchBoxInput, @searchRequested, @editFirstAttendee)
 
+		document.getElementById('btnRegisterAttendee').onclick = @registerAttendee
+		document.getElementById('btnBackToList').onclick = @backToList
+
 	searchRequested: (searchQuery) =>		
 		if searchQuery == ''
 			localStorage.removeItem('searchQuery')
@@ -97,6 +100,7 @@ class Index
 
 	editAttendee: (attendee) =>
 		@editor = new AttendeeEditor(attendee)
+		document.getElementById('searchListContainer').style.display = 'none'
 		@editor.show()
 
 	updateEditedAttendee: (attendeeId) =>
@@ -108,6 +112,23 @@ class Index
 				@tableBody.replaceChild(newRow, @selectedAttendeeRow)
 		request.open('GET', "/attendees?id=#{attendeeId}", true)
 		request.send(null)
+
+	registerAttendee: () =>
+		request = new XMLHttpRequest()
+		eventsData = @editor.getEventsData()
+		attendeeData = @editor.getAttendeeData()
+		data = "events=#{eventsData}"
+		if attendeeData
+			data += '&' + attendeeData
+		request.open('PUT', "/attendees?id=#{@editor.attendee._id.$oid}&registered=1", false)
+		request.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+		request.send(data)		
+		@updateEditedAttendee(@editor.attendee._id.$oid)
+		@backToList()
+
+	backToList: () =>
+		@editor.hide()
+		document.getElementById('searchListContainer').style.display = 'block'
 
 	appendCell: (tr, text) ->
 		td = document.createElement 'td'

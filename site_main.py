@@ -69,18 +69,23 @@ def update_attendee():
     id = request.args.get('id', None)
     user_id = flask_login.current_user.get_id()
     events = request.form.get('events', None)
-    if events is not None:
-        events = events.split(',') if events else []
-        model.set_attendee_events(get_db(), id, events)
-    registered = request.args.get('registered', None)
-    if registered is not None:
-        registered = bool(registered)
-        model.set_attendee_registered(get_db(), id, user_id, registered)
+    if id is not None:
+        if events is not None:
+            events = events.split(',') if events else []
+            model.set_attendee_events(get_db(), id, events)
+        registered = request.args.get('registered', None)
+        if registered is not None:
+            registered = bool(registered)
+            model.set_attendee_registered(get_db(), id, user_id, registered)
     if flask_login.current_user.is_admin:
+        print 'Admin updating an attendee!'
         valid_field_ids = [field['fieldId'] for field in fields.INFO_FIELDS]
+        print valid_field_ids
         submitted_field_ids = filter(lambda x : x in request.form, valid_field_ids)
+        print submitted_field_ids
         if submitted_field_ids:
             attendee_info = {field: request.form[field] for field in submitted_field_ids}
+            print attendee_info
             model.set_attendee_info(get_db(), id, attendee_info)
     return json.dumps({})
 
@@ -115,8 +120,10 @@ def dashboard():
     events = list(events_cursor)
     for event in events:
         event['attendee_count'] = model.get_event_attendees_count(get_db(), event['_id'])
-    return render_template('dashboard.html', events = events, 
-        user = flask_login.current_user)
+    return render_template('dashboard.html',
+        events = events, 
+        user = flask_login.current_user,
+        fields=fields.INFO_FIELDS)
 
 @app.route('/logout')
 def logout():

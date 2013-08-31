@@ -84,8 +84,11 @@ def set_attendee_registered(db, attendee_id, user_id, registered):
                     'registered_by': user_id}})
 
 def set_attendee_info(db, attendee_id, info):
-    db.attendees.update({'_id': ObjectId(attendee_id)},
-        {'$set': info})
+    if attendee_id:
+        db.attendees.update({'_id': ObjectId(attendee_id)},
+            {'$set': info})
+    else:
+        db.attendees.insert(info)
 
 def find_attendee(db, id):
     cursor = db.attendees.find({'_id': ObjectId(id)})
