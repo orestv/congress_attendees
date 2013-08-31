@@ -13,14 +13,12 @@ class Index
 
 	searchRequested: (searchQuery) =>		
 		if searchQuery == ''
-			localStorage.removeItem('searchQuery')
 			@nextSearch = null
 			@searchRequest.abort()
 			@searching = false
 			document.getElementById('imgSearchLoader').style.visibility = 'hidden'
 			@clearSearchResults()
 			return
-		localStorage.searchQuery = searchQuery
 		document.getElementById('imgSearchLoader').style.visibility = 'visible'
 		if @searching
 			@searchRequest.abort()

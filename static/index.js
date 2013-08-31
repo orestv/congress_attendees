@@ -42,7 +42,6 @@
 
     Index.prototype.searchRequested = function(searchQuery) {
       if (searchQuery === '') {
-        localStorage.removeItem('searchQuery');
         this.nextSearch = null;
         this.searchRequest.abort();
         this.searching = false;
@@ -50,7 +49,6 @@
         this.clearSearchResults();
         return;
       }
-      localStorage.searchQuery = searchQuery;
       document.getElementById('imgSearchLoader').style.visibility = 'visible';
       if (this.searching) {
         this.searchRequest.abort();
