@@ -90,15 +90,15 @@ class Index
 		return tr
 
 	editAttendeeClicked: (attendee) =>
-		if not attendee.registered or confirm('Цей учасник вже зареєстрований. Ви справді бажаєте змінити його дані?')
-			localStorage.selectedAttendeeJSON = JSON.stringify(attendee)
-			@editAttendee attendee
+		@editAttendee attendee
 
 	editFirstAttendee: () =>
 		if @first_attendee?
 			@editAttendee @first_attendee
 
 	editAttendee: (attendee) =>
+		if attendee.registered and not confirm('Цей учасник вже зареєстрований. Ви справді бажаєте змінити його дані?')
+			return
 		@editor = new AttendeeEditor(attendee)
 		document.getElementById('searchListContainer').style.display = 'none'
 		@editor.show()

@@ -147,10 +147,7 @@
     };
 
     Index.prototype.editAttendeeClicked = function(attendee) {
-      if (!attendee.registered || confirm('Цей учасник вже зареєстрований. Ви справді бажаєте змінити його дані?')) {
-        localStorage.selectedAttendeeJSON = JSON.stringify(attendee);
-        return this.editAttendee(attendee);
-      }
+      return this.editAttendee(attendee);
     };
 
     Index.prototype.editFirstAttendee = function() {
@@ -160,6 +157,9 @@
     };
 
     Index.prototype.editAttendee = function(attendee) {
+      if (attendee.registered && !confirm('Цей учасник вже зареєстрований. Ви справді бажаєте змінити його дані?')) {
+        return;
+      }
       this.editor = new AttendeeEditor(attendee);
       document.getElementById('searchListContainer').style.display = 'none';
       return this.editor.show();
