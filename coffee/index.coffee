@@ -13,14 +13,12 @@ class Index
 
 	searchRequested: (searchQuery) =>		
 		if searchQuery == ''
-			localStorage.removeItem('searchQuery')
 			@nextSearch = null
 			@searchRequest.abort()
 			@searching = false
 			document.getElementById('imgSearchLoader').style.visibility = 'hidden'
 			@clearSearchResults()
 			return
-		localStorage.searchQuery = searchQuery
 		document.getElementById('imgSearchLoader').style.visibility = 'visible'
 		if @searching
 			@searchRequest.abort()
@@ -90,15 +88,15 @@ class Index
 		return tr
 
 	editAttendeeClicked: (attendee) =>
-		if not attendee.registered or confirm('Цей учасник вже зареєстрований. Ви справді бажаєте змінити його дані?')
-			localStorage.selectedAttendeeJSON = JSON.stringify(attendee)
-			@editAttendee attendee
+		@editAttendee attendee
 
 	editFirstAttendee: () =>
 		if @first_attendee?
 			@editAttendee @first_attendee
 
 	editAttendee: (attendee) =>
+		if attendee.registered and not confirm('Цей учасник вже зареєстрований. Ви справді бажаєте змінити його дані?')
+			return
 		@editor = new AttendeeEditor(attendee)
 		document.getElementById('searchListContainer').style.display = 'none'
 		@editor.show()

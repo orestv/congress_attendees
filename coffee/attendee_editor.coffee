@@ -49,7 +49,7 @@ class AttendeeEditor
 	fill: () =>
 		for inputId, objectKey of @fields
 			input = document.getElementById(inputId)
-			if input?
+			if input? and @attendee[objectKey]?
 				input.value = @attendee[objectKey]
 		for evt in @attendee['attended_events']
 			document.getElementById(evt['id']).checked = true

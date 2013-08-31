@@ -103,7 +103,7 @@
       for (inputId in _ref) {
         objectKey = _ref[inputId];
         input = document.getElementById(inputId);
-        if (input != null) {
+        if ((input != null) && (this.attendee[objectKey] != null)) {
           input.value = this.attendee[objectKey];
         }
       }
