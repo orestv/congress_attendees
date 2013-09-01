@@ -163,12 +163,13 @@ class AttendeeEditor
 			for e in @eventsFreePlaces when e._id == evt._id
 				if e.free_places? and e.free_places <= 0
 					return
-		if evt['booked'] or evt['checked']
+		if evt['booked']
 			btnCancel.style.display = 'inline'
-			if evt['booked']
-				spBooked.style.display = 'inline'
-			else
+			if @attendee['registered']
 				spPaid.style.display = 'inline'
+				evt['paid'] = true
+			else
+				spBooked.style.display = 'inline'
 		else
 			btnBook.style.display = 'inline'
 			if @setDefaultActions and evt.default
@@ -263,7 +264,7 @@ class AttendeeEditor
 
 	preparePrice: () =>
 		price = 0
-		for evt in @events when evt.price? and evt['booked']
+		for evt in @events when evt.price? and evt['booked'] and not evt['paid']
 			price += evt['price']
 		document.getElementById('spPrice').textContent = price
 
@@ -272,7 +273,7 @@ class AttendeeEditor
 		while ul.hasChildNodes()
 			ul.removeChild ul.lastChild
 		console.log @events
-		for evt in @events when evt['item_caption']? and (evt['booked'] or evt['checked'])
+		for evt in @events when evt['item_caption']? and evt['booked'] and not evt['paid']
 			li = document.createElement('li')
 			li.textContent = evt.item_caption
 			ul.appendChild(li)

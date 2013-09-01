@@ -331,12 +331,13 @@
           }
         }
       }
-      if (evt['booked'] || evt['checked']) {
+      if (evt['booked']) {
         btnCancel.style.display = 'inline';
-        if (evt['booked']) {
-          return spBooked.style.display = 'inline';
+        if (this.attendee['registered']) {
+          spPaid.style.display = 'inline';
+          return evt['paid'] = true;
         } else {
-          return spPaid.style.display = 'inline';
+          return spBooked.style.display = 'inline';
         }
       } else {
         btnBook.style.display = 'inline';
@@ -478,7 +479,7 @@
       _ref = this.events;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         evt = _ref[_i];
-        if ((evt.price != null) && evt['booked']) {
+        if ((evt.price != null) && evt['booked'] && !evt['paid']) {
           price += evt['price'];
         }
       }
@@ -496,7 +497,7 @@
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         evt = _ref[_i];
-        if (!((evt['item_caption'] != null) && (evt['booked'] || evt['checked']))) {
+        if (!((evt['item_caption'] != null) && evt['booked'] && !evt['paid'])) {
           continue;
         }
         li = document.createElement('li');

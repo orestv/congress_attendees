@@ -142,5 +142,5 @@ def init_events(conn):
 
 if __name__ == '__main__':
 	conn = pymongo.MongoClient()
-	init_events(conn)
+	init_users(conn)
 	conn.close()
