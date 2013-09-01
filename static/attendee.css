@@ -1,0 +1,11 @@
+.attendeeEditorTable input[type=text],input[type=tel] {
+	width: 8cm;
+}
+
+.attendeeEditorBlock {
+	margin-left: 2cm;
+	padding-bottom: .5cm;
+	margin-bottom: .5cm;
+	width: 80%;
+	border-bottom: 1px solid black;
+}

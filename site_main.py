@@ -13,8 +13,12 @@ import locale
 import fields
 from bson import json_util
 import flask.ext.login as flask_login
+from threading import Lock
+
+from time import sleep
 
 app = Flask(__name__)
+app.event_update_lock = Lock()
 
 app.config.from_pyfile('config.cfg')
 mongo = PyMongo(app)
@@ -53,15 +57,31 @@ def login_request():
 @app.route('/index')
 @flask_login.login_required
 def index():
-    events_cursor = model.get_events(get_db())
-    events = []
-    for event in events_cursor:
-        event['_id'] = str(event['_id'])
-        events.append(event)
+    print 'Acquiring lock!'
+    with app.event_update_lock:
+        print 'Sleeping...'
+        sleep(10)
+    print 'Lock released'
+    events = get_all_events()
     return render_template('index.html', 
         fields=fields.INFO_FIELDS, 
         events = events, 
         user = flask_login.current_user)
+
+@app.route('/attendee_event', methods=['PUT'])
+def attendee_event():
+    pass
+
+@app.route('/events', methods=['GET'])
+def events():
+    request_type = request.args.get('type', None)
+    result = {}
+    if request_type == 'free_places':
+        result = model.get_events_free_places(get_db())
+    else:
+        result = get_all_events()    
+    return json.dumps({'events': result})
+
 
 @app.route('/attendees', methods=['PUT'])
 @flask_login.login_required
@@ -102,14 +122,23 @@ def attendees():
         result = model.get_event_attendees(get_db(), event_id)
     elif id:
         attendee = find_attendee_by_id(id)
-        events_db = model.get_events(get_db())
-        events = []
-        for event in events_db:
-            if 'limit' in event:
-                event['attendees'] = model.get_event_attendees_count(get_db(), event['_id'])
-            events.append(event)
-        result = {'attendee': attendee, 'events': events}
+        # events_db = model.get_events(get_db())
+        # events = []
+        # for event in events_db:
+        #     if 'limit' in event:
+        #         event['attendees'] = model.get_event_attendees_count(get_db(), event['_id'])
+        #     events.append(event)
+        # result = {'attendee': attendee, 'events': events}
+        result = {'attendee': attendee}
     return json.dumps(result, default=json_util.default)
+
+@app.route('/attendee_edit', methods=['GET'])
+@flask_login.login_required
+def edit_attendee():
+    return render_template('attendee.html', 
+        fields = fields.INFO_FIELDS,
+        user = flask_login.current_user,
+        events = get_all_events())
 
 @app.route('/dashboard')
 @flask_login.login_required
@@ -146,7 +175,14 @@ def find_attendee_by_id(id):
     cursor = model.find_attendee(get_db(), id)
     if not cursor:
         return {}
-    attendee = cursor[0]
-    return attendee
+    return cursor
+
+def get_all_events():
+    events_cursor = model.get_events(get_db())
+    events = []
+    for event in events_cursor:
+        event['_id'] = str(event['_id'])
+        events.append(event)
+    return events
 
 app.run(debug=True)

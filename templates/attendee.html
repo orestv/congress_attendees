@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block title %}
+	{{ super() }}
+	Учасник
+{% endblock %}
+{% block head %}
+	{{ super() }}
+	<link rel="stylesheet" href="/static/index.css">
+	<link rel="stylesheet" href="/static/attendee.css">
+	<script src="/static/sizzle.min.js" type="text/javascript" charset="utf-8" async defer></script>
+	<script src="/static/attendee.js" type="text/javascript" charset="utf-8" async defer></script>
+{% endblock %}
+
+{% macro event_control(event) -%}
+	{% if event.limit %}
+		<input type="button" name="btnBook" value="Забронювати" eventId="{{event._id}}" style="display: none">
+		<input type="button" name="btnCancel" value="Відмінити" eventId="{{event._id}}" style="display: none">
+
+		<span class="EventStatus" name="spBooked" eventId="{{event._id}}" style="display: none">
+			Заброньовано
+		</span>
+		<span class="EventStatus" name="spPaid" eventId="{{event._id}}" style="display: none">
+			Оплачено
+		</span>
+	{% else %}
+		<input type="checkbox" name="cbVerify" value="">
+	{% endif %}
+{%- endmacro %}
+
+{% macro event_places(event) -%}
+	<span class="EventStatus" name="spFreePlaces" eventId="{{event._id}}" style="display: none"></span>
+	<span class="EventStatus" name="spNoFreePlaces" eventId="{{event._id}}" style="display: none">
+		Вільних місць немає
+	</span>
+	<span class="eventStatus" name="spNoLimit" eventId="{{event._id}}" style="display:none">Необмежено</span>
+{%- endmacro %}
+
+{% macro event_price(event) -%}
+	{% if event.price %}
+		{{ event.price }}
+	{% else %}
+		Безкоштовно
+	{% endif %}
+{% endmacro %}
+
+
+{% block content %}
+	<div class="attendeeEditorBlock">
+		<table class="attendeeEditorTable">
+			<tbody>
+				{% for field in fields %}
+					<tr>
+						<td>{{field.caption}}</td>
+						<td>
+							<input type="{{field.type}}" id="{{field.input_id}}" 
+							{% if not user.is_admin %}
+								disabled
+							{% endif %}
+							>
+						</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+	<div class="attendeeEditorBlock">
+		<table class="attendeeEditorTable">
+			<thead>
+				<tr>
+					<th width="40%">Назва</th>
+					<th width="10%">Ціна</th>
+					<th width="25%">Вільних місць</th>
+					<th width="25%">Дії</th>
+				</tr>
+			</thead>
+			<tbody id="tbEvents">
+				{% for event in events %}
+					<tr>
+						<td>
+							<label for="{{event._id}}">{{event.caption}}</label>
+						</td>
+						<td style="text-align: center">
+							{{ event_price(event) }}
+						</td>
+						<td style="text-align: center">
+							{{ event_places(event) }}
+						</td>
+						<td style="text-align: center">
+							{{ event_control(event) }}
+						</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+{% endblock %}
