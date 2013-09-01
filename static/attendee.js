@@ -100,7 +100,7 @@
       this.fetchEvents = function(callback) {
         return AttendeeEditor.prototype.fetchEvents.apply(_this, arguments);
       };
-      this.fetchEventFreePlaces = function() {
+      this.fetchEventFreePlaces = function(callback) {
         return AttendeeEditor.prototype.fetchEventFreePlaces.apply(_this, arguments);
       };
       this.saveAttendeeInfo = function(callback) {
@@ -127,13 +127,14 @@
       document.getElementById('btnCancelRegistration').onclick = this.btnCancelRegistration_clicked;
       this.tbEvents = Sizzle('#tbEvents')[0];
       this.initInputEvents();
-      this.fetchEventFreePlaces();
-      if (this.attendeeId != null) {
-        this.fetchAttendee();
-        this.fetchEvents();
-      } else {
-        this.dvEvents.style.display = 'none';
-      }
+      this.fetchEventFreePlaces(function() {
+        if (_this.attendeeId != null) {
+          _this.fetchAttendee();
+          return _this.fetchEvents();
+        } else {
+          return _this.dvEvents.style.display = 'none';
+        }
+      });
     }
 
     AttendeeEditor.prototype.fetchAttendee = function() {
@@ -204,16 +205,19 @@
       return rqSAI.send(this.getAttendeeData());
     };
 
-    AttendeeEditor.prototype.fetchEventFreePlaces = function() {
+    AttendeeEditor.prototype.fetchEventFreePlaces = function(callback) {
       var request,
         _this = this;
       request = new XMLHttpRequest();
       request.onreadystatechange = function() {
-        var events, response;
+        var response;
         if (request.readyState === 4) {
           response = JSON.parse(request.responseText);
-          events = response.events;
-          return _this.fillEventsFreePlaces(events);
+          _this.eventsFreePlaces = response.events;
+          _this.fillEventsFreePlaces(_this.eventsFreePlaces);
+          if (callback != null) {
+            return callback();
+          }
         }
       };
       request.open('GET', '/events?type=free_places', true);
@@ -304,7 +308,7 @@
     };
 
     AttendeeEditor.prototype.fillEventActions = function(evt) {
-      var btnBook, btnCancel, item, spBooked, spPaid, _i, _len, _ref;
+      var btnBook, btnCancel, e, item, spBooked, spPaid, _i, _j, _len, _len1, _ref, _ref1;
       btnCancel = this.getEventElement('btnCancel', evt);
       btnBook = this.getEventElement('btnBook', evt);
       spBooked = this.getEventElement('spBooked', evt);
@@ -315,6 +319,17 @@
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         item = _ref[_i];
         item.style.display = 'none';
+      }
+      if (evt.limit != null) {
+        _ref1 = this.eventsFreePlaces;
+        for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+          e = _ref1[_j];
+          if (e._id === evt._id) {
+            if ((e.free_places != null) && e.free_places <= 0) {
+              return;
+            }
+          }
+        }
       }
       if (evt['booked'] || evt['checked']) {
         btnCancel.style.display = 'inline';
@@ -339,7 +354,7 @@
       loader.style.display = 'inline';
       request = new XMLHttpRequest();
       request.onreadystatechange = function() {
-        var response;
+        var error, response;
         if (request.readyState !== 4) {
           return;
         }
@@ -350,8 +365,12 @@
           _this.getEventElement('btnCancel', evt).style.display = 'inline';
           evt['booked'] = true;
         } else {
-          alert('Error!');
-          console.log(response.error);
+          error = response.error;
+          if (error.type === 'outofplaces') {
+            alert('Пробачте, місць не залишилось');
+          } else {
+            alert('Відбулась невідома помилка, бронювання не вдалось');
+          }
         }
         return _this.updateEventFreePlaces(evt._id);
       };
@@ -402,12 +421,19 @@
         _this = this;
       rqUEFP = new XMLHttpRequest();
       rqUEFP.onreadystatechange = function() {
-        var current_evt, response;
+        var current_evt, e, response, _i, _len, _ref;
         if (rqUEFP.readyState !== 4) {
           return;
         }
         response = JSON.parse(rqUEFP.responseText);
         current_evt = response.event;
+        _ref = _this.eventsFreePlaces;
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          e = _ref[_i];
+          if (e._id = current_evt._id) {
+            e.free_places = current_evt.free_places;
+          }
+        }
         return _this.fillEventFreePlaces(current_evt);
       };
       rqUEFP.open('GET', "/events?type=free_places&id=" + eventId, true);
@@ -527,8 +553,12 @@
     };
 
     AttendeeEditor.prototype.btnFinishRegistration_clicked = function() {
-      this.btnFinishRegistration.style.display = 'None';
-      return this.saveAttendeeInfo(this.showPostRegistrationMessage);
+      if (window.creatingAttendee) {
+        return window.location.href = '/';
+      } else {
+        this.btnFinishRegistration.style.display = 'None';
+        return this.saveAttendeeInfo(this.showPostRegistrationMessage);
+      }
     };
 
     AttendeeEditor.prototype.btnRegister_clicked = function() {

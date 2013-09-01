@@ -75,11 +75,13 @@ def attendee_event():
             })
     if request.method == 'PUT':
         with app.event_update_lock:
-            free_places = model.get_event_free_places(get_db(), event_id)
-            if free_places <= 0:
-                return json.dumps({'success': False, 'error': {
-                    'type': 'outofplaces'
-                    }})
+            db_evt = model.get_event(get_db(), event_id)
+            if 'limit' in db_evt:
+                evt = model.get_event_free_places(get_db(), event_id)
+                if evt['free_places'] <= 0:
+                    return json.dumps({'success': False, 'error': {
+                        'type': 'outofplaces'
+                        }})
             model.book_attendee_event(get_db(), attendee_id, event_id)
     elif request.method == 'DELETE':
         with app.event_update_lock:
@@ -142,7 +144,6 @@ def update_attendee():
             attendee_info = {field: request.form[field] for field in submitted_field_ids}
             print attendee_info
             model.set_attendee_info(get_db(), id, attendee_info)
-            time.sleep(2)
     return json.dumps({})
 
 @app.route('/attendees', methods=['GET'])

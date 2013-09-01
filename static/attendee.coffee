@@ -30,12 +30,13 @@ class AttendeeEditor
 
 		@tbEvents = Sizzle('#tbEvents')[0]
 		@initInputEvents()
-		@fetchEventFreePlaces()
-		if @attendeeId?
-			@fetchAttendee()
-			@fetchEvents()
-		else
-			@dvEvents.style.display = 'none'
+		@fetchEventFreePlaces(() =>
+			if @attendeeId?
+				@fetchAttendee()
+				@fetchEvents()
+			else
+				@dvEvents.style.display = 'none'
+			)		
 
 	fetchAttendee: () =>
 		request = new XMLHttpRequest()
@@ -87,13 +88,15 @@ class AttendeeEditor
 		rqSAI.setRequestHeader("Content-type","application/x-www-form-urlencoded");
 		rqSAI.send(@getAttendeeData())
 
-	fetchEventFreePlaces: () =>
+	fetchEventFreePlaces: (callback) =>
 		request = new XMLHttpRequest()
 		request.onreadystatechange = () =>
 			if request.readyState == 4
 				response = JSON.parse(request.responseText)
-				events = response.events
-				@fillEventsFreePlaces(events)
+				@eventsFreePlaces = response.events
+				@fillEventsFreePlaces(@eventsFreePlaces)
+				if callback?
+					callback()
 		request.open('GET', '/events?type=free_places', true)
 		request.send(null)
 
@@ -154,7 +157,12 @@ class AttendeeEditor
 		btnBook.onclick = @btnBook_clicked
 		btnCancel.onclick = @btnCancel_clicked
 		for item in [btnCancel, btnBook, spBooked, spPaid]
-			item.style.display = 'none'		
+			item.style.display = 'none'
+
+		if evt.limit?
+			for e in @eventsFreePlaces when e._id == evt._id
+				if e.free_places? and e.free_places <= 0
+					return
 		if evt['booked'] or evt['checked']
 			btnCancel.style.display = 'inline'
 			if evt['booked']
@@ -181,8 +189,11 @@ class AttendeeEditor
 				@getEventElement('btnCancel', evt).style.display = 'inline'
 				evt['booked'] = true
 			else
-				alert('Error!')
-				console.log response.error
+				error = response.error
+				if error.type == 'outofplaces'
+					alert('Пробачте, місць не залишилось')
+				else
+					alert('Відбулась невідома помилка, бронювання не вдалось')
 			@updateEventFreePlaces evt._id
 		request.open('PUT', '/attendee_event', true)
 		request.setRequestHeader("Content-type","application/x-www-form-urlencoded");
@@ -220,6 +231,8 @@ class AttendeeEditor
 				return
 			response = JSON.parse(rqUEFP.responseText)
 			current_evt = response.event
+			for e in @eventsFreePlaces when e._id = current_evt._id
+				e.free_places = current_evt.free_places
 			@fillEventFreePlaces current_evt
 		rqUEFP.open('GET', "/events?type=free_places&id=#{eventId}", true)
 		rqUEFP.send(null)
@@ -293,8 +306,11 @@ class AttendeeEditor
 			@saveAttendeeInfo()
 
 	btnFinishRegistration_clicked: () =>
-		@btnFinishRegistration.style.display = 'None'
-		@saveAttendeeInfo(@showPostRegistrationMessage)
+		if window.creatingAttendee
+			window.location.href = '/'
+		else
+			@btnFinishRegistration.style.display = 'None'
+			@saveAttendeeInfo(@showPostRegistrationMessage)
 
 	btnRegister_clicked: () =>
 		@register(() =>

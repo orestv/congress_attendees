@@ -26,13 +26,19 @@ def intersect_attendees(a, b):
 
 def compare_attendees(a1, a2):
     for field in ['lastname', 'firstname', 'middlename']:
-        compare_result = locale.strcoll(a1[field], a2[field])
-        if compare_result:
-            return compare_result
+        f1 = a1.get(field)
+        f2 = a2.get(field)
+        if f1 and f2:
+            compare_result = locale.strcoll(a1[field], a2[field])
+            if compare_result:
+                return compare_result
     return 0
 
 def get_events(db):
     return db.events.find()
+
+def get_event(db, event_id):
+    return db.events.find_one({'_id': ObjectId(event_id)})
 
 def get_event_attendees(db, event_id):
     if type(event_id) is not str:
