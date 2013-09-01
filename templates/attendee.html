@@ -13,8 +13,7 @@
 
 {% macro event_control(event) -%}
 	{% if event.limit %}
-		<input type="button" name="btnBook" value="Забронювати" eventId="{{event._id}}" style="display: none">
-		<input type="button" name="btnCancel" value="Відмінити" eventId="{{event._id}}" style="display: none">
+		<img src="/static/ajax-loader.gif" name="imgLoader" eventId="{{event._id}}" style="display: none">
 
 		<span class="EventStatus" name="spBooked" eventId="{{event._id}}" style="display: none">
 			Заброньовано
@@ -22,6 +21,9 @@
 		<span class="EventStatus" name="spPaid" eventId="{{event._id}}" style="display: none">
 			Оплачено
 		</span>
+		
+		<input type="button" name="btnBook" value="Забронювати" eventId="{{event._id}}" style="display: none">
+		<input type="button" name="btnCancel" value="Відмінити" eventId="{{event._id}}" style="display: none">
 	{% else %}
 		<input type="checkbox" name="cbVerify" value="">
 	{% endif %}

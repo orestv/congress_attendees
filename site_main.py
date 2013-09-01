@@ -57,11 +57,6 @@ def login_request():
 @app.route('/index')
 @flask_login.login_required
 def index():
-    print 'Acquiring lock!'
-    with app.event_update_lock:
-        print 'Sleeping...'
-        sleep(10)
-    print 'Lock released'
     events = get_all_events()
     return render_template('index.html', 
         fields=fields.INFO_FIELDS, 
@@ -70,17 +65,35 @@ def index():
 
 @app.route('/attendee_event', methods=['PUT'])
 def attendee_event():
-    pass
+    event_id = request.form.get('eid', None)
+    attendee_id = request.form.get('aid', None)
+    if not event_id or not attendee_id:
+        return json.dumps({'success': False, 'error': {
+            'type': 'exception',
+            'message': 'Event Id or Attendee Id not specified'}
+            })
+    with app.event_update_lock:
+        free_places = model.get_event_free_places(get_db(), event_id)
+        if free_places <= 0:
+            return json.dumps({'success': False, 'error': {
+                'type': 'outofplaces'
+                }})
+        model.book_attendee_event(get_db(), attendee_id, event_id)
+    return json.dumps({'success': True})        
 
 @app.route('/events', methods=['GET'])
 def events():
     request_type = request.args.get('type', None)
+    eid = request.args.get('id', None)
     result = {}
     if request_type == 'free_places':
-        result = model.get_events_free_places(get_db())
+        if eid:
+            result = {'event': model.get_event_free_places(get_db(), eid)}
+        else:
+            result = {'events': model.get_events_free_places(get_db())}
     else:
-        result = get_all_events()    
-    return json.dumps({'events': result})
+        result = {'events': get_all_events()}
+    return json.dumps(result)
 
 
 @app.route('/attendees', methods=['PUT'])
@@ -122,13 +135,6 @@ def attendees():
         result = model.get_event_attendees(get_db(), event_id)
     elif id:
         attendee = find_attendee_by_id(id)
-        # events_db = model.get_events(get_db())
-        # events = []
-        # for event in events_db:
-        #     if 'limit' in event:
-        #         event['attendees'] = model.get_event_attendees_count(get_db(), event['_id'])
-        #     events.append(event)
-        # result = {'attendee': attendee, 'events': events}
         result = {'attendee': attendee}
     return json.dumps(result, default=json_util.default)
 
@@ -185,4 +191,4 @@ def get_all_events():
         events.append(event)
     return events
 
-app.run(debug=True)
+app.run(debug=True, threaded=True)

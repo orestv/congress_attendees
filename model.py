@@ -56,25 +56,35 @@ def get_event_attendees_count(db, event_id):
     return len(event_attendees)
 
 def get_event_free_places(db, event_id):
+    s_eid = event_id
+    event_id = ObjectId(event_id)
     evt = db.events.find_one({'_id': event_id})
     if not evt.get('limit', None):
         raise ValueError, 'Trying to get free places for event without limits: %s' % (str(event_id))
     attendees_count = db.attendees.find({'attended_events': 
-        {'$elemMatch': {'id': str(event_id), 'checked': True}}}).count()
+            {'$elemMatch': {'_id': s_eid, 'booked': True}}
+        }).count()
     free_places = evt['limit'] - attendees_count
-    return free_places
+    return {'_id': s_eid, 'free_places': free_places}
 
 def get_events_free_places(db):
     events = []
     for evt in db.events.find():
+        s_eid = str(evt['_id'])
         free_places = None
         if evt.get('limit', None):
-            free_places = get_event_free_places(db, evt['_id'])
-            print 'Free places for %s: %i' % (evt['_id'], free_places)
-        events.append({'_id': str(evt['_id']), 
-            'free_places': free_places})
+            events.append (get_event_free_places(db, s_eid))
+        else:
+            events.append({'_id': s_eid})
     return events
 
+def book_attendee_event(db, attendee_id, event_id):
+    db.attendees.update({'_id': ObjectId(attendee_id)}, 
+        {'$pull': {'attended_events': 
+            {'$elemMatch': {'_id': event_id}}}})
+    db.attendees.update({'_id': ObjectId(attendee_id)}, 
+        {'$push': {'attended_events': 
+            {'_id': event_id, 'booked': True}}})
 
 def set_attendee_events(db, attendee_id, event_ids):
     now = datetime.datetime.utcnow()

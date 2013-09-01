@@ -20,7 +20,7 @@ class AttendeeEditor
 		if @attendeeId?
 			@fetchAttendee()
 		else
-			@attendeeFetched = true		
+			@createAttendee()	
 		@fetchEvents()
 
 	fetchAttendee: () =>
@@ -29,6 +29,7 @@ class AttendeeEditor
 			if request.readyState == 4
 				response = JSON.parse(request.responseText)
 				@attendee = response.attendee
+				console.log @attendee
 				@attendeeFetched = true
 				setTimeout @fillEventsActions, 1
 				setTimeout (() => 
@@ -36,6 +37,10 @@ class AttendeeEditor
 					, 1)
 		request.open('GET', "/attendees?id=#{@attendeeId}", true)
 		request.send(null)
+
+	createAttendee: () =>
+		@attendeeFetched = true
+		setTimeout @fillEventsActions, 1
 
 	fetchEventFreePlaces: () =>
 		request = new XMLHttpRequest()
@@ -89,7 +94,6 @@ class AttendeeEditor
 		@joinEventData()
 		console.log 'Filling event actions'
 		for evt in @events
-			console.log evt
 			@fillEventActions evt
 
 	fillEventActions: (evt) =>
@@ -102,34 +106,69 @@ class AttendeeEditor
 			btnCancel.onclick = @btnCancel_clicked
 			for item in [btnCancel, btnBook, spBooked, spPaid]
 				item.style.display = 'none'		
-			if evt['booked'] or evt['paid']
-				@getEventElement('btnCancel').style.display = 'inline'
+			if evt['booked'] or evt['checked']
+				btnCancel.style.display = 'inline'
 				if evt['booked']
-					@getEventElement('spBooked').style.display = 'inline'
+					spBooked.style.display = 'inline'
+				else
+					spPaid.style.display = 'inline'
 			else
 				btnBook.style.display = 'inline'
+
+	bookEvent: (evt) =>
+		loader = @getEventElement 'imgLoader', evt
+		@getEventElement('btnBook', evt).style.display = 'none'
+		loader.style.display = 'inline'
+		request = new XMLHttpRequest()
+		request.onreadystatechange = () =>
+			if request.readyState != 4
+				return
+			loader.style.display = 'none'
+			response = JSON.parse(request.responseText)
+			if response['success']
+				@getEventElement('spBooked', evt).style.display = 'inline'
+				@getEventElement('btnCancel', evt).style.display = 'inline'
+			else
+				alert('Error!')
+				console.log response.error
+			@updateEventFreePlaces evt._id
+		request.open('PUT', '/attendee_event', true)
+		request.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+		data = "eid=#{evt._id}&aid=#{@attendeeId}"
+		request.send(data)
+
+	updateEventFreePlaces: (eventId) =>
+		request = new XMLHttpRequest()
+		request.onreadystatechange = () =>
+			if request.readyState != 4
+				return
+			response = JSON.parse(request.responseText)
+			current_evt = response.event
+			@fillEventFreePlaces current_evt
+		request.open('GET', "/events?type=free_places&id=#{eventId}", true)
+		request.send(null)
 
 	btnBook_clicked: (event) =>
 		btnBook = event.target		
 		eventId = @getEventIdFromEvent event
 		evt = null
-		for e in events when e['_id'] == eventId
+		for e in @events when e['_id'] == eventId
 			evt = e
+		@bookEvent(evt)
 
 	btnCancel_clicked: (event) =>
 		btnCancel = event.target
 		eventId = @getEventIdFromEvent event
-		for e in events when e['_id'] == eventId
+		for e in @events when e['_id'] == eventId
 			evt = e
-		if not confirm('Ви впевнені, що бажаєте відмінити реєстрацію на "#{evt.caption}"?')
+		if not confirm("Ви впевнені, що бажаєте відмінити реєстрацію на '#{evt.caption}'?")
 			return
 
 	joinEventData: () =>
-		#todo
 		for a_evt in @attendee['attended_events']
 			for evt in @events when evt['_id'] == a_evt['_id']
-				for attr in a_evt
-					console.log attr
+				for attr in ['booked', 'checked']
+					evt[attr] = a_evt[attr]
 
 	getEventElement: (name, evt) ->
 		return Sizzle("[eventId=#{evt._id}][name=#{name}]", @tbEvents)[0]
