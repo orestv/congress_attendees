@@ -137,16 +137,35 @@ class AttendeeEditor
 		data = "eid=#{evt._id}&aid=#{@attendeeId}"
 		request.send(data)
 
-	updateEventFreePlaces: (eventId) =>
+	unbookEvent: (evt) =>
+		loader = @getEventElement 'imgLoader', evt
+		@getEventElement('btnCancel', evt).style.display = 'none'
+		@getEventElement('spBooked', evt).style.display = 'none'
+		loader.style.display = 'inline'
 		request = new XMLHttpRequest()
 		request.onreadystatechange = () =>
 			if request.readyState != 4
 				return
-			response = JSON.parse(request.responseText)
+			delete evt.checked
+			delete evt.booked
+			@fillEventActions(evt)
+			@updateEventFreePlaces evt._id
+			loader.style.display = 'none'
+		request.open('DELETE', '/attendee_event')
+		request.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+		data = "eid=#{evt._id}&aid=#{@attendeeId}"
+		request.send(data)
+
+	updateEventFreePlaces: (eventId) =>
+		rqUEFP = new XMLHttpRequest()
+		rqUEFP.onreadystatechange = () =>
+			if rqUEFP.readyState != 4
+				return
+			response = JSON.parse(rqUEFP.responseText)
 			current_evt = response.event
 			@fillEventFreePlaces current_evt
-		request.open('GET', "/events?type=free_places&id=#{eventId}", true)
-		request.send(null)
+		rqUEFP.open('GET', "/events?type=free_places&id=#{eventId}", true)
+		rqUEFP.send(null)
 
 	btnBook_clicked: (event) =>
 		btnBook = event.target		
@@ -161,8 +180,8 @@ class AttendeeEditor
 		eventId = @getEventIdFromEvent event
 		for e in @events when e['_id'] == eventId
 			evt = e
-		if not confirm("Ви впевнені, що бажаєте відмінити реєстрацію на '#{evt.caption}'?")
-			return
+		if confirm("Ви впевнені, що бажаєте відмінити реєстрацію на '#{evt.caption}'?")
+			@unbookEvent(evt)
 
 	joinEventData: () =>
 		for a_evt in @attendee['attended_events']

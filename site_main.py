@@ -63,7 +63,8 @@ def index():
         events = events, 
         user = flask_login.current_user)
 
-@app.route('/attendee_event', methods=['PUT'])
+@app.route('/attendee_event', methods=['PUT', 'DELETE'])
+@flask_login.login_required
 def attendee_event():
     event_id = request.form.get('eid', None)
     attendee_id = request.form.get('aid', None)
@@ -72,19 +73,24 @@ def attendee_event():
             'type': 'exception',
             'message': 'Event Id or Attendee Id not specified'}
             })
-    with app.event_update_lock:
-        free_places = model.get_event_free_places(get_db(), event_id)
-        if free_places <= 0:
-            return json.dumps({'success': False, 'error': {
-                'type': 'outofplaces'
-                }})
-        model.book_attendee_event(get_db(), attendee_id, event_id)
-    return json.dumps({'success': True})        
+    if request.method == 'PUT':
+        with app.event_update_lock:
+            free_places = model.get_event_free_places(get_db(), event_id)
+            if free_places <= 0:
+                return json.dumps({'success': False, 'error': {
+                    'type': 'outofplaces'
+                    }})
+            model.book_attendee_event(get_db(), attendee_id, event_id)
+    elif request.method == 'DELETE':
+        with app.event_update_lock:
+            model.unbook_attendee_event(get_db(), attendee_id, event_id)        
+    return json.dumps({'success': True})
 
 @app.route('/events', methods=['GET'])
 def events():
     request_type = request.args.get('type', None)
     eid = request.args.get('id', None)
+    print "event id is %s" % (eid)
     result = {}
     if request_type == 'free_places':
         if eid:

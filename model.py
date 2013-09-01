@@ -79,12 +79,14 @@ def get_events_free_places(db):
     return events
 
 def book_attendee_event(db, attendee_id, event_id):
-    db.attendees.update({'_id': ObjectId(attendee_id)}, 
-        {'$pull': {'attended_events': 
-            {'$elemMatch': {'_id': event_id}}}})
+    unbook_attendee_event(db, attendee_id, event_id)
     db.attendees.update({'_id': ObjectId(attendee_id)}, 
         {'$push': {'attended_events': 
             {'_id': event_id, 'booked': True}}})
+
+def unbook_attendee_event(db, attendee_id, event_id):
+    db.attendees.update({'_id': ObjectId(attendee_id)}, 
+        {'$pull': {'attended_events': {'_id': event_id}}})
 
 def set_attendee_events(db, attendee_id, event_ids):
     now = datetime.datetime.utcnow()

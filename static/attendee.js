@@ -38,6 +38,9 @@
       this.updateEventFreePlaces = function(eventId) {
         return AttendeeEditor.prototype.updateEventFreePlaces.apply(_this, arguments);
       };
+      this.unbookEvent = function(evt) {
+        return AttendeeEditor.prototype.unbookEvent.apply(_this, arguments);
+      };
       this.bookEvent = function(evt) {
         return AttendeeEditor.prototype.bookEvent.apply(_this, arguments);
       };
@@ -245,21 +248,45 @@
       return request.send(data);
     };
 
-    AttendeeEditor.prototype.updateEventFreePlaces = function(eventId) {
-      var request,
+    AttendeeEditor.prototype.unbookEvent = function(evt) {
+      var data, loader, request,
         _this = this;
+      loader = this.getEventElement('imgLoader', evt);
+      this.getEventElement('btnCancel', evt).style.display = 'none';
+      this.getEventElement('spBooked', evt).style.display = 'none';
+      loader.style.display = 'inline';
       request = new XMLHttpRequest();
       request.onreadystatechange = function() {
-        var current_evt, response;
         if (request.readyState !== 4) {
           return;
         }
-        response = JSON.parse(request.responseText);
+        delete evt.checked;
+        delete evt.booked;
+        _this.fillEventActions(evt);
+        _this.updateEventFreePlaces(evt._id);
+        return loader.style.display = 'none';
+      };
+      request.open('DELETE', '/attendee_event');
+      request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+      data = "eid=" + evt._id + "&aid=" + this.attendeeId;
+      return request.send(data);
+    };
+
+    AttendeeEditor.prototype.updateEventFreePlaces = function(eventId) {
+      var rqUEFP,
+        _this = this;
+      rqUEFP = new XMLHttpRequest();
+      rqUEFP.onreadystatechange = function() {
+        var current_evt, response;
+        if (rqUEFP.readyState !== 4) {
+          return;
+        }
+        response = JSON.parse(rqUEFP.responseText);
         current_evt = response.event;
         return _this.fillEventFreePlaces(current_evt);
       };
-      request.open('GET', "/events?type=free_places&id=" + eventId, true);
-      return request.send(null);
+      rqUEFP.open('GET', "/events?type=free_places&id=" + eventId, true);
+      return rqUEFP.send(null);
     };
 
     AttendeeEditor.prototype.btnBook_clicked = function(event) {
@@ -288,8 +315,8 @@
           evt = e;
         }
       }
-      if (!confirm("Ви впевнені, що бажаєте відмінити реєстрацію на '" + evt.caption + "'?")) {
-
+      if (confirm("Ви впевнені, що бажаєте відмінити реєстрацію на '" + evt.caption + "'?")) {
+        return this.unbookEvent(evt);
       }
     };
 
