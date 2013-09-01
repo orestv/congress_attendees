@@ -75,7 +75,6 @@ def attendee_event():
             })
     if request.method == 'PUT':
         with app.event_update_lock:
-            sleep(2)
             free_places = model.get_event_free_places(get_db(), event_id)
             if free_places <= 0:
                 return json.dumps({'success': False, 'error': {
