@@ -10,6 +10,9 @@
 	<script>
 		{% if attendee_id %}
 			window.attendeeId = '{{attendee_id}}'
+			window.creatingAttendee = false
+		{% else %}
+			window.creatingAttendee = true
 		{% endif %}
 	</script>
 	<script src="/static/sizzle.min.js" type="text/javascript" charset="utf-8" async defer></script>
@@ -48,7 +51,7 @@
 
 
 {% block content %}
-	<div class="attendeeEditorBlock">
+	<div class="attendeeEditorBlock" id="dvInfo">
 		<table class="attendeeEditorTable">
 			<tbody>
 				{% for field in fields %}
@@ -97,5 +100,20 @@
 				{% endfor %}
 			</tbody>
 		</table>
+		<input type="button" id="btnFinishRegistration" value="Завершити реєстрацію">
+	</div>
+	<div class="modalPlaceholder" id="dvModalPlaceholder">
+	</div>	
+	<div id="dvPostRegistrationMessage">
+		<div class="messageContainer">
+			Прийміть в учасника <span id="spPrice"></span> грн і видайте йому наступні матеріали та квитки:
+			<ul id="itemsList">
+				
+			</ul>
+		</div>
+		<div class="buttonsContainer">
+			<input type="button" value="Відмінити" id="btnCancelRegistration"/>
+			<input type="button" id="btnRegister" value="Завершити"/>
+		</div>
 	</div>
 {% endblock %}

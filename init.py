@@ -46,19 +46,32 @@ EVENTS = [
 	{'caption': u'Обов’язковий реєстраційний платіж',
 		'import_id': 'registration', 'price': 200, 'default': True},
 	{'caption': u'Пакет матеріалів',
-		'import_id': 'materials', 'price': 100, 'limit': 900, 'default': True},
+		'import_id': 'materials', 'price': 100, 
+		'limit': 900, 'default': True,
+		'item_caption': 'пакет матеріалів'},
 	{'caption': u'Екскурсія 19.09 в 14 год.',
-		'import_id': 'excursion_19', 'price': 40, 'limit': 90},
+		'import_id': 'excursion_19', 
+		'price': 40, 'limit': 90,
+		'item_caption': u'квиток на екскурсію 19.09'},
 	{'caption': u'Екскурсія 20.09 в 14 год.',
-		'import_id': 'excursion_20', 'price': 40, 'limit': 90},
+		'import_id': 'excursion_20', 
+		'price': 40, 'limit': 90,
+		'item_caption': u'квиток на екскурсію 20.09'},
 	{'caption': u'Церемонія відкриття 18.09 в 19 год.',
-		'import_id': 'opening', 'limit': 500},
+		'import_id': 'opening', 'limit': 500,
+		'item_caption': u'квиток на церемонію відкриття'},
 	{'caption': u'Урочиста вечеря 19.09 в 19 год.',
-		'import_id': 'ceremonial_dinner', 'price': 300, 'limit': 500},
+		'import_id': 'ceremonial_dinner', 
+		'price': 300, 'limit': 500,
+		'item_caption': u'квиток на урочисту вечерю'},
 	{'caption': u'Обід 19.09 в 13 год.',
-		'import_id': 'dinner_19', 'price': 50, 'limit': 600},
+		'import_id': 'dinner_19', 
+		'price': 50, 'limit': 600,
+		'item_caption': u'квиток на обід 19.09'},
 	{'caption': u'Обід 20.09 в 13 год.',
-		'import_id': 'dinner_20', 'price': 50, 'limit': 600}
+		'import_id': 'dinner_20', 
+		'price': 50, 'limit': 600,
+		'item_caption': u'квиток на обід 20.09'}
 ]
 
 
@@ -129,5 +142,5 @@ def init_events(conn):
 
 if __name__ == '__main__':
 	conn = pymongo.MongoClient()
-	init_users(conn)
+	init_events(conn)
 	conn.close()

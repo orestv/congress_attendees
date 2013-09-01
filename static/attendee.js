@@ -46,6 +46,15 @@
       this.infoInputsEnable = function(enable) {
         return AttendeeEditor.prototype.infoInputsEnable.apply(_this, arguments);
       };
+      this.btnCancelRegistration_clicked = function() {
+        return AttendeeEditor.prototype.btnCancelRegistration_clicked.apply(_this, arguments);
+      };
+      this.btnRegister_clicked = function() {
+        return AttendeeEditor.prototype.btnRegister_clicked.apply(_this, arguments);
+      };
+      this.btnFinishRegistration_clicked = function() {
+        return AttendeeEditor.prototype.btnFinishRegistration_clicked.apply(_this, arguments);
+      };
       this.btnSaveInfo_clicked = function(event) {
         return AttendeeEditor.prototype.btnSaveInfo_clicked.apply(_this, arguments);
       };
@@ -54,6 +63,21 @@
       };
       this.btnBook_clicked = function(event) {
         return AttendeeEditor.prototype.btnBook_clicked.apply(_this, arguments);
+      };
+      this.prepareItemsList = function() {
+        return AttendeeEditor.prototype.prepareItemsList.apply(_this, arguments);
+      };
+      this.preparePrice = function() {
+        return AttendeeEditor.prototype.preparePrice.apply(_this, arguments);
+      };
+      this.hidePostRegistrationMessage = function() {
+        return AttendeeEditor.prototype.hidePostRegistrationMessage.apply(_this, arguments);
+      };
+      this.showPostRegistrationMessage = function() {
+        return AttendeeEditor.prototype.showPostRegistrationMessage.apply(_this, arguments);
+      };
+      this.register = function(callback) {
+        return AttendeeEditor.prototype.register.apply(_this, arguments);
       };
       this.updateEventFreePlaces = function(eventId) {
         return AttendeeEditor.prototype.updateEventFreePlaces.apply(_this, arguments);
@@ -95,8 +119,12 @@
       };
       this.dvEvents = document.getElementById('dvEvents');
       this.btnSaveInfo = document.getElementById('btnSaveInfo');
+      this.btnFinishRegistration = document.getElementById('btnFinishRegistration');
       document.getElementById(firstInputId).focus();
       this.btnSaveInfo.onclick = this.btnSaveInfo_clicked;
+      this.btnFinishRegistration.onclick = this.btnFinishRegistration_clicked;
+      document.getElementById('btnRegister').onclick = this.btnRegister_clicked;
+      document.getElementById('btnCancelRegistration').onclick = this.btnCancelRegistration_clicked;
       this.tbEvents = Sizzle('#tbEvents')[0];
       this.initInputEvents();
       this.fetchEventFreePlaces();
@@ -320,6 +348,7 @@
         if (response['success']) {
           _this.getEventElement('spBooked', evt).style.display = 'inline';
           _this.getEventElement('btnCancel', evt).style.display = 'inline';
+          evt['booked'] = true;
         } else {
           alert('Error!');
           console.log(response.error);
@@ -385,6 +414,72 @@
       return rqUEFP.send(null);
     };
 
+    AttendeeEditor.prototype.register = function(callback) {
+      var rqRegister,
+        _this = this;
+      rqRegister = new XMLHttpRequest();
+      rqRegister.onreadystatechange = function() {
+        if (rqRegister.readyState !== 4) {
+          return;
+        }
+        if (callback != null) {
+          return callback();
+        }
+      };
+      rqRegister.open('PUT', "/attendees?id=" + this.attendee._id + "&registered=True", true);
+      return rqRegister.send(null);
+    };
+
+    AttendeeEditor.prototype.showPostRegistrationMessage = function() {
+      this.dvEvents.style.display = 'none';
+      this.infoInputsEnable(false);
+      document.getElementById('dvModalPlaceholder').style.display = 'block';
+      document.getElementById('dvPostRegistrationMessage').style.display = 'block';
+      this.preparePrice();
+      return this.prepareItemsList();
+    };
+
+    AttendeeEditor.prototype.hidePostRegistrationMessage = function() {
+      this.dvEvents.style.display = 'block';
+      this.infoInputsEnable(true);
+      document.getElementById('dvModalPlaceholder').style.display = 'none';
+      return document.getElementById('dvPostRegistrationMessage').style.display = 'none';
+    };
+
+    AttendeeEditor.prototype.preparePrice = function() {
+      var evt, price, _i, _len, _ref;
+      price = 0;
+      _ref = this.events;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        evt = _ref[_i];
+        if ((evt.price != null) && evt['booked']) {
+          price += evt['price'];
+        }
+      }
+      return document.getElementById('spPrice').textContent = price;
+    };
+
+    AttendeeEditor.prototype.prepareItemsList = function() {
+      var evt, li, ul, _i, _len, _ref, _results;
+      ul = document.getElementById('itemsList');
+      while (ul.hasChildNodes()) {
+        ul.removeChild(ul.lastChild);
+      }
+      console.log(this.events);
+      _ref = this.events;
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        evt = _ref[_i];
+        if (!((evt['item_caption'] != null) && (evt['booked'] || evt['checked']))) {
+          continue;
+        }
+        li = document.createElement('li');
+        li.textContent = evt.item_caption;
+        _results.push(ul.appendChild(li));
+      }
+      return _results;
+    };
+
     AttendeeEditor.prototype.btnBook_clicked = function(event) {
       var btnBook, e, eventId, evt, _i, _len, _ref;
       btnBook = event.currentTarget;
@@ -429,6 +524,23 @@
       } else {
         return this.saveAttendeeInfo();
       }
+    };
+
+    AttendeeEditor.prototype.btnFinishRegistration_clicked = function() {
+      this.btnFinishRegistration.style.display = 'None';
+      return this.saveAttendeeInfo(this.showPostRegistrationMessage);
+    };
+
+    AttendeeEditor.prototype.btnRegister_clicked = function() {
+      var _this = this;
+      return this.register(function() {
+        return window.location.href = '/';
+      });
+    };
+
+    AttendeeEditor.prototype.btnCancelRegistration_clicked = function() {
+      this.btnFinishRegistration.style.display = 'block';
+      return this.hidePostRegistrationMessage();
     };
 
     AttendeeEditor.prototype.infoInputsEnable = function(enable) {

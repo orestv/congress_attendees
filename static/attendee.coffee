@@ -19,10 +19,15 @@ class AttendeeEditor
 
 		@dvEvents = document.getElementById 'dvEvents'
 		@btnSaveInfo = document.getElementById('btnSaveInfo')
+		@btnFinishRegistration = document.getElementById('btnFinishRegistration')
 
 		document.getElementById(firstInputId).focus()
 
 		@btnSaveInfo.onclick = @btnSaveInfo_clicked
+		@btnFinishRegistration.onclick = @btnFinishRegistration_clicked
+		document.getElementById('btnRegister').onclick = @btnRegister_clicked
+		document.getElementById('btnCancelRegistration').onclick = @btnCancelRegistration_clicked
+
 		@tbEvents = Sizzle('#tbEvents')[0]
 		@initInputEvents()
 		@fetchEventFreePlaces()
@@ -174,6 +179,7 @@ class AttendeeEditor
 			if response['success']
 				@getEventElement('spBooked', evt).style.display = 'inline'
 				@getEventElement('btnCancel', evt).style.display = 'inline'
+				evt['booked'] = true
 			else
 				alert('Error!')
 				console.log response.error
@@ -218,6 +224,46 @@ class AttendeeEditor
 		rqUEFP.open('GET', "/events?type=free_places&id=#{eventId}", true)
 		rqUEFP.send(null)
 
+	register: (callback) =>
+		rqRegister = new XMLHttpRequest()
+		rqRegister.onreadystatechange = () =>
+			if rqRegister.readyState != 4
+				return
+			if callback?
+				callback()
+		rqRegister.open('PUT', "/attendees?id=#{@attendee._id}&registered=True", true)
+		rqRegister.send(null)
+
+	showPostRegistrationMessage: () =>
+		@dvEvents.style.display = 'none'
+		@infoInputsEnable(false)
+		document.getElementById('dvModalPlaceholder').style.display = 'block'
+		document.getElementById('dvPostRegistrationMessage').style.display = 'block'
+		@preparePrice()
+		@prepareItemsList()
+
+	hidePostRegistrationMessage: () =>
+		@dvEvents.style.display = 'block'
+		@infoInputsEnable(true)
+		document.getElementById('dvModalPlaceholder').style.display = 'none'
+		document.getElementById('dvPostRegistrationMessage').style.display = 'none'
+
+	preparePrice: () =>
+		price = 0
+		for evt in @events when evt.price? and evt['booked']
+			price += evt['price']
+		document.getElementById('spPrice').textContent = price
+
+	prepareItemsList: () =>
+		ul = document.getElementById('itemsList')
+		while ul.hasChildNodes()
+			ul.removeChild ul.lastChild
+		console.log @events
+		for evt in @events when evt['item_caption']? and (evt['booked'] or evt['checked'])
+			li = document.createElement('li')
+			li.textContent = evt.item_caption
+			ul.appendChild(li)
+
 	btnBook_clicked: (event) =>
 		btnBook = event.currentTarget		
 		eventId = @getEventIdFromEvent event
@@ -245,6 +291,19 @@ class AttendeeEditor
 			)			
 		else
 			@saveAttendeeInfo()
+
+	btnFinishRegistration_clicked: () =>
+		@btnFinishRegistration.style.display = 'None'
+		@saveAttendeeInfo(@showPostRegistrationMessage)
+
+	btnRegister_clicked: () =>
+		@register(() =>
+			window.location.href = '/')
+
+	btnCancelRegistration_clicked: () =>
+		@btnFinishRegistration.style.display = 'block'
+		@hidePostRegistrationMessage()
+
 
 	infoInputsEnable: (enable) =>
 		for inputId, objectKey of @fields
