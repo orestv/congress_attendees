@@ -7,26 +7,27 @@
 	{{ super() }}
 	<link rel="stylesheet" href="/static/index.css">
 	<link rel="stylesheet" href="/static/attendee.css">
+	<script>
+		{% if attendee_id %}
+			window.attendeeId = '{{attendee_id}}'
+		{% endif %}
+	</script>
 	<script src="/static/sizzle.min.js" type="text/javascript" charset="utf-8" async defer></script>
 	<script src="/static/attendee.js" type="text/javascript" charset="utf-8" async defer></script>
 {% endblock %}
 
 {% macro event_control(event) -%}
-	{% if event.limit %}
-		<img src="/static/ajax-loader.gif" name="imgLoader" eventId="{{event._id}}" style="display: none">
+	<img src="/static/ajax-loader.gif" name="imgLoader" eventId="{{event._id}}" style="display: none">
 
-		<span class="EventStatus" name="spBooked" eventId="{{event._id}}" style="display: none">
-			Заброньовано
-		</span>
-		<span class="EventStatus" name="spPaid" eventId="{{event._id}}" style="display: none">
-			Оплачено
-		</span>
+	<span class="EventStatus" name="spBooked" eventId="{{event._id}}" style="display: none">
+		Заброньовано
+	</span>
+	<span class="EventStatus" name="spPaid" eventId="{{event._id}}" style="display: none">
+		Оплачено
+	</span>
 
-		<input type="button" name="btnBook" value="Забронювати" eventId="{{event._id}}" style="display: none">
-		<input type="button" name="btnCancel" value="Відмінити" eventId="{{event._id}}" style="display: none">
-	{% else %}
-		<input type="checkbox" name="cbCheck" eventId="{{event._id}}">
-	{% endif %}
+	<input type="button" name="btnBook" value="Забронювати" eventId="{{event._id}}" style="display: none">
+	<input type="button" name="btnCancel" value="Відмінити" eventId="{{event._id}}" style="display: none">
 {%- endmacro %}
 
 {% macro event_places(event) -%}
@@ -64,8 +65,10 @@
 				{% endfor %}
 			</tbody>
 		</table>
+		<input type="button" value="Зберегти" id="btnSaveInfo" disabled>
+		<img src="/static/ajax-loader.gif" id="imgSaveLoader" style="display: none">
 	</div>
-	<div class="attendeeEditorBlock">
+	<div class="attendeeEditorBlock" id="dvEvents">
 		<table class="attendeeEditorTable">
 			<thead>
 				<tr>

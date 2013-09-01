@@ -101,31 +101,48 @@ def events():
         result = {'events': get_all_events()}
     return json.dumps(result)
 
+@app.route('/attendees', methods=['POST'])
+@flask_login.login_required
+def add_attendee():
+    aid = model.add_attendee(get_db())
 
-@app.route('/attendees', methods=['PUT'])
+    valid_field_ids = [field['fieldId'] for field in fields.INFO_FIELDS]
+    submitted_field_ids = filter(lambda x : x in request.form, valid_field_ids)
+    if submitted_field_ids:
+        attendee_info = {field: request.form[field] for field in submitted_field_ids}
+        model.set_attendee_info(get_db(), id, attendee_info)
+
+    attendee = find_attendee_by_id(aid)
+    return json.dumps({'attendee': attendee})
+
+@app.route('/attendees', methods=['PUT', 'DELETE'])
 @flask_login.login_required
 def update_attendee():
     id = request.args.get('id', None)
     user_id = flask_login.current_user.get_id()
-    events = request.form.get('events', None)
-    if id is not None:
-        if events is not None:
-            events = events.split(',') if events else []
-            model.set_attendee_events(get_db(), id, events)
-        registered = request.args.get('registered', None)
-        if registered is not None:
-            registered = bool(registered)
-            model.set_attendee_registered(get_db(), id, user_id, registered)
-    if flask_login.current_user.is_admin:
-        print 'Admin updating an attendee!'
-        valid_field_ids = [field['fieldId'] for field in fields.INFO_FIELDS]
-        print valid_field_ids
-        submitted_field_ids = filter(lambda x : x in request.form, valid_field_ids)
-        print submitted_field_ids
-        if submitted_field_ids:
-            attendee_info = {field: request.form[field] for field in submitted_field_ids}
-            print attendee_info
-            model.set_attendee_info(get_db(), id, attendee_info)
+    if request.method == 'DELETE':
+        model.delete_attendee(get_db(), id)
+    else:
+        events = request.form.get('events', None)
+        if id is not None:
+            if events is not None:
+                events = events.split(',') if events else []
+                model.set_attendee_events(get_db(), id, events)
+            registered = request.args.get('registered', None)
+            if registered is not None:
+                registered = bool(registered)
+                model.set_attendee_registered(get_db(), id, user_id, registered)
+        if flask_login.current_user.is_admin:
+            print 'Admin updating an attendee!'
+            valid_field_ids = [field['fieldId'] for field in fields.INFO_FIELDS]
+            print valid_field_ids
+            submitted_field_ids = filter(lambda x : x in request.form, valid_field_ids)
+            print submitted_field_ids
+            if submitted_field_ids:
+                attendee_info = {field: request.form[field] for field in submitted_field_ids}
+                print attendee_info
+                model.set_attendee_info(get_db(), id, attendee_info)
+                time.sleep(2)
     return json.dumps({})
 
 @app.route('/attendees', methods=['GET'])
@@ -147,10 +164,14 @@ def attendees():
 @app.route('/attendee_edit', methods=['GET'])
 @flask_login.login_required
 def edit_attendee():
+    mode = request.args.get('mode', 'add')
+    aid = request.args.get('id', None)   
     return render_template('attendee.html', 
         fields = fields.INFO_FIELDS,
         user = flask_login.current_user,
-        events = get_all_events())
+        events = get_all_events(),
+        mode = mode, 
+        attendee_id = aid)
 
 @app.route('/dashboard')
 @flask_login.login_required
@@ -180,14 +201,17 @@ def find_attendees_by_word(search_term):
     attendee_count = len(attendees)
     attendees.sort(cmp = model.compare_attendees)
     attendees = attendees[:30]
+    for a in attendees:
+        a['_id'] = str(a['_id'])
     result = {'count': attendee_count, 'attendees': attendees}
     return result
 
 def find_attendee_by_id(id):
-    cursor = model.find_attendee(get_db(), id)
-    if not cursor:
+    attendee = model.find_attendee(get_db(), id)
+    if not attendee:
         return {}
-    return cursor
+    attendee['_id'] = str(attendee['_id'])
+    return attendee
 
 def get_all_events():
     events_cursor = model.get_events(get_db())

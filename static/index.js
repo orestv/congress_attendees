@@ -170,16 +170,10 @@
     };
 
     Index.prototype.editAttendee = function(attendee) {
-      var editorData;
       if (attendee.registered && !confirm('Цей учасник вже зареєстрований. Ви справді бажаєте змінити його дані?')) {
         return;
       }
-      editorData = JSON.stringify({
-        'id': "" + attendee._id.$oid,
-        'from': 'search'
-      });
-      sessionStorage.attendeeEditorData = editorData;
-      window.location.href = '/attendee_edit';
+      window.location.href = "/attendee_edit?id=" + attendee._id;
       return;
       this.editor = new AttendeeEditor(attendee);
       document.getElementById('searchListContainer').style.display = 'none';
@@ -211,10 +205,10 @@
       if (attendeeData) {
         data += '&' + attendeeData;
       }
-      request.open('PUT', "/attendees?id=" + this.editor.attendee._id.$oid + "&registered=1", false);
+      request.open('PUT', "/attendees?id=" + this.editor.attendee._id + "&registered=1", false);
       request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
       request.send(data);
-      this.updateEditedAttendee(this.editor.attendee._id.$oid);
+      this.updateEditedAttendee(this.editor.attendee._id);
       return this.backToList();
     };
 

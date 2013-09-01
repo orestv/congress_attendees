@@ -11,17 +11,26 @@ class AttendeeEditor
 	}
 
 	firstInputId = 'txtLastname'
-	@attendeeFetched = false
-	@eventsFetched = false
 
 	constructor: (@attendeeId) ->
+		@attendeeFetched = false
+		@eventsFetched = false
+		@attendee = {'attended_events': []}
+
+		@dvEvents = document.getElementById 'dvEvents'
+		@btnSaveInfo = document.getElementById('btnSaveInfo')
+
+		document.getElementById(firstInputId).focus()
+
+		@btnSaveInfo.onclick = @btnSaveInfo_clicked
 		@tbEvents = Sizzle('#tbEvents')[0]
+		@initInputEvents()
 		@fetchEventFreePlaces()
 		if @attendeeId?
 			@fetchAttendee()
+			@fetchEvents()
 		else
-			@createAttendee()	
-		@fetchEvents()
+			@dvEvents.style.display = 'none'
 
 	fetchAttendee: () =>
 		request = new XMLHttpRequest()
@@ -38,9 +47,40 @@ class AttendeeEditor
 		request.open('GET', "/attendees?id=#{@attendeeId}", true)
 		request.send(null)
 
-	createAttendee: () =>
-		@attendeeFetched = true
-		setTimeout @fillEventsActions, 1
+	createAttendee: (callback) =>
+		@btnSaveInfo.style.display = 'none'
+		Sizzle('#imgSaveLoader')[0].style.display = 'inline'
+		rqCA = new XMLHttpRequest()
+		rqCA.onreadystatechange = () =>
+			if rqCA.readyState != 4
+				return
+			response = JSON.parse(rqCA.responseText)
+			@attendee = response.attendee
+			@attendeeId = @attendee._id
+			@attendeeFetched = true
+			if callback?
+				setTimeout callback, 1
+			setTimeout @fillEventsActions, 1
+		rqCA.open('POST', '/attendees')
+		rqCA.send(null)
+
+	saveAttendeeInfo: (callback) =>
+		@btnSaveInfo.style.display = 'none'
+		Sizzle('#imgSaveLoader')[0].style.display = 'inline'
+		@infoInputsEnable(false)
+		rqSAI = new XMLHttpRequest()
+		rqSAI.onreadystatechange = () =>
+			if rqSAI.readyState != 4
+				return
+			@btnSaveInfo.style.display = 'inline'
+			Sizzle('#imgSaveLoader')[0].style.display = 'none'
+			@infoInputsEnable(true)
+			@updateLocalAttendeeData()
+			@allInfoInputsChangedMark()
+			setTimeout callback, 1
+		rqSAI.open('PUT', "/attendees?id=#{@attendee._id}", true)
+		rqSAI.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+		rqSAI.send(@getAttendeeData())
 
 	fetchEventFreePlaces: () =>
 		request = new XMLHttpRequest()
@@ -52,7 +92,7 @@ class AttendeeEditor
 		request.open('GET', '/events?type=free_places', true)
 		request.send(null)
 
-	fetchEvents: () =>
+	fetchEvents: (callback) =>
 		request = new XMLHttpRequest()
 		request.onreadystatechange = () =>
 			if request.readyState == 4
@@ -60,6 +100,8 @@ class AttendeeEditor
 				@events = response.events
 				@eventsFetched = true
 				setTimeout @fillEventsActions, 1
+				if callback?
+					callback()
 		request.open('GET', '/events', true)
 		request.send(null)
 
@@ -89,37 +131,35 @@ class AttendeeEditor
 
 	fillEventsActions: () =>
 		if not @attendeeFetched or not @eventsFetched
-			console.log 'Attendee fetched: #{@attendeeFetched}, events fetched: #{@eventsFetched}'
+			console.log "Attendee fetched: #{@attendeeFetched}, events fetched: #{@eventsFetched}"
 			return
 		@joinEventData()
 		@setDefaultActions = (@attendee.attended_events.length == 0)
 		console.log 'Filling event actions'
 		for evt in @events
 			@fillEventActions evt
+		if @setDefaultActions
+			@setDefaultActions = false
 
 	fillEventActions: (evt) =>
-		if evt.limit?
-			btnCancel = @getEventElement 'btnCancel', evt
-			btnBook = @getEventElement 'btnBook', evt
-			spBooked = @getEventElement 'spBooked', evt
-			spPaid = @getEventElement 'spPaid', evt
-			btnBook.onclick = @btnBook_clicked
-			btnCancel.onclick = @btnCancel_clicked
-			for item in [btnCancel, btnBook, spBooked, spPaid]
-				item.style.display = 'none'		
-			if evt['booked'] or evt['checked']
-				btnCancel.style.display = 'inline'
-				if evt['booked']
-					spBooked.style.display = 'inline'
-				else
-					spPaid.style.display = 'inline'
+		btnCancel = @getEventElement 'btnCancel', evt
+		btnBook = @getEventElement 'btnBook', evt
+		spBooked = @getEventElement 'spBooked', evt
+		spPaid = @getEventElement 'spPaid', evt
+		btnBook.onclick = @btnBook_clicked
+		btnCancel.onclick = @btnCancel_clicked
+		for item in [btnCancel, btnBook, spBooked, spPaid]
+			item.style.display = 'none'		
+		if evt['booked'] or evt['checked']
+			btnCancel.style.display = 'inline'
+			if evt['booked']
+				spBooked.style.display = 'inline'
 			else
-				btnBook.style.display = 'inline'
-				if @setDefaultActions and evt.default
-					@bookEvent evt
+				spPaid.style.display = 'inline'
 		else
+			btnBook.style.display = 'inline'
 			if @setDefaultActions and evt.default
-				@getEventElement('cbCheck', evt).checked = 'checked'
+				@bookEvent evt
 
 	bookEvent: (evt) =>
 		loader = @getEventElement 'imgLoader', evt
@@ -162,6 +202,11 @@ class AttendeeEditor
 		data = "eid=#{evt._id}&aid=#{@attendeeId}"
 		request.send(data)
 
+	updateLocalAttendeeData: () =>
+		for inputId, objectKey of @fields
+			input = document.getElementById(inputId)
+			@attendee[objectKey] = input.value		
+
 	updateEventFreePlaces: (eventId) =>
 		rqUEFP = new XMLHttpRequest()
 		rqUEFP.onreadystatechange = () =>
@@ -174,7 +219,7 @@ class AttendeeEditor
 		rqUEFP.send(null)
 
 	btnBook_clicked: (event) =>
-		btnBook = event.target		
+		btnBook = event.currentTarget		
 		eventId = @getEventIdFromEvent event
 		evt = null
 		for e in @events when e['_id'] == eventId
@@ -182,12 +227,82 @@ class AttendeeEditor
 		@bookEvent(evt)
 
 	btnCancel_clicked: (event) =>
-		btnCancel = event.target
+		btnCancel = event.currentTarget
 		eventId = @getEventIdFromEvent event
 		for e in @events when e['_id'] == eventId
 			evt = e
 		if confirm("Ви впевнені, що бажаєте відмінити реєстрацію на '#{evt.caption}'?")
 			@unbookEvent(evt)
+
+	btnSaveInfo_clicked: (event) =>
+		if not @attendeeId?
+			@createAttendee(() =>
+				@saveAttendeeInfo(() =>
+					@fetchEvents(() =>
+						document.getElementById('dvEvents').style.display = 'block'
+					)
+				)
+			)			
+		else
+			@saveAttendeeInfo()
+
+	infoInputsEnable: (enable) =>
+		for inputId, objectKey of @fields
+			input = document.getElementById(inputId)
+			if enable
+				input.removeAttribute('disabled')
+			else
+				input.setAttribute('disabled', 'disabled')
+
+	initInputEvents: () ->
+		for inputId, objectKey of @fields
+			input = document.getElementById(inputId)
+			if input?
+				input.onkeyup = @infoInputKeyPressed
+
+	infoInputKeyPressed: (event) =>
+		input = event.currentTarget
+		@infoInputChangedMark(input)
+		@updateInfoSaveButtonState()
+
+	allInfoInputsChangedMark: () =>
+		for inputId, objectKey of @fields
+			input = document.getElementById(inputId)
+			@infoInputChangedMark(input)
+		@updateInfoSaveButtonState()
+
+	infoInputChangedMark: (input) =>
+		if @isInputChanged(input)
+			input.style.backgroundColor = '#E0FFE0'
+		else
+			input.style.backgroundColor = 'white'
+
+	isInputChanged: (input) =>
+		fieldId = @fields[input.id]
+		fieldValue = @attendee[fieldId]
+		if not fieldValue?
+			fieldValue = ''
+		return fieldValue != input.value
+
+	updateInfoSaveButtonState: () =>
+		for inputId, objectKey of @fields
+			input = document.getElementById(inputId)
+			if @isInputChanged(input)
+				@btnSaveInfo.removeAttribute('disabled')
+				return
+		@btnSaveInfo.setAttribute('disabled', 'disabled')
+
+	getAttendeeData: () =>
+		resultArray = []
+		for inputId, objectKey of @fields
+			input = document.getElementById inputId
+			attendeeValue = @attendee[objectKey]
+			if not attendeeValue?
+				attendeeValue = ''
+			if input.value == attendeeValue
+				continue
+			resultArray.push "#{objectKey}=#{input.value}"
+		return resultArray.join('&')
 
 	joinEventData: () =>
 		for a_evt in @attendee['attended_events']
@@ -203,5 +318,5 @@ class AttendeeEditor
 		return target.getAttribute('eventId')
 
 window.onload = () ->
-	editorData = JSON.parse(sessionStorage.attendeeEditorData)
-	window.editor = new AttendeeEditor(editorData.id)
+	attendeeId = window.attendeeId
+	window.editor = new AttendeeEditor(attendeeId)
