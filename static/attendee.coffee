@@ -92,6 +92,7 @@ class AttendeeEditor
 			console.log 'Attendee fetched: #{@attendeeFetched}, events fetched: #{@eventsFetched}'
 			return
 		@joinEventData()
+		@setDefaultActions = (@attendee.attended_events.length == 0)
 		console.log 'Filling event actions'
 		for evt in @events
 			@fillEventActions evt
@@ -114,6 +115,11 @@ class AttendeeEditor
 					spPaid.style.display = 'inline'
 			else
 				btnBook.style.display = 'inline'
+				if @setDefaultActions and evt.default
+					@bookEvent evt
+		else
+			if @setDefaultActions and evt.default
+				@getEventElement('cbCheck', evt).checked = 'checked'
 
 	bookEvent: (evt) =>
 		loader = @getEventElement 'imgLoader', evt

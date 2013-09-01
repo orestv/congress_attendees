@@ -21,11 +21,11 @@
 		<span class="EventStatus" name="spPaid" eventId="{{event._id}}" style="display: none">
 			Оплачено
 		</span>
-		
+
 		<input type="button" name="btnBook" value="Забронювати" eventId="{{event._id}}" style="display: none">
 		<input type="button" name="btnCancel" value="Відмінити" eventId="{{event._id}}" style="display: none">
 	{% else %}
-		<input type="checkbox" name="cbVerify" value="">
+		<input type="checkbox" name="cbCheck" eventId="{{event._id}}">
 	{% endif %}
 {%- endmacro %}
 

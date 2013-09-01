@@ -182,6 +182,7 @@
         return;
       }
       this.joinEventData();
+      this.setDefaultActions = this.attendee.attended_events.length === 0;
       console.log('Filling event actions');
       _ref = this.events;
       _results = [];
@@ -214,7 +215,14 @@
             return spPaid.style.display = 'inline';
           }
         } else {
-          return btnBook.style.display = 'inline';
+          btnBook.style.display = 'inline';
+          if (this.setDefaultActions && evt["default"]) {
+            return this.bookEvent(evt);
+          }
+        }
+      } else {
+        if (this.setDefaultActions && evt["default"]) {
+          return this.getEventElement('cbCheck', evt).checked = 'checked';
         }
       }
     };
