@@ -43,13 +43,35 @@ def create_attendee(cursor, firstname, middlename, lastname):
 		'lastname': lastname})
 
 EVENTS = [
-	{'caption': u'Обід 19.09'},
-	{'caption': u'Обід 20.09'},
-	{'caption': u'Екскурсія 19.09, 11:00', 'limit': 5},
-	{'caption': u'Екскурсія 19.09, 12:00', 'limit': 7},
-	{'caption': u'Екскурсія 20.09, 11:00', 'limit': 3},
-	{'caption': u'Екскурсія 20.09, 12:00', 'limit': 4},
-	{'caption': u'Урочиста вечеря 19.09'}
+	{'caption': u'Обов’язковий реєстраційний платіж',
+		'import_id': 'registration', 'price': 200, 'default': True},
+	{'caption': u'Пакет матеріалів',
+		'import_id': 'materials', 'price': 100, 
+		'limit': 900, 'default': True,
+		'item_caption': 'пакет матеріалів'},
+	{'caption': u'Екскурсія 19.09 в 14 год.',
+		'import_id': 'excursion_19', 
+		'price': 40, 'limit': 90,
+		'item_caption': u'квиток на екскурсію 19.09'},
+	{'caption': u'Екскурсія 20.09 в 14 год.',
+		'import_id': 'excursion_20', 
+		'price': 40, 'limit': 90,
+		'item_caption': u'квиток на екскурсію 20.09'},
+	{'caption': u'Церемонія відкриття 18.09 в 19 год.',
+		'import_id': 'opening', 'limit': 500,
+		'item_caption': u'квиток на церемонію відкриття'},
+	{'caption': u'Урочиста вечеря 19.09 в 19 год.',
+		'import_id': 'ceremonial_dinner', 
+		'price': 300, 'limit': 500,
+		'item_caption': u'квиток на урочисту вечерю'},
+	{'caption': u'Обід 19.09 в 13 год.',
+		'import_id': 'dinner_19', 
+		'price': 50, 'limit': 600,
+		'item_caption': u'квиток на обід 19.09'},
+	{'caption': u'Обід 20.09 в 13 год.',
+		'import_id': 'dinner_20', 
+		'price': 50, 'limit': 600,
+		'item_caption': u'квиток на обід 20.09'}
 ]
 
 
@@ -80,9 +102,6 @@ def init_attendees(conn):
 		local_attendees.append(attendee)
 	attendees.insert(local_attendees)
 
-	db.events.drop()
-	db.events.insert(EVENTS)
-
 def init_users(conn):
 	db = conn.congress
 	db.users.drop()
@@ -92,16 +111,34 @@ def init_users(conn):
 
 	for line in file_users:
 		line = line.rstrip()
-		line_split = line.split(' ')
+		line_split = line.split('\t')
 		user = {key : line_split[fields[key]] for key in fields}
 		user['password_hash'] = crypt.crypt(user['password'], 'sha2')
 		user['admin'] = (len(line_split) > 4)
 		del user['password']
 		db.users.insert(user)
 
+	db.attendees.update({},
+		{'$set': {
+			'registered': False
+		}}, multi = True)
+	db.attendees.update({},
+		{'$unset': {
+			'registered_on': None,
+			'registered_by': None
+		}}, multi = True)
+
 	file_users.close()
 
-	# db.users.insert(user)
+def init_events(conn):
+	db = conn.congress
+	db.attendees.update({}, 
+		{'$set': 
+			{'attended_events': []}
+		},
+		multi = True)
+	db.events.drop()
+	db.events.insert(EVENTS)
 
 if __name__ == '__main__':
 	conn = pymongo.MongoClient()

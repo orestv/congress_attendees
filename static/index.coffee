@@ -14,7 +14,8 @@ class Index
 	searchRequested: (searchQuery) =>		
 		if searchQuery == ''
 			@nextSearch = null
-			@searchRequest.abort()
+			if @searchRequest?
+				@searchRequest.abort()
 			@searching = false
 			document.getElementById('imgSearchLoader').style.visibility = 'hidden'
 			@clearSearchResults()
@@ -97,6 +98,8 @@ class Index
 	editAttendee: (attendee) =>
 		if attendee.registered and not confirm('Цей учасник вже зареєстрований. Ви справді бажаєте змінити його дані?')
 			return
+		window.location.href = "/attendee_edit?id=#{attendee._id}"
+		return
 		@editor = new AttendeeEditor(attendee)
 		document.getElementById('searchListContainer').style.display = 'none'
 		@editor.show()
@@ -118,10 +121,10 @@ class Index
 		data = "events=#{eventsData}"
 		if attendeeData
 			data += '&' + attendeeData
-		request.open('PUT', "/attendees?id=#{@editor.attendee._id.$oid}&registered=1", false)
+		request.open('PUT', "/attendees?id=#{@editor.attendee._id}&registered=1", false)
 		request.setRequestHeader("Content-type","application/x-www-form-urlencoded");
 		request.send(data)		
-		@updateEditedAttendee(@editor.attendee._id.$oid)
+		@updateEditedAttendee(@editor.attendee._id)
 		@backToList()
 
 	backToList: () =>
