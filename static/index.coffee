@@ -77,10 +77,10 @@ class Index
 		td = document.createElement 'td'
 		button = document.createElement 'input'
 		button.type = 'button'
-		if not attendee.registered?
-			button.value = 'Зареєструвати'
-		else
+		if attendee.registered
 			button.value = 'Змінити інформацію'
+		else
+			button.value = 'Зареєструвати'
 		button.onclick = =>
 			@editAttendeeClicked attendee
 			@selectedAttendeeRow = tr
