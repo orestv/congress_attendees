@@ -145,10 +145,10 @@
       td = document.createElement('td');
       button = document.createElement('input');
       button.type = 'button';
-      if (attendee.registered == null) {
-        button.value = 'Зареєструвати';
-      } else {
+      if (attendee.registered) {
         button.value = 'Змінити інформацію';
+      } else {
+        button.value = 'Зареєструвати';
       }
       button.onclick = function() {
         _this.editAttendeeClicked(attendee);
