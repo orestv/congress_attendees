@@ -185,7 +185,6 @@ class AttendeeEditor
 				return
 			loader.style.display = 'none'
 			response = JSON.parse(request.responseText)
-			console.log response
 			if response['success']
 				@getEventElement('spBooked', evt).style.display = 'inline'
 				@getEventElement('btnCancel', evt).style.display = 'inline'
@@ -214,8 +213,8 @@ class AttendeeEditor
 				return
 			delete evt.paid
 			delete evt.booked
-			@fillEventActions(evt)
 			@updateEventFreePlaces evt._id
+			@fillEventActions(evt)
 			loader.style.display = 'none'
 		request.open('DELETE', '/attendee_event')
 		request.setRequestHeader("Content-type","application/x-www-form-urlencoded");
@@ -237,7 +236,6 @@ class AttendeeEditor
 			for e in @eventsFreePlaces when e._id = current_evt._id
 				e.free_places = current_evt.free_places
 			@fillEventFreePlaces current_evt
-			@fillEventActions current_evt
 		rqUEFP.open('GET', "/events?type=free_places&id=#{eventId}", true)
 		rqUEFP.send(null)
 
@@ -365,15 +363,12 @@ class AttendeeEditor
 		if not fieldValue?
 			fieldValue = ''
 		inputValue = @getInputValue input
-		if fieldValue != inputValue
-			console.log "#{inputValue}, #{fieldValue}"
 		return fieldValue != inputValue
 
 	updateInfoSaveButtonState: () =>
 		for inputId, objectKey of @fields
 			input = document.getElementById(inputId)
 			if @isInputChanged(input)
-				console.log input
 				@btnSaveInfo.removeAttribute('disabled')
 				return
 		@btnSaveInfo.setAttribute('disabled', 'disabled')
@@ -393,11 +388,9 @@ class AttendeeEditor
 
 	joinEventData: () =>
 		for a_evt in @attendee['attended_events']
-			console.log a_evt
 			for evt in @events when evt['_id'] == a_evt['_id']
 				for attr in ['booked', 'paid']
 					evt[attr] = a_evt[attr]
-				console.log evt
 
 	getInputValue: (input) ->
 		switch input.type
