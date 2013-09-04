@@ -554,12 +554,7 @@
     };
 
     AttendeeEditor.prototype.btnFinishRegistration_clicked = function() {
-      if (window.creatingAttendee) {
-        return window.location.href = '/';
-      } else {
-        this.btnFinishRegistration.style.display = 'None';
-        return this.saveAttendeeInfo(this.showPostRegistrationMessage);
-      }
+      return this.saveAttendeeInfo(this.showPostRegistrationMessage);
     };
 
     AttendeeEditor.prototype.btnRegister_clicked = function() {

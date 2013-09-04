@@ -307,11 +307,7 @@ class AttendeeEditor
 			@saveAttendeeInfo()
 
 	btnFinishRegistration_clicked: () =>
-		if window.creatingAttendee
-			window.location.href = '/'
-		else
-			@btnFinishRegistration.style.display = 'None'
-			@saveAttendeeInfo(@showPostRegistrationMessage)
+		@saveAttendeeInfo(@showPostRegistrationMessage)
 
 	btnRegister_clicked: () =>
 		@register(() =>
