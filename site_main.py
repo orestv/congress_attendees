@@ -165,13 +165,15 @@ def attendees():
 @app.route('/attendee_edit', methods=['GET'])
 @flask_login.login_required
 def edit_attendee():
-    mode = request.args.get('mode', 'add')
-    aid = request.args.get('id', None)   
+    aid = request.args.get('id', None)
+    attendee = find_attendee_by_id(aid)
+    if not flask_login.current_user.is_admin \
+            and attendee and attendee['registered']:
+        return redirect('/index')
     return render_template('attendee.html', 
         fields = fields.INFO_FIELDS,
         user = flask_login.current_user,
-        events = get_all_events(),
-        mode = mode, 
+        events = get_all_events(), 
         attendee_id = aid)
 
 @app.route('/dashboard')
