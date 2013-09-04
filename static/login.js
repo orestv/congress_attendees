@@ -3,7 +3,7 @@
 (function() {
 
   window.onload = function() {
-    return document.getElementById('txtLogin').focus();
+    return document.getElementById('txtPassword').focus();
   };
 
 }).call(this);

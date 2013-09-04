@@ -10,6 +10,27 @@ import re
 from string import digits
 import crypt
 
+INFO_FIELDS = [
+	{'col': 0, 'id': 'lastname'},
+	{'col': 1, 'id': 'firstname'},
+	{'col': 2, 'id': 'middlename'},
+	{'col': 3, 'id': 'city'},
+	{'col': 4, 'id': 'region'},
+	{'col': 5, 'id': 'organization'},
+	{'col': 6, 'id': 'position'},
+	{'col': 7, 'id': 'rank'},
+	{'col': 8, 'id': 'email'},
+	{'col': 9, 'id': 'phone'},
+	{'col': 11, 'id': 'delegate', 'bool': True}
+]
+EVENT_FIELDS = [
+	{'col': 12, 'id': 'registration'},
+	{'col': 13, 'id': 'materials'},
+	{'col': 14, 'id': 'ceremonial_dinner'},
+	{'col': 15, 'id': 'dinner_19'},
+	{'col': 16, 'id': 'dinner_20'},
+]
+
 def read_names(filename):
 	input_file = open(filename, 'r')
 	result = [name.replace('\n', '') for name in input_file]
@@ -47,7 +68,7 @@ EVENTS = [
 		'import_id': 'registration', 'price': 200, 'default': True},
 	{'caption': u'Пакет матеріалів',
 		'import_id': 'materials', 'price': 100, 
-		'limit': 900, 'default': True,
+		'limit': 900 - 612, 'default': True,
 		'item_caption': 'пакет матеріалів'},
 	{'caption': u'Екскурсія 19.09 в 14 год.',
 		'import_id': 'excursion_19', 
@@ -77,44 +98,46 @@ EVENTS = [
 
 def init_attendees(conn):
 	db = conn.congress
-	attendees = db.attendees
-	firstnames = read_names('firstnames')
-	lastnames = read_names('lastnames')
-	cities = read_names('cities')
-	fields = ['хірург', 'анестезіолог', 'педіатр', 'патологоанатом', 'пульмонолог']
-	attendees.drop()
-
-	local_attendees = []
-	for i in xrange(100000):
-		firstname = random.choice(firstnames)
-		lastname = random.choice(lastnames)
-		city = random.choice(cities)
-		middlename = generate_middlename(random.choice(firstnames))
-		phone = generate_phone()
-		field = random.choice(fields)
-		attendee = {'firstname': firstname,
-			'middlename': middlename,
-			'lastname': lastname,
-			'city': city,
-			'phone': phone,
-			'field': field,
-			'attended_events': []}
-		local_attendees.append(attendee)
-	attendees.insert(local_attendees)
+	db.attendees.drop()
+	events = {}
+	for field in EVENT_FIELDS:
+		event = db.events.find_one({'import_id': field['id']})
+		events[field['id']] = str(event['_id'])
+	with open('attendees.csv', 'r') as f:
+		for line in f:
+			if line.startswith('Прізвище'):
+				continue
+			items = line.split(',')
+			attendee = {field['id']: items[field['col']].decode('utf-8') for field in INFO_FIELDS}
+			for field in INFO_FIELDS:
+				if field.get('bool', False):
+					value = items[field['col']]
+					attendee[field['id']] = (value == 'Так')
+			# print attendee
+			# return
+			attended_events = []
+			for field in EVENT_FIELDS:
+				if items[field['col']] != 'Так':
+					continue
+				eid = events[field['id']]
+				event = {'_id': eid, 'booked': True, 'paid': True}
+				attended_events.append(event)
+			attendee['attended_events'] = attended_events
+			db.attendees.insert(attendee)
 
 def init_users(conn):
 	db = conn.congress
 	db.users.drop()
-	fields = {'firstname': 1, 'lastname': 0, 'login': 2, 'password': 3}
+	fields = {'firstname': 1, 'lastname': 0, 'password': 2}
 
 	file_users = open('users_pwds', 'r')
 
 	for line in file_users:
 		line = line.rstrip()
-		line_split = line.split('\t')
+		line_split = line.split()
 		user = {key : line_split[fields[key]] for key in fields}
 		user['password_hash'] = crypt.crypt(user['password'], 'sha2')
-		user['admin'] = (len(line_split) > 4)
+		user['admin'] = (len(line_split) > 3 and line_split[3] == '*')
 		del user['password']
 		db.users.insert(user)
 
@@ -142,5 +165,6 @@ def init_events(conn):
 
 if __name__ == '__main__':
 	conn = pymongo.MongoClient()
-	init_users(conn)
+	init_events(conn)
+	init_attendees(conn)
 	conn.close()

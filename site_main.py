@@ -45,13 +45,13 @@ def root():
 
 @app.route('/login', methods=['POST'])
 def login_request():
-    login, password = request.form.get('login'), request.form.get('password')
-    user = users.get_user_by_credentials(get_db(), login, password)
+    password = request.form.get('password')
+    user = users.get_user_by_credentials(get_db(), password)
     if user:
         flask_login.login_user(user)
         return redirect(url_for('index'))
     else:
-        flash(u'Логін чи пароль невірні!')
+        flash(u'Пароль невірний!')
         return redirect(url_for('root'))
 
 @app.route('/index')
@@ -78,6 +78,7 @@ def attendee_event():
             db_evt = model.get_event(get_db(), event_id)
             if 'limit' in db_evt:
                 evt = model.get_event_free_places(get_db(), event_id)
+                print evt
                 if evt['free_places'] <= 0:
                     return json.dumps({'success': False, 'error': {
                         'type': 'outofplaces'
@@ -142,6 +143,11 @@ def update_attendee():
         print submitted_field_ids
         if submitted_field_ids:
             attendee_info = {field: request.form[field] for field in submitted_field_ids}
+            for field in fields.INFO_FIELDS:
+                if field['type'] == 'checkbox' and field['fieldId'] in attendee_info:
+                    value = attendee_info[field['fieldId']]
+                    value = (value == u'true')
+                    attendee_info[field['fieldId']] = value
             print attendee_info
             model.set_attendee_info(get_db(), id, attendee_info)
     return json.dumps({})
@@ -165,13 +171,17 @@ def attendees():
 @app.route('/attendee_edit', methods=['GET'])
 @flask_login.login_required
 def edit_attendee():
-    mode = request.args.get('mode', 'add')
-    aid = request.args.get('id', None)   
+    aid = request.args.get('id', None)
+    attendee = find_attendee_by_id(aid)
+    if aid and not attendee:
+        return redirect('/index')
+    if not flask_login.current_user.is_admin \
+            and attendee and attendee['registered']:
+        return redirect('/index')
     return render_template('attendee.html', 
         fields = fields.INFO_FIELDS,
         user = flask_login.current_user,
-        events = get_all_events(),
-        mode = mode, 
+        events = get_all_events(), 
         attendee_id = aid)
 
 @app.route('/dashboard')

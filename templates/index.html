@@ -7,6 +7,13 @@
     {{ super() }}
     <link rel="stylesheet" href="/static/index.css">
     <link rel="stylesheet" href="/static/attendee_editor.css">
+    <script>
+    {% if user.is_admin %}
+        window.admin = true
+    {% else %}
+        window.admin = false
+    {% endif %}
+    </script>
     <script src="/static/search.js" type="text/javascript" charset="utf-8" async defer></script>
     <script src="/static/index.js" type="text/javascript" charset="utf-8" async defer></script>
     <script src="/static/attendee_editor.js" type="text/javascript" charset="utf-8" async defer></script>    

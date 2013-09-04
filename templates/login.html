@@ -12,21 +12,14 @@
 	<form action="/login" method="POST" accept-charset="utf-8" id="frmLogin">
 		<div class="loginBlock">
 			<table>
-					<tbody>						
-						<tr>
-							<td>Логін:</td>
-							<td>
-								<input type="text" name="login" value="" id="txtLogin" tabstop="1" required="required">
-							</td>
-							<td colspan="2"></td>
-						</tr>
+					<tbody>
 						<tr>
 							<td>Пароль:</td>
 							<td>
-								<input type="password" name="password" value="" id="txtPassword" tabstop="2" required="required">
+								<input type="password" name="password" value="" id="txtPassword" tabstop="1" required="required">
 							</td>
 							<td>
-								<input type="submit" value="Вхід" tabstop="3" id="btnLogin">
+								<input type="submit" value="Вхід" tabstop="2" id="btnLogin">
 							</td>
 							<td>
 								{% with messages = get_flashed_messages() %}

@@ -42,6 +42,7 @@
       this.searchRequested = function(searchQuery) {
         return Index.prototype.searchRequested.apply(_this, arguments);
       };
+      this.admin = window.admin;
       this.searching = false;
       this.nextSearch = null;
       this.table = document.getElementById('searchResultsTable');
@@ -143,18 +144,20 @@
         tr.className = 'registered';
       }
       td = document.createElement('td');
-      button = document.createElement('input');
-      button.type = 'button';
-      if (attendee.registered) {
-        button.value = 'Змінити інформацію';
-      } else {
-        button.value = 'Зареєструвати';
+      if (this.admin || !attendee.registered) {
+        button = document.createElement('input');
+        button.type = 'button';
+        if (attendee.registered) {
+          button.value = 'Змінити інформацію';
+        } else {
+          button.value = 'Зареєструвати';
+        }
+        button.onclick = function() {
+          _this.editAttendeeClicked(attendee);
+          return _this.selectedAttendeeRow = tr;
+        };
+        td.appendChild(button);
       }
-      button.onclick = function() {
-        _this.editAttendeeClicked(attendee);
-        return _this.selectedAttendeeRow = tr;
-      };
-      td.appendChild(button);
       tr.appendChild(td);
       return tr;
     };
@@ -164,7 +167,7 @@
     };
 
     Index.prototype.editFirstAttendee = function() {
-      if (this.first_attendee != null) {
+      if ((this.first_attendee != null) && (this.admin || !this.first_attendee.registered)) {
         return this.editAttendee(this.first_attendee);
       }
     };

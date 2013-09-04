@@ -1,5 +1,6 @@
 class Index
 	constructor: () ->
+		@admin = window.admin
 		@searching = false
 		@nextSearch = null
 		@table = document.getElementById('searchResultsTable')
@@ -75,16 +76,17 @@ class Index
 		if attendee.registered? and attendee.registered
 			tr.className = 'registered'
 		td = document.createElement 'td'
-		button = document.createElement 'input'
-		button.type = 'button'
-		if attendee.registered
-			button.value = 'Змінити інформацію'
-		else
-			button.value = 'Зареєструвати'
-		button.onclick = =>
-			@editAttendeeClicked attendee
-			@selectedAttendeeRow = tr
-		td.appendChild button
+		if @admin or not attendee.registered
+			button = document.createElement 'input'
+			button.type = 'button'
+			if attendee.registered
+				button.value = 'Змінити інформацію'
+			else
+				button.value = 'Зареєструвати'
+			button.onclick = =>
+				@editAttendeeClicked attendee
+				@selectedAttendeeRow = tr
+			td.appendChild button
 		tr.appendChild td
 		return tr
 
@@ -92,7 +94,7 @@ class Index
 		@editAttendee attendee
 
 	editFirstAttendee: () =>
-		if @first_attendee?
+		if @first_attendee? and (@admin or not @first_attendee.registered)
 			@editAttendee @first_attendee
 
 	editAttendee: (attendee) =>
