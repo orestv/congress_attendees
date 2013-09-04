@@ -5,9 +5,12 @@ class AttendeeEditor
 		'txtLastname': 'lastname',
 		'txtMiddlename': 'middlename',
 		'txtCity': 'city',
-		'txtPhone': 'personal_phone',
+		'txtRegion': 'region',
+		'txtPhone': 'phone',
 		'txtPosition': 'position',
-		'txtOrganization': 'organization'
+		'txtRank': 'rank',
+		'txtOrganization': 'organization',
+		'cbDelegate': 'delegate'
 	}
 
 	firstInputId = 'txtLastname'
@@ -44,7 +47,6 @@ class AttendeeEditor
 			if request.readyState == 4
 				response = JSON.parse(request.responseText)
 				@attendee = response.attendee
-				console.log @attendee
 				@attendeeFetched = true
 				setTimeout @fillEventsActions, 1
 				setTimeout (() => 
@@ -117,7 +119,7 @@ class AttendeeEditor
 		for inputId, objectKey of @fields
 			input = document.getElementById(inputId)
 			if input? and @attendee[objectKey]?
-				input.value = @attendee[objectKey]
+				@setInputValue input, @attendee[objectKey]
 
 	fillEventsFreePlaces: (events) ->
 		for evt in events
@@ -143,7 +145,6 @@ class AttendeeEditor
 			return
 		@joinEventData()
 		@setDefaultActions = (@attendee.attended_events.length == 0)
-		console.log 'Filling event actions'
 		for evt in @events
 			@fillEventActions evt
 		if @setDefaultActions
@@ -159,18 +160,17 @@ class AttendeeEditor
 		for item in [btnCancel, btnBook, spBooked, spPaid]
 			item.style.display = 'none'
 
-		if evt.limit?
-			for e in @eventsFreePlaces when e._id == evt._id
-				if e.free_places? and e.free_places <= 0
-					return
-		if evt['booked']
+		if evt['booked'] or evt['paid']
 			btnCancel.style.display = 'inline'
-			if @attendee['registered']
+			if evt['paid']
 				spPaid.style.display = 'inline'
-				evt['paid'] = true
 			else
 				spBooked.style.display = 'inline'
 		else
+			if evt.limit?
+				for e in @eventsFreePlaces when e._id == evt._id
+					if e.free_places? and e.free_places <= 0
+						return
 			btnBook.style.display = 'inline'
 			if @setDefaultActions and evt.default
 				@bookEvent evt
@@ -185,6 +185,7 @@ class AttendeeEditor
 				return
 			loader.style.display = 'none'
 			response = JSON.parse(request.responseText)
+			console.log response
 			if response['success']
 				@getEventElement('spBooked', evt).style.display = 'inline'
 				@getEventElement('btnCancel', evt).style.display = 'inline'
@@ -196,6 +197,7 @@ class AttendeeEditor
 				else
 					alert('Відбулась невідома помилка, бронювання не вдалось')
 			@updateEventFreePlaces evt._id
+			@fillEventActions evt
 		request.open('PUT', '/attendee_event', true)
 		request.setRequestHeader("Content-type","application/x-www-form-urlencoded");
 		data = "eid=#{evt._id}&aid=#{@attendeeId}"
@@ -210,7 +212,7 @@ class AttendeeEditor
 		request.onreadystatechange = () =>
 			if request.readyState != 4
 				return
-			delete evt.checked
+			delete evt.paid
 			delete evt.booked
 			@fillEventActions(evt)
 			@updateEventFreePlaces evt._id
@@ -223,7 +225,7 @@ class AttendeeEditor
 	updateLocalAttendeeData: () =>
 		for inputId, objectKey of @fields
 			input = document.getElementById(inputId)
-			@attendee[objectKey] = input.value		
+			@attendee[objectKey] = @getInputValue input
 
 	updateEventFreePlaces: (eventId) =>
 		rqUEFP = new XMLHttpRequest()
@@ -235,6 +237,7 @@ class AttendeeEditor
 			for e in @eventsFreePlaces when e._id = current_evt._id
 				e.free_places = current_evt.free_places
 			@fillEventFreePlaces current_evt
+			@fillEventActions current_evt
 		rqUEFP.open('GET', "/events?type=free_places&id=#{eventId}", true)
 		rqUEFP.send(null)
 
@@ -272,8 +275,11 @@ class AttendeeEditor
 		ul = document.getElementById('itemsList')
 		while ul.hasChildNodes()
 			ul.removeChild ul.lastChild
-		console.log @events
-		for evt in @events when evt['item_caption']? and evt['booked'] and not evt['paid']
+		for evt in @events when evt['item_caption']? 
+			if not evt['booked'] 
+				continue
+			if evt['paid'] and @attendee.registered
+				continue
 			li = document.createElement('li')
 			li.textContent = evt.item_caption
 			ul.appendChild(li)
@@ -330,7 +336,11 @@ class AttendeeEditor
 		for inputId, objectKey of @fields
 			input = document.getElementById(inputId)
 			if input?
-				input.onkeyup = @infoInputKeyPressed
+				switch input.type
+					when 'text', 'tel'
+						input.onkeyup = @infoInputKeyPressed
+					when 'checkbox'
+						input.onchange = @infoInputKeyPressed
 
 	infoInputKeyPressed: (event) =>
 		input = event.currentTarget
@@ -354,12 +364,16 @@ class AttendeeEditor
 		fieldValue = @attendee[fieldId]
 		if not fieldValue?
 			fieldValue = ''
-		return fieldValue != input.value
+		inputValue = @getInputValue input
+		if fieldValue != inputValue
+			console.log "#{inputValue}, #{fieldValue}"
+		return fieldValue != inputValue
 
 	updateInfoSaveButtonState: () =>
 		for inputId, objectKey of @fields
 			input = document.getElementById(inputId)
 			if @isInputChanged(input)
+				console.log input
 				@btnSaveInfo.removeAttribute('disabled')
 				return
 		@btnSaveInfo.setAttribute('disabled', 'disabled')
@@ -368,19 +382,36 @@ class AttendeeEditor
 		resultArray = []
 		for inputId, objectKey of @fields
 			input = document.getElementById inputId
+			value = @getInputValue input
 			attendeeValue = @attendee[objectKey]
 			if not attendeeValue?
 				attendeeValue = ''
-			if input.value == attendeeValue
+			if value == attendeeValue
 				continue
-			resultArray.push "#{objectKey}=#{input.value}"
+			resultArray.push "#{objectKey}=#{value}"
 		return resultArray.join('&')
 
 	joinEventData: () =>
 		for a_evt in @attendee['attended_events']
+			console.log a_evt
 			for evt in @events when evt['_id'] == a_evt['_id']
-				for attr in ['booked', 'checked']
+				for attr in ['booked', 'paid']
 					evt[attr] = a_evt[attr]
+				console.log evt
+
+	getInputValue: (input) ->
+		switch input.type
+			when 'text', 'tel'
+				return input.value
+			when 'checkbox'
+				return input.checked
+
+	setInputValue: (input, value) ->
+		switch input.type
+			when 'text', 'tel'
+				input.value = value
+			when 'checkbox'
+				input.checked = value
 
 	getEventElement: (name, evt) ->
 		return Sizzle("[eventId=#{evt._id}][name=#{name}]", @tbEvents)[0]

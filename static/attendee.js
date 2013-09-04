@@ -12,9 +12,12 @@
       'txtLastname': 'lastname',
       'txtMiddlename': 'middlename',
       'txtCity': 'city',
-      'txtPhone': 'personal_phone',
+      'txtRegion': 'region',
+      'txtPhone': 'phone',
       'txtPosition': 'position',
-      'txtOrganization': 'organization'
+      'txtRank': 'rank',
+      'txtOrganization': 'organization',
+      'cbDelegate': 'delegate'
     };
 
     firstInputId = 'txtLastname';
@@ -146,7 +149,6 @@
         if (request.readyState === 4) {
           response = JSON.parse(request.responseText);
           _this.attendee = response.attendee;
-          console.log(_this.attendee);
           _this.attendeeFetched = true;
           setTimeout(_this.fillEventsActions, 1);
           return setTimeout((function() {
@@ -252,7 +254,7 @@
         objectKey = _ref[inputId];
         input = document.getElementById(inputId);
         if ((input != null) && (this.attendee[objectKey] != null)) {
-          _results.push(input.value = this.attendee[objectKey]);
+          _results.push(this.setInputValue(input, this.attendee[objectKey]));
         } else {
           _results.push(void 0);
         }
@@ -296,7 +298,6 @@
       }
       this.joinEventData();
       this.setDefaultActions = this.attendee.attended_events.length === 0;
-      console.log('Filling event actions');
       _ref = this.events;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         evt = _ref[_i];
@@ -320,26 +321,25 @@
         item = _ref[_i];
         item.style.display = 'none';
       }
-      if (evt.limit != null) {
-        _ref1 = this.eventsFreePlaces;
-        for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
-          e = _ref1[_j];
-          if (e._id === evt._id) {
-            if ((e.free_places != null) && e.free_places <= 0) {
-              return;
-            }
-          }
-        }
-      }
-      if (evt['booked']) {
+      if (evt['booked'] || evt['paid']) {
         btnCancel.style.display = 'inline';
-        if (this.attendee['registered']) {
-          spPaid.style.display = 'inline';
-          return evt['paid'] = true;
+        if (evt['paid']) {
+          return spPaid.style.display = 'inline';
         } else {
           return spBooked.style.display = 'inline';
         }
       } else {
+        if (evt.limit != null) {
+          _ref1 = this.eventsFreePlaces;
+          for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+            e = _ref1[_j];
+            if (e._id === evt._id) {
+              if ((e.free_places != null) && e.free_places <= 0) {
+                return;
+              }
+            }
+          }
+        }
         btnBook.style.display = 'inline';
         if (this.setDefaultActions && evt["default"]) {
           return this.bookEvent(evt);
@@ -361,6 +361,7 @@
         }
         loader.style.display = 'none';
         response = JSON.parse(request.responseText);
+        console.log(response);
         if (response['success']) {
           _this.getEventElement('spBooked', evt).style.display = 'inline';
           _this.getEventElement('btnCancel', evt).style.display = 'inline';
@@ -373,7 +374,8 @@
             alert('Відбулась невідома помилка, бронювання не вдалось');
           }
         }
-        return _this.updateEventFreePlaces(evt._id);
+        _this.updateEventFreePlaces(evt._id);
+        return _this.fillEventActions(evt);
       };
       request.open('PUT', '/attendee_event', true);
       request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
@@ -393,7 +395,7 @@
         if (request.readyState !== 4) {
           return;
         }
-        delete evt.checked;
+        delete evt.paid;
         delete evt.booked;
         _this.fillEventActions(evt);
         _this.updateEventFreePlaces(evt._id);
@@ -412,7 +414,7 @@
       for (inputId in _ref) {
         objectKey = _ref[inputId];
         input = document.getElementById(inputId);
-        _results.push(this.attendee[objectKey] = input.value);
+        _results.push(this.attendee[objectKey] = this.getInputValue(input));
       }
       return _results;
     };
@@ -435,7 +437,8 @@
             e.free_places = current_evt.free_places;
           }
         }
-        return _this.fillEventFreePlaces(current_evt);
+        _this.fillEventFreePlaces(current_evt);
+        return _this.fillEventActions(current_evt);
       };
       rqUEFP.open('GET', "/events?type=free_places&id=" + eventId, true);
       return rqUEFP.send(null);
@@ -492,12 +495,17 @@
       while (ul.hasChildNodes()) {
         ul.removeChild(ul.lastChild);
       }
-      console.log(this.events);
       _ref = this.events;
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         evt = _ref[_i];
-        if (!((evt['item_caption'] != null) && evt['booked'] && !evt['paid'])) {
+        if (!(evt['item_caption'] != null)) {
+          continue;
+        }
+        if (!evt['booked']) {
+          continue;
+        }
+        if (evt['paid'] && this.attendee.registered) {
           continue;
         }
         li = document.createElement('li');
@@ -593,7 +601,17 @@
         objectKey = _ref[inputId];
         input = document.getElementById(inputId);
         if (input != null) {
-          _results.push(input.onkeyup = this.infoInputKeyPressed);
+          switch (input.type) {
+            case 'text':
+            case 'tel':
+              _results.push(input.onkeyup = this.infoInputKeyPressed);
+              break;
+            case 'checkbox':
+              _results.push(input.onchange = this.infoInputKeyPressed);
+              break;
+            default:
+              _results.push(void 0);
+          }
         } else {
           _results.push(void 0);
         }
@@ -628,13 +646,17 @@
     };
 
     AttendeeEditor.prototype.isInputChanged = function(input) {
-      var fieldId, fieldValue;
+      var fieldId, fieldValue, inputValue;
       fieldId = this.fields[input.id];
       fieldValue = this.attendee[fieldId];
       if (fieldValue == null) {
         fieldValue = '';
       }
-      return fieldValue !== input.value;
+      inputValue = this.getInputValue(input);
+      if (fieldValue !== inputValue) {
+        console.log("" + inputValue + ", " + fieldValue);
+      }
+      return fieldValue !== inputValue;
     };
 
     AttendeeEditor.prototype.updateInfoSaveButtonState = function() {
@@ -644,6 +666,7 @@
         objectKey = _ref[inputId];
         input = document.getElementById(inputId);
         if (this.isInputChanged(input)) {
+          console.log(input);
           this.btnSaveInfo.removeAttribute('disabled');
           return;
         }
@@ -652,20 +675,21 @@
     };
 
     AttendeeEditor.prototype.getAttendeeData = function() {
-      var attendeeValue, input, inputId, objectKey, resultArray, _ref;
+      var attendeeValue, input, inputId, objectKey, resultArray, value, _ref;
       resultArray = [];
       _ref = this.fields;
       for (inputId in _ref) {
         objectKey = _ref[inputId];
         input = document.getElementById(inputId);
+        value = this.getInputValue(input);
         attendeeValue = this.attendee[objectKey];
         if (attendeeValue == null) {
           attendeeValue = '';
         }
-        if (input.value === attendeeValue) {
+        if (value === attendeeValue) {
           continue;
         }
-        resultArray.push("" + objectKey + "=" + input.value);
+        resultArray.push("" + objectKey + "=" + value);
       }
       return resultArray.join('&');
     };
@@ -676,29 +700,47 @@
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         a_evt = _ref[_i];
+        console.log(a_evt);
         _results.push((function() {
-          var _j, _len1, _ref1, _results1;
+          var _j, _k, _len1, _len2, _ref1, _ref2, _results1;
           _ref1 = this.events;
           _results1 = [];
           for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
             evt = _ref1[_j];
-            if (evt['_id'] === a_evt['_id']) {
-              _results1.push((function() {
-                var _k, _len2, _ref2, _results2;
-                _ref2 = ['booked', 'checked'];
-                _results2 = [];
-                for (_k = 0, _len2 = _ref2.length; _k < _len2; _k++) {
-                  attr = _ref2[_k];
-                  _results2.push(evt[attr] = a_evt[attr]);
-                }
-                return _results2;
-              })());
+            if (!(evt['_id'] === a_evt['_id'])) {
+              continue;
             }
+            _ref2 = ['booked', 'paid'];
+            for (_k = 0, _len2 = _ref2.length; _k < _len2; _k++) {
+              attr = _ref2[_k];
+              evt[attr] = a_evt[attr];
+            }
+            _results1.push(console.log(evt));
           }
           return _results1;
         }).call(this));
       }
       return _results;
+    };
+
+    AttendeeEditor.prototype.getInputValue = function(input) {
+      switch (input.type) {
+        case 'text':
+        case 'tel':
+          return input.value;
+        case 'checkbox':
+          return input.checked;
+      }
+    };
+
+    AttendeeEditor.prototype.setInputValue = function(input, value) {
+      switch (input.type) {
+        case 'text':
+        case 'tel':
+          return input.value = value;
+        case 'checkbox':
+          return input.checked = value;
+      }
     };
 
     AttendeeEditor.prototype.getEventElement = function(name, evt) {

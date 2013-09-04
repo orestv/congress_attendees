@@ -8,9 +8,12 @@ INFO_FIELDS = [
     {'caption': u'Ім’я', 'type': 'text', 'input_id': 'txtFirstname', 'fieldId': 'firstname'},
     {'caption': u'По батькові', 'type': 'text', 'input_id': 'txtMiddlename', 'fieldId': 'middlename'},
     {'caption': u'Місто', 'type': 'text', 'input_id': 'txtCity', 'fieldId': 'city'},
+    {'caption': u'Область', 'type': 'text', 'input_id': 'txtRegion', 'fieldId': 'region'},
     {'caption': u'Організація', 'type': 'text', 'input_id': 'txtOrganization', 'fieldId': 'organization'},
-    {'caption': u'Спеціальність', 'type': 'text', 'input_id': 'txtPosition', 'fieldId': 'position'},
-    {'caption': u'Телефон', 'type': 'tel', 'input_id': 'txtPhone', 'fieldId': 'personal_phone'}
+    {'caption': u'Посада', 'type': 'text', 'input_id': 'txtPosition', 'fieldId': 'position'},
+    {'caption': u'Звання', 'type': 'text', 'input_id': 'txtRank', 'fieldId': 'rank'},
+    {'caption': u'Телефон', 'type': 'tel', 'input_id': 'txtPhone', 'fieldId': 'phone'},
+    {'caption': u'Делегат', 'type': 'checkbox', 'input_id': 'cbDelegate', 'fieldId': 'delegate'}
 ]
 
 ATTEND_FIELDS = [

@@ -78,6 +78,7 @@ def attendee_event():
             db_evt = model.get_event(get_db(), event_id)
             if 'limit' in db_evt:
                 evt = model.get_event_free_places(get_db(), event_id)
+                print evt
                 if evt['free_places'] <= 0:
                     return json.dumps({'success': False, 'error': {
                         'type': 'outofplaces'
@@ -142,6 +143,11 @@ def update_attendee():
         print submitted_field_ids
         if submitted_field_ids:
             attendee_info = {field: request.form[field] for field in submitted_field_ids}
+            for field in fields.INFO_FIELDS:
+                if field['type'] == 'checkbox' and field['fieldId'] in attendee_info:
+                    value = attendee_info[field['fieldId']]
+                    value = (value == u'true')
+                    attendee_info[field['fieldId']] = value
             print attendee_info
             model.set_attendee_info(get_db(), id, attendee_info)
     return json.dumps({})
@@ -167,6 +173,8 @@ def attendees():
 def edit_attendee():
     aid = request.args.get('id', None)
     attendee = find_attendee_by_id(aid)
+    if aid and not attendee:
+        return redirect('/index')
     if not flask_login.current_user.is_admin \
             and attendee and attendee['registered']:
         return redirect('/index')
