@@ -361,7 +361,6 @@
         }
         loader.style.display = 'none';
         response = JSON.parse(request.responseText);
-        console.log(response);
         if (response['success']) {
           _this.getEventElement('spBooked', evt).style.display = 'inline';
           _this.getEventElement('btnCancel', evt).style.display = 'inline';
@@ -397,8 +396,8 @@
         }
         delete evt.paid;
         delete evt.booked;
-        _this.fillEventActions(evt);
         _this.updateEventFreePlaces(evt._id);
+        _this.fillEventActions(evt);
         return loader.style.display = 'none';
       };
       request.open('DELETE', '/attendee_event');
@@ -437,8 +436,7 @@
             e.free_places = current_evt.free_places;
           }
         }
-        _this.fillEventFreePlaces(current_evt);
-        return _this.fillEventActions(current_evt);
+        return _this.fillEventFreePlaces(current_evt);
       };
       rqUEFP.open('GET', "/events?type=free_places&id=" + eventId, true);
       return rqUEFP.send(null);
@@ -653,9 +651,6 @@
         fieldValue = '';
       }
       inputValue = this.getInputValue(input);
-      if (fieldValue !== inputValue) {
-        console.log("" + inputValue + ", " + fieldValue);
-      }
       return fieldValue !== inputValue;
     };
 
@@ -666,7 +661,6 @@
         objectKey = _ref[inputId];
         input = document.getElementById(inputId);
         if (this.isInputChanged(input)) {
-          console.log(input);
           this.btnSaveInfo.removeAttribute('disabled');
           return;
         }
@@ -700,22 +694,24 @@
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         a_evt = _ref[_i];
-        console.log(a_evt);
         _results.push((function() {
-          var _j, _k, _len1, _len2, _ref1, _ref2, _results1;
+          var _j, _len1, _ref1, _results1;
           _ref1 = this.events;
           _results1 = [];
           for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
             evt = _ref1[_j];
-            if (!(evt['_id'] === a_evt['_id'])) {
-              continue;
+            if (evt['_id'] === a_evt['_id']) {
+              _results1.push((function() {
+                var _k, _len2, _ref2, _results2;
+                _ref2 = ['booked', 'paid'];
+                _results2 = [];
+                for (_k = 0, _len2 = _ref2.length; _k < _len2; _k++) {
+                  attr = _ref2[_k];
+                  _results2.push(evt[attr] = a_evt[attr]);
+                }
+                return _results2;
+              })());
             }
-            _ref2 = ['booked', 'paid'];
-            for (_k = 0, _len2 = _ref2.length; _k < _len2; _k++) {
-              attr = _ref2[_k];
-              evt[attr] = a_evt[attr];
-            }
-            _results1.push(console.log(evt));
           }
           return _results1;
         }).call(this));

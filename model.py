@@ -68,8 +68,9 @@ def get_event_free_places(db, event_id):
     if not evt.get('limit', None):
         free_places = None
     else:
-        attendees_count = db.attendees.find({'attended_events': 
-                {'_id': s_eid, 'booked': True, 'paid': True}
+        attendees_count = db.attendees.find({'$or':
+                [{'attended_events': {'_id': s_eid, 'booked': True, 'paid': True}},
+                    {'attended_events': {'_id': s_eid, 'booked': True}}]
             }).count()
         free_places = evt['limit'] - attendees_count
     return {'_id': s_eid, 'free_places': free_places}
