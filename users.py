@@ -33,9 +33,9 @@ def get_user_by_id(db, uid):
         return None
     return User(str(db_user['_id']), db_user['admin'], db_user['firstname'], db_user['lastname'])
 
-def get_user_by_credentials(db, login, password):
+def get_user_by_credentials(db, password):
     password_hash = crypt.crypt(password, 'sha2')
-    db_user = db.users.find_one({'login': login, 'password_hash': password_hash})
+    db_user = db.users.find_one({'password_hash': password_hash})
     if not db_user:
         return None
     return User(str(db_user['_id']), db_user['admin'], db_user['firstname'], db_user['lastname'])

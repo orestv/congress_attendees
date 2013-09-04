@@ -1,2 +1,2 @@
 window.onload = () ->
-	document.getElementById('txtLogin').focus()
+	document.getElementById('txtPassword').focus()

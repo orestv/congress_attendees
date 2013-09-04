@@ -45,13 +45,13 @@ def root():
 
 @app.route('/login', methods=['POST'])
 def login_request():
-    login, password = request.form.get('login'), request.form.get('password')
-    user = users.get_user_by_credentials(get_db(), login, password)
+    password = request.form.get('password')
+    user = users.get_user_by_credentials(get_db(), password)
     if user:
         flask_login.login_user(user)
         return redirect(url_for('index'))
     else:
-        flash(u'Логін чи пароль невірні!')
+        flash(u'Пароль невірний!')
         return redirect(url_for('root'))
 
 @app.route('/index')
