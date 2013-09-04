@@ -105,16 +105,16 @@ def init_attendees(conn):
 def init_users(conn):
 	db = conn.congress
 	db.users.drop()
-	fields = {'firstname': 1, 'lastname': 0, 'login': 2, 'password': 3}
+	fields = {'firstname': 1, 'lastname': 0, 'password': 2}
 
 	file_users = open('users_pwds', 'r')
 
 	for line in file_users:
 		line = line.rstrip()
-		line_split = line.split('\t')
+		line_split = line.split()
 		user = {key : line_split[fields[key]] for key in fields}
 		user['password_hash'] = crypt.crypt(user['password'], 'sha2')
-		user['admin'] = (len(line_split) > 4)
+		user['admin'] = (len(line_split) > 3 and line_split[3] == '*')
 		del user['password']
 		db.users.insert(user)
 
