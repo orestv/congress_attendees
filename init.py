@@ -68,7 +68,7 @@ EVENTS = [
 		'import_id': 'registration', 'price': 200, 'default': True},
 	{'caption': u'Пакет матеріалів',
 		'import_id': 'materials', 'price': 100, 
-		'limit': 900 - 612, 'default': True,
+		'limit': 900, 'default': True,
 		'item_caption': 'пакет матеріалів'},
 	{'caption': u'Екскурсія 19.09 в 14 год.',
 		'import_id': 'excursion_19', 
