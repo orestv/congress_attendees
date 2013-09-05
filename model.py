@@ -72,7 +72,6 @@ def get_event_free_places(db, event_id):
                 'attended_events._id': s_eid,
                 'attended_events.booked': True
             }).count()
-        print event_id, evt['caption'], attendees_count
         free_places = evt['limit'] - attendees_count
     return {'_id': s_eid, 'free_places': free_places}
 
@@ -126,7 +125,6 @@ def set_attendee_registered(db, attendee_id, user_id, registered):
                     'registered_by': user_id}})
     attendee = db.attendees.find_one({'_id': ObjectId(attendee_id)})
     for event in attendee['attended_events']:
-        print event
         db.attendees.update({'_id': ObjectId(attendee_id), 'attended_events._id': event['_id']},
             {'$set': {'attended_events.$.paid': True}})
 
