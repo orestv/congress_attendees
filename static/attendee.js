@@ -274,6 +274,7 @@
 
     AttendeeEditor.prototype.fillEventFreePlaces = function(evt) {
       var span;
+      console.log(evt);
       this.getEventElement('spNoLimit', evt).style.display = 'none';
       this.getEventElement('spFreePlaces', evt).style.display = 'none';
       this.getEventElement('spNoFreePlaces', evt).style.display = 'none';
@@ -368,13 +369,12 @@
         } else {
           error = response.error;
           if (error.type === 'outofplaces') {
-            alert('Пробачте, місць не залишилось');
+
           } else {
             alert('Відбулась невідома помилка, бронювання не вдалось');
           }
         }
-        _this.updateEventFreePlaces(evt._id);
-        return _this.fillEventActions(evt);
+        return _this.updateEventFreePlaces(evt._id);
       };
       request.open('PUT', '/attendee_event', true);
       request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");

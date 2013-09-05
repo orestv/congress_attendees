@@ -176,7 +176,7 @@ def edit_attendee():
     if aid and not attendee:
         return redirect('/index')
     if not flask_login.current_user.is_admin \
-            and attendee and attendee['registered']:
+            and attendee and attendee.get('registered', False):
         return redirect('/index')
     return render_template('attendee.html', 
         fields = fields.INFO_FIELDS,

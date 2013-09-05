@@ -126,6 +126,7 @@ class AttendeeEditor
 			@fillEventFreePlaces evt
 
 	fillEventFreePlaces: (evt) ->
+		console.log evt
 		@getEventElement('spNoLimit', evt).style.display = 'none'
 		@getEventElement('spFreePlaces', evt).style.display = 'none'
 		@getEventElement('spNoFreePlaces', evt).style.display = 'none'
@@ -192,11 +193,10 @@ class AttendeeEditor
 			else
 				error = response.error
 				if error.type == 'outofplaces'
-					alert('Пробачте, місць не залишилось')
+					# alert('Пробачте, місць не залишилось')
 				else
 					alert('Відбулась невідома помилка, бронювання не вдалось')
 			@updateEventFreePlaces evt._id
-			@fillEventActions evt
 		request.open('PUT', '/attendee_event', true)
 		request.setRequestHeader("Content-type","application/x-www-form-urlencoded");
 		data = "eid=#{evt._id}&aid=#{@attendeeId}"
