@@ -14,6 +14,8 @@ import fields
 from bson import json_util
 import flask.ext.login as flask_login
 from threading import Lock
+from logging import FileHandler
+import sys
 
 from time import sleep
 
@@ -21,6 +23,14 @@ app = Flask(__name__)
 app.event_update_lock = Lock()
 
 app.config.from_pyfile('config.cfg')
+
+log_filename = app.config['LOG_FILENAME']
+if log_filename:
+    try:
+        app.logger.addHandler(FileHandler(log_filename))
+    except:
+        pass
+
 mongo = PyMongo(app)
 
 login_manager = flask_login.LoginManager()
