@@ -1,12 +1,6 @@
 class Dashboard
 	constructor: () ->
 		document.getElementById('btnEventAttendeesHide').onclick = @clearEventAttendees
-		@btnShowAttendeeEditor = document.getElementById('btnShowAttendeeEditor')
-		@btnHideAttendeeEditor = document.getElementById('btnHideAttendeeEditor')
-		@btnAddAttendee = document.getElementById('btnAddAttendee')
-		@btnShowAttendeeEditor.onclick = @showAttendeeEditor
-		@btnHideAttendeeEditor.onclick = @hideAttendeeEditor
-		@btnAddAttendee.onclick = @addAttendee
 
 	showEventAttendees: (eventId, eventCaption) =>
 		@clearEventAttendees()
@@ -36,30 +30,14 @@ class Dashboard
 		details = "#{attendee.lastname} #{attendee.firstname} #{attendee.middlename}, #{attendee.city}"
 		tdDetails = document.createElement 'td'
 		tdDetails.appendChild document.createTextNode(details)
-		if attendee.queue
-			tr.className = 'queuedAttendee'
+		tdActions = document.createElement 'td'
+		aEdit = document.createElement 'a'
+		aEdit.appendChild document.createTextNode('Редагувати')
+		aEdit.setAttribute('href', "/attendee_edit?id=#{attendee._id}")
+		tdActions.appendChild aEdit
 		tr.appendChild tdDetails
+		tr.appendChild tdActions
 		return tr
-
-	showAttendeeEditor: () =>
-		@btnShowAttendeeEditor.style.display = 'none'
-		@attendeeEditor = new AttendeeEditor({})
-		@attendeeEditor.show()
-
-	hideAttendeeEditor: () =>
-		@btnShowAttendeeEditor.style.display = 'block'
-		@attendeeEditor.clear()
-		@attendeeEditor.hide()
-
-	addAttendee: () =>
-		attendeeData = @attendeeEditor.getAttendeeData()
-		console.log attendeeData
-		request = new XMLHttpRequest()
-		request.open('PUT', '/attendees', false)
-		request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded')
-		request.send(attendeeData)
-		@hideAttendeeEditor()
-
 
 window.onload = () ->
 	window.Page = new Dashboard()

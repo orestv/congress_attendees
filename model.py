@@ -41,20 +41,13 @@ def get_event(db, event_id):
     return db.events.find_one({'_id': ObjectId(event_id)})
 
 def get_event_attendees(db, event_id):
-    if type(event_id) is not str:
-        event_id = str(event_id)
-    cursor = db.attendees.find({'attended_events': 
-        {'$elemMatch': {'id': event_id}}
-        }).sort('registered_on', 1)
-    attendees = [a for a in cursor]
-
-    event = db.events.find_one({'_id': ObjectId(event_id)})
-    event_limit = event.get('limit', None)
-
-    if event_limit and event_limit < attendees.count:
-        for attendee in attendees[event_limit:]:
-            attendee['queue'] = True
-
+    s_eid = str(event_id)
+    print s_eid
+    cursor = db.attendees.find({
+        'attended_events._id': s_eid,
+        'attended_events.booked': True
+        })
+    attendees = list(cursor)
     return attendees
 
 def get_event_attendees_count(db, event_id):

@@ -8,15 +8,6 @@
 
     function Dashboard() {
       var _this = this;
-      this.addAttendee = function() {
-        return Dashboard.prototype.addAttendee.apply(_this, arguments);
-      };
-      this.hideAttendeeEditor = function() {
-        return Dashboard.prototype.hideAttendeeEditor.apply(_this, arguments);
-      };
-      this.showAttendeeEditor = function() {
-        return Dashboard.prototype.showAttendeeEditor.apply(_this, arguments);
-      };
       this.fillEventAttendees = function(eventAttendees) {
         return Dashboard.prototype.fillEventAttendees.apply(_this, arguments);
       };
@@ -27,12 +18,6 @@
         return Dashboard.prototype.showEventAttendees.apply(_this, arguments);
       };
       document.getElementById('btnEventAttendeesHide').onclick = this.clearEventAttendees;
-      this.btnShowAttendeeEditor = document.getElementById('btnShowAttendeeEditor');
-      this.btnHideAttendeeEditor = document.getElementById('btnHideAttendeeEditor');
-      this.btnAddAttendee = document.getElementById('btnAddAttendee');
-      this.btnShowAttendeeEditor.onclick = this.showAttendeeEditor;
-      this.btnHideAttendeeEditor.onclick = this.hideAttendeeEditor;
-      this.btnAddAttendee.onclick = this.addAttendee;
     }
 
     Dashboard.prototype.showEventAttendees = function(eventId, eventCaption) {
@@ -72,39 +57,19 @@
     };
 
     Dashboard.prototype.createEventAttendeeRow = function(attendee) {
-      var details, tdDetails, tr;
+      var aEdit, details, tdActions, tdDetails, tr;
       tr = document.createElement('tr');
       details = "" + attendee.lastname + " " + attendee.firstname + " " + attendee.middlename + ", " + attendee.city;
       tdDetails = document.createElement('td');
       tdDetails.appendChild(document.createTextNode(details));
-      if (attendee.queue) {
-        tr.className = 'queuedAttendee';
-      }
+      tdActions = document.createElement('td');
+      aEdit = document.createElement('a');
+      aEdit.appendChild(document.createTextNode('Редагувати'));
+      aEdit.setAttribute('href', "/attendee_edit?id=" + attendee._id);
+      tdActions.appendChild(aEdit);
       tr.appendChild(tdDetails);
+      tr.appendChild(tdActions);
       return tr;
-    };
-
-    Dashboard.prototype.showAttendeeEditor = function() {
-      this.btnShowAttendeeEditor.style.display = 'none';
-      this.attendeeEditor = new AttendeeEditor({});
-      return this.attendeeEditor.show();
-    };
-
-    Dashboard.prototype.hideAttendeeEditor = function() {
-      this.btnShowAttendeeEditor.style.display = 'block';
-      this.attendeeEditor.clear();
-      return this.attendeeEditor.hide();
-    };
-
-    Dashboard.prototype.addAttendee = function() {
-      var attendeeData, request;
-      attendeeData = this.attendeeEditor.getAttendeeData();
-      console.log(attendeeData);
-      request = new XMLHttpRequest();
-      request.open('PUT', '/attendees', false);
-      request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-      request.send(attendeeData);
-      return this.hideAttendeeEditor();
     };
 
     return Dashboard;

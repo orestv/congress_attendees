@@ -173,6 +173,9 @@ def attendees():
         result = find_attendees_by_word(search_term)
     elif event_id:
         result = model.get_event_attendees(get_db(), event_id)
+        sort_attendees_by_name(result)
+        for a in result:
+            a['_id'] = str(a['_id'])
     elif id:
         attendee = find_attendee_by_id(id)
         result = {'attendee': attendee}
@@ -218,14 +221,17 @@ def find_attendees_by_word(search_term):
         return {}
     db = get_db()
     attendees = model.find_attendees(db, search_term)
-    locale.setlocale(locale.LC_ALL, 'uk_UA.UTF-8')
-    attendee_count = len(attendees)
-    attendees.sort(cmp = model.compare_attendees)
+    sort_attendees_by_name(attendees)
     attendees = attendees[:30]
     for a in attendees:
         a['_id'] = str(a['_id'])
     result = {'count': attendee_count, 'attendees': attendees}
     return result
+
+def sort_attendees_by_name(attendees):
+    locale.setlocale(locale.LC_ALL, 'uk_UA.UTF-8')
+    attendee_count = len(attendees)
+    attendees.sort(cmp = model.compare_attendees)
 
 def find_attendee_by_id(id):
     attendee = model.find_attendee(get_db(), id)
