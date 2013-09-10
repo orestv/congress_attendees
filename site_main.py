@@ -14,7 +14,9 @@ import fields
 from bson import json_util
 import flask.ext.login as flask_login
 from threading import Lock
+import logging
 from logging import FileHandler
+from TlsSMTPHandler import TlsSMTPHandler
 import sys
 
 from time import sleep
@@ -30,6 +32,16 @@ if log_filename:
         app.logger.addHandler(FileHandler(log_filename))
     except:
         pass
+try:
+    handler = TlsSMTPHandler(('smtp.gmail.com', 587),
+        app.config['EMAIL_LOGIN'], [app.config['EMAIL_RECIPIENT']], 
+        app.config['EMAIL_SUBJECT'],
+        (app.config['EMAIL_LOGIN'], app.config['EMAIL_PASSWORD']))
+    handler.setLevel(logging.ERROR)
+    app.logger.addHandler(handler)
+except Exception as ex:
+    app.logger.exception(ex)
+
 
 mongo = PyMongo(app)
 
