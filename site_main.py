@@ -222,6 +222,7 @@ def find_attendees_by_word(search_term):
     db = get_db()
     attendees = model.find_attendees(db, search_term)
     sort_attendees_by_name(attendees)
+    attendee_count = len(attendees)
     attendees = attendees[:30]
     for a in attendees:
         a['_id'] = str(a['_id'])
@@ -230,7 +231,6 @@ def find_attendees_by_word(search_term):
 
 def sort_attendees_by_name(attendees):
     locale.setlocale(locale.LC_ALL, 'uk_UA.UTF-8')
-    attendee_count = len(attendees)
     attendees.sort(cmp = model.compare_attendees)
 
 def find_attendee_by_id(id):
