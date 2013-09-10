@@ -18,6 +18,7 @@
 			<thead>
 				<tr>
 					<th>Назва</th>
+					<th>Вартість</th>
 					<th>Учасники</th>
 				</tr>
 			</thead>
@@ -26,11 +27,18 @@
 					<tr>
 						<td> {{ event.caption }} </td>
 						<td>
+							{% if event.price %}
+								{{ event.price }} грн
+							{% else %}
+								Безкоштовно
+							{% endif %}
+						</td>
+						<td>
 							{% if event.attendee_count > 0 %}
 								<a href="#" onclick="Page.showEventAttendees('{{event._id}}', '{{event.caption}}')">
 							{% endif %}
 							{% if event.limit %}
-							{{ event.attendee_count }} / {{ event.limit }}
+								{{ event.attendee_count }} / {{ event.limit }}
 							{% else %}
 								{{ event.attendee_count }}
 							{% endif %}

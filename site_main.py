@@ -218,8 +218,10 @@ def dashboard():
     events = list(events_cursor)
     for event in events:
         event['attendee_count'] = model.get_event_attendees_count(get_db(), event['_id'])
+        if event.get('limit', None):
+            event['free_places'] = event['limit'] - event['attendee_count']
     return render_template('dashboard.html',
-        events = events, 
+        events = events,
         user = flask_login.current_user,
         fields=fields.INFO_FIELDS)
 
