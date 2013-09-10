@@ -15,27 +15,35 @@
       this.input = input;
       this.f_search = f_search;
       this.f_select = f_select;
-      this.search = function() {
-        return SearchBox.prototype.search.apply(_this, arguments);
+      this.performSearch = function() {
+        return SearchBox.prototype.performSearch.apply(_this, arguments);
       };
       this.inputKeyPressed = function(event) {
         return SearchBox.prototype.inputKeyPressed.apply(_this, arguments);
       };
+      this.scheduleSearch = function() {
+        return SearchBox.prototype.scheduleSearch.apply(_this, arguments);
+      };
       this.keyDownTimeout = null;
       this.input.onkeydown = this.inputKeyPressed;
+      this.input.onsearch = this.scheduleSearch;
     }
+
+    SearchBox.prototype.scheduleSearch = function() {
+      if (this.keyDownTimeout != null) {
+        window.clearTimeout(this.keyDownTimeout);
+      }
+      return this.keyDownTimeout = window.setTimeout(this.performSearch, SEARCH_TIMEOUT);
+    };
 
     SearchBox.prototype.inputKeyPressed = function(event) {
       if (event.keyCode === 13) {
         this.f_select();
       }
-      if (this.keyDownTimeout != null) {
-        window.clearTimeout(this.keyDownTimeout);
-      }
-      return this.keyDownTimeout = window.setTimeout(this.search, SEARCH_TIMEOUT);
+      return this.scheduleSearch();
     };
 
-    SearchBox.prototype.search = function() {
+    SearchBox.prototype.performSearch = function() {
       var text;
       text = this.input.value;
       return this.f_search(text);
