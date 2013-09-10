@@ -65,34 +65,40 @@ def create_attendee(cursor, firstname, middlename, lastname):
 
 EVENTS = [
 	{'caption': u'Обов’язковий реєстраційний платіж',
-		'import_id': 'registration', 'price': 200, 'default': True},
+		'import_id': 'registration', 'price': 200,
+		'default': True,
+		'item_caption': u'сертифікат і бейджик'},
 	{'caption': u'Пакет матеріалів',
-		'import_id': 'materials', 'price': 100, 
+		'import_id': 'materials', 'price': 100,
 		'limit': 900, 'default': True,
-		'item_caption': 'пакет матеріалів'},
+		'item_caption': u'пакет матеріалів'},
+	{'caption': u'Обід 18.09 в 14 год.',
+		'import_id': 'dinner_18',
+		'limit': 300, 'default': True,
+		'item_caption': u'квиток на обід 19.09'},
+	{'caption': u'Обід 19.09 в 13 год.',
+		'import_id': 'dinner_19',
+		'price': 50, 'limit': 600, 'default': True,
+		'item_caption': u'квиток на обід 19.09'},
+	{'caption': u'Обід 20.09 в 13 год.',
+		'import_id': 'dinner_20',
+		'price': 50, 'limit': 600, 'default': True,
+		'item_caption': u'квиток на обід 20.09'},
 	{'caption': u'Екскурсія 19.09 в 14 год.',
-		'import_id': 'excursion_19', 
+		'import_id': 'excursion_19',
 		'price': 40, 'limit': 90,
 		'item_caption': u'квиток на екскурсію 19.09'},
 	{'caption': u'Екскурсія 20.09 в 14 год.',
-		'import_id': 'excursion_20', 
+		'import_id': 'excursion_20',
 		'price': 40, 'limit': 90,
 		'item_caption': u'квиток на екскурсію 20.09'},
 	{'caption': u'Церемонія відкриття 18.09 в 19 год.',
 		'import_id': 'opening', 'limit': 500,
 		'item_caption': u'квиток на церемонію відкриття'},
 	{'caption': u'Урочиста вечеря 19.09 в 19 год.',
-		'import_id': 'ceremonial_dinner', 
+		'import_id': 'ceremonial_dinner',
 		'price': 300, 'limit': 500,
-		'item_caption': u'квиток на урочисту вечерю'},
-	{'caption': u'Обід 19.09 в 13 год.',
-		'import_id': 'dinner_19', 
-		'price': 50, 'limit': 600,
-		'item_caption': u'квиток на обід 19.09'},
-	{'caption': u'Обід 20.09 в 13 год.',
-		'import_id': 'dinner_20', 
-		'price': 50, 'limit': 600,
-		'item_caption': u'квиток на обід 20.09'}
+		'item_caption': u'квиток на урочисту вечерю'}
 ]
 
 
@@ -117,7 +123,8 @@ def init_attendees(conn):
 			# return
 			attended_events = []
 			for field in EVENT_FIELDS:
-				if items[field['col']] != 'Так':
+				choice = items[field['col']].strip()
+				if choice != 'Так':
 					continue
 				eid = events[field['id']]
 				event = {'_id': eid, 'booked': True, 'paid': True}
@@ -155,8 +162,8 @@ def init_users(conn):
 
 def init_events(conn):
 	db = conn.congress
-	db.attendees.update({}, 
-		{'$set': 
+	db.attendees.update({},
+		{'$set':
 			{'attended_events': []}
 		},
 		multi = True)
