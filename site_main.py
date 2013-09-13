@@ -111,21 +111,6 @@ def attendee_event():
             model.unbook_attendee_event(get_db(), attendee_id, event_id)        
     return json.dumps({'success': True})
 
-@app.route('/events', methods=['GET'])
-def events():
-    request_type = request.args.get('type', None)
-    eid = request.args.get('id', None)
-    print "event id is %s" % (eid)
-    result = {}
-    if request_type == 'free_places':
-        if eid:
-            result = {'event': model.get_event_free_places(get_db(), eid)}
-        else:
-            result = {'events': model.get_events_free_places(get_db())}
-    else:
-        result = {'events': get_all_events()}
-    return json.dumps(result)
-
 @app.route('/attendees', methods=['POST'])
 @flask_login.login_required
 def add_attendee():
@@ -209,19 +194,42 @@ def edit_attendee():
         events = get_all_events(), 
         attendee_id = aid)
 
-@app.route('/dashboard')
+@app.route('/admin/events')
 @flask_login.login_required
-def dashboard():
+def admin_events():
     if not flask_login.current_user.is_admin:
         return login_manager.unauthorized()
     events_cursor = model.get_events(get_db())
     events = list(events_cursor)
     for event in events:
         event['attendee_count'] = model.get_event_attendees_count(get_db(), event['_id'])
-    return render_template('dashboard.html',
-        events = events, 
+        if event.get('limit', None):
+            event['free_places'] = event['limit'] - event['attendee_count']
+    return render_template('events.html',
+        events = events,
         user = flask_login.current_user,
         fields=fields.INFO_FIELDS)
+
+@app.route('/admin/registrators')
+@flask_login.login_required
+def admin_registrators():
+    if not flask_login.current_user.is_admin:
+        return login_manager.unauthorized()
+
+@app.route('/events', methods=['GET'])
+def events():
+    request_type = request.args.get('type', None)
+    eid = request.args.get('id', None)
+    result = {}
+    if request_type == 'free_places':
+        if eid:
+            result = {'event': model.get_event_free_places(get_db(), eid)}
+        else:
+            result = {'events': model.get_events_free_places(get_db())}
+        return json.dumps(result)
+    else:
+        result = {'events': get_all_events()}
+        return json.dumps(result)
 
 @app.route('/logout')
 def logout():

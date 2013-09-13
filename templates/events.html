@@ -5,19 +5,18 @@
 {% endblock %}
 {% block head %}
 	{{ super() }}
-	<link rel="stylesheet" href="/static/dashboard.css">
-	<link rel="stylesheet" href="/static/attendee_editor.css">
-	<script src="/static/dashboard.js" type="text/javascript" charset="utf-8" async defer></script>	
-	<script src="/static/attendee_editor.js" type="text/javascript" charset="utf-8" async defer></script>
+	<link rel="stylesheet" href="/static/events.css">
+	<script src="/static/events.js" type="text/javascript" charset="utf-8" async defer></script>
 {% endblock %}
 
-{% block content %}	
+{% block content %}
 	<div id="dvEvents" style="float: left;">
 		<table class="dashboardTable">
 			<caption><h3>Події</h3></caption>
 			<thead>
 				<tr>
 					<th>Назва</th>
+					<th>Вартість</th>
 					<th>Учасники</th>
 				</tr>
 			</thead>
@@ -26,11 +25,18 @@
 					<tr>
 						<td> {{ event.caption }} </td>
 						<td>
+							{% if event.price %}
+								{{ event.price }} грн
+							{% else %}
+								Безкоштовно
+							{% endif %}
+						</td>
+						<td>
 							{% if event.attendee_count > 0 %}
 								<a href="#" onclick="Page.showEventAttendees('{{event._id}}', '{{event.caption}}')">
 							{% endif %}
 							{% if event.limit %}
-							{{ event.attendee_count }} / {{ event.limit }}
+								{{ event.attendee_count }} / {{ event.limit }}
 							{% else %}
 								{{ event.attendee_count }}
 							{% endif %}
