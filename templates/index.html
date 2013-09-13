@@ -6,7 +6,6 @@
 {% block head %}
     {{ super() }}
     <link rel="stylesheet" href="/static/index.css">
-    <link rel="stylesheet" href="/static/attendee_editor.css">
     <script>
     {% if user.is_admin %}
         window.admin = true
@@ -16,7 +15,6 @@
     </script>
     <script src="/static/search.js" type="text/javascript" charset="utf-8" async defer></script>
     <script src="/static/index.js" type="text/javascript" charset="utf-8" async defer></script>
-    <script src="/static/attendee_editor.js" type="text/javascript" charset="utf-8" async defer></script>    
 {% endblock %}
 {% block content %}
     <div id="searchListContainer">
@@ -47,38 +45,5 @@
         <div style="width: 100%; text-align: left">
             <input type="button" id="btnBackToList" value="<<< Список">
         </div>
-
-        {% include "attendee_editor.html" %}
-        
-        <div class="attendeeEditorBlock">
-            <table class="attendeeEditorTable">
-                <thead>
-                    <tr>
-                        <th>Імпреза</th>
-                        <th>Відвідає?</th>
-                        <th>Зайнято місць</th>
-                        <th>Всього місць</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for event in events %}
-                        <tr>
-                            <td>
-                                <label for="{{event._id}}">{{event.caption}}</label>
-                            </td>
-                            <td><input type="checkbox" id="{{event._id}}" name="events"/></td>
-                            <td>
-                                <span id="spAttendees_{{event._id}}"></span>
-                            </td>
-                            <td>
-                                <span id="spLimit_{{event._id}}"></span>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        <div style="clear: both"></div>
-        <input type="button" id="btnRegisterAttendee" value="Зареєструвати"/>
     </div>
 {% endblock %}
