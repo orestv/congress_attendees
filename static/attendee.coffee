@@ -246,7 +246,7 @@ class AttendeeEditor
 				return
 			if callback?
 				callback()
-		rqRegister.open('PUT', "/attendees?id=#{@attendee._id}&registered=True", true)
+		rqRegister.open('PUT', "/attendees?id=#{@attendee._id}&registered=True&cash=#{@price}", true)
 		rqRegister.send(null)
 
 	showPostRegistrationMessage: () =>
@@ -267,6 +267,7 @@ class AttendeeEditor
 		price = 0
 		for evt in @events when evt.price? and evt['booked'] and not evt['paid']
 			price += evt['price']
+		@price = price
 		document.getElementById('spPrice').textContent = price
 
 	prepareItemsList: () =>

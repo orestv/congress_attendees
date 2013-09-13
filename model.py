@@ -24,15 +24,17 @@ def intersect_attendees(a, b):
     result = filter(lambda item: item['_id'] in ids, a + b)
     return result
 
-def compare_attendees(a1, a2):
-    for field in ['lastname', 'firstname', 'middlename']:
-        f1 = a1.get(field)
-        f2 = a2.get(field)
-        if f1 and f2:
-            compare_result = locale.strcoll(a1[field], a2[field])
-            if compare_result:
-                return compare_result
-    return 0
+def get_comparer(fields):
+    def compare_records(a1, a2):
+        for field in fields:
+            f1 = a1.get(field)
+            f2 = a2.get(field)
+            if f1 and f2:
+                compare_result = locale.strcoll(a1[field], a2[field])
+                if compare_result:
+                    return compare_result
+        return 0
+    return compare_records
 
 def get_events(db):
     return db.events.find()
@@ -107,7 +109,7 @@ def set_attendee_events(db, attendee_id, event_ids):
     db.attendees.update({'_id': attendee_id},
         {'$set': {'attended_events': all_events}})
 
-def set_attendee_registered(db, attendee_id, user_id, registered):
+def set_attendee_registered(db, attendee_id, user_id, registered, cash):
     cur = db.attendees.find({'_id': ObjectId(attendee_id), 
         'registered': True})
     already_registered = (cur.count() > 0)
@@ -116,6 +118,8 @@ def set_attendee_registered(db, attendee_id, user_id, registered):
             {'$set': {'registered': registered, 
                     'registered_on': datetime.datetime.now(), 
                     'registered_by': user_id}})
+    db.users.update({'_id': ObjectId(user_id)}, 
+        {'$inc': {'cash': int(cash)}})
     attendee = db.attendees.find_one({'_id': ObjectId(attendee_id)})
     for event in attendee['attended_events']:
         db.attendees.update({'_id': ObjectId(attendee_id), 'attended_events._id': event['_id']},
@@ -140,6 +144,28 @@ def set_attendee_info(db, attendee_id, info):
 def find_attendee(db, id):
     cursor = db.attendees.find_one({'_id': ObjectId(id)})
     return cursor
+
+def get_attendee_count_by_registrator(db, r_id):
+    return db.attendees.find({'registered_by': r_id}).count()
+
+def get_attendee_count_by_registrators(db):
+    result = []
+    users = db.users.find()
+    for user in users:
+        item = {
+            'firstname': user['firstname'],
+            'lastname': user['lastname'],
+            'cash': user['cash'],
+            'attendee_count': get_attendee_count_by_registrator(db, str(user['_id']))
+        }
+        result.append(item)
+    return result
+
+def get_all_attendee_count(db):
+    return db.attendees.find().count()
+
+def get_registered_attendee_count(db):
+    return db.attendees.find({'registered': True}).count()
 
 def find_attendees(db, search_term, search_by_city = False):
     words = search_term.split(' ')

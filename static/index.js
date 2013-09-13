@@ -49,8 +49,6 @@
       searchBoxInput = document.getElementById('searchBox');
       searchBoxInput.focus();
       searchbox = new window.SearchBox(searchBoxInput, this.searchRequested, this.editFirstAttendee);
-      document.getElementById('btnRegisterAttendee').onclick = this.registerAttendee;
-      document.getElementById('btnBackToList').onclick = this.backToList;
     }
 
     Index.prototype.searchRequested = function(searchQuery) {

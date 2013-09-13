@@ -453,7 +453,7 @@
           return callback();
         }
       };
-      rqRegister.open('PUT', "/attendees?id=" + this.attendee._id + "&registered=True", true);
+      rqRegister.open('PUT', "/attendees?id=" + this.attendee._id + "&registered=True&cash=" + this.price, true);
       return rqRegister.send(null);
     };
 
@@ -483,6 +483,7 @@
           price += evt['price'];
         }
       }
+      this.price = price;
       return document.getElementById('spPrice').textContent = price;
     };
 
