@@ -273,7 +273,6 @@
 
     AttendeeEditor.prototype.fillEventFreePlaces = function(evt) {
       var span;
-      console.log(evt);
       this.getEventElement('spNoLimit', evt).style.display = 'none';
       this.getEventElement('spFreePlaces', evt).style.display = 'none';
       this.getEventElement('spNoFreePlaces', evt).style.display = 'none';
@@ -297,7 +296,7 @@
         return;
       }
       this.joinEventData();
-      this.setDefaultActions = this.attendee.attended_events.length === 0;
+      this.setDefaultActions = !this.attendee.registered;
       _ref = this.events;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         evt = _ref[_i];

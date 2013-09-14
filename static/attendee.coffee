@@ -126,7 +126,6 @@ class AttendeeEditor
 			@fillEventFreePlaces evt
 
 	fillEventFreePlaces: (evt) ->
-		console.log evt
 		@getEventElement('spNoLimit', evt).style.display = 'none'
 		@getEventElement('spFreePlaces', evt).style.display = 'none'
 		@getEventElement('spNoFreePlaces', evt).style.display = 'none'
@@ -145,7 +144,7 @@ class AttendeeEditor
 			console.log "Attendee fetched: #{@attendeeFetched}, events fetched: #{@eventsFetched}"
 			return
 		@joinEventData()
-		@setDefaultActions = (@attendee.attended_events.length == 0)
+		@setDefaultActions = not @attendee.registered#(@attendee.attended_events.length == 0)
 		for evt in @events
 			@fillEventActions evt
 		if @setDefaultActions
