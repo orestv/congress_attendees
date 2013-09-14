@@ -140,8 +140,9 @@ def update_attendee():
                 model.set_attendee_events(get_db(), id, events)
             registered = request.args.get('registered', None)
             if registered is not None:
+                cash = request.args.get('cash', 0)
                 registered = bool(registered)
-                model.set_attendee_registered(get_db(), id, user_id, registered)
+                model.set_attendee_registered(get_db(), id, user_id, registered, cash)
         # if flask_login.current_user.is_admin:
         print 'Admin updating an attendee!'
         valid_field_ids = [field['fieldId'] for field in fields.INFO_FIELDS]
@@ -183,15 +184,23 @@ def attendees():
 def edit_attendee():
     aid = request.args.get('id', None)
     attendee = find_attendee_by_id(aid)
+    reg_data = None
+    r_id = attendee.get('registered_by', None)
+    if r_id:
+        reg_data = {
+            'registrator': model.get_user_by_id(get_db(), r_id),
+            'registered_on': attendee['registered_on'],
+        }
     if aid and not attendee:
         return redirect('/index')
     if not flask_login.current_user.is_admin \
             and attendee and attendee.get('registered', False):
         return redirect('/index')
-    return render_template('attendee.html', 
+    return render_template('attendee.html',
         fields = fields.INFO_FIELDS,
         user = flask_login.current_user,
-        events = get_all_events(), 
+        events = get_all_events(),
+        reg_data = reg_data,
         attendee_id = aid)
 
 @app.route('/admin/events')
@@ -208,13 +217,24 @@ def admin_events():
     return render_template('events.html',
         events = events,
         user = flask_login.current_user,
-        fields=fields.INFO_FIELDS)
+        fields = fields.INFO_FIELDS)
 
-@app.route('/admin/registrators')
+@app.route('/admin/report')
 @flask_login.login_required
-def admin_registrators():
+def admin_report():
     if not flask_login.current_user.is_admin:
         return login_manager.unauthorized()
+    db = get_db()
+    total_attendee_count = model.get_all_attendee_count(db)
+    registered_attendee_count = model.get_registered_attendee_count(db)
+    registrators = model.get_attendee_count_by_registrators(db)
+    sort_users_by_name(registrators)
+
+    return render_template('report.html',
+        user = flask_login.current_user,
+        total_attendee_count = total_attendee_count,
+        registered_attendee_count = registered_attendee_count,
+        registrators = registrators)
 
 @app.route('/events', methods=['GET'])
 def events():
@@ -251,7 +271,11 @@ def find_attendees_by_word(search_term):
 
 def sort_attendees_by_name(attendees):
     locale.setlocale(locale.LC_ALL, 'uk_UA.UTF-8')
-    attendees.sort(cmp = model.compare_attendees)
+    attendees.sort(cmp = model.get_comparer(['lastname', 'firstname', 'middlename']))
+
+def sort_users_by_name(users):
+    locale.setlocale(locale.LC_ALL, 'uk_UA.UTF-8')
+    users.sort(cmp = model.get_comparer(['lastname', 'firstname']))
 
 def find_attendee_by_id(id):
     attendee = model.find_attendee(get_db(), id)

@@ -9,9 +9,6 @@ class Index
 		searchBoxInput.focus()
 		searchbox = new window.SearchBox(searchBoxInput, @searchRequested, @editFirstAttendee)
 
-		document.getElementById('btnRegisterAttendee').onclick = @registerAttendee
-		document.getElementById('btnBackToList').onclick = @backToList
-
 	searchRequested: (searchQuery) =>		
 		if searchQuery == ''
 			@nextSearch = null

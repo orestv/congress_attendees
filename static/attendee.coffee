@@ -161,12 +161,11 @@ class AttendeeEditor
 		for item in [btnCancel, btnBook, spBooked, spPaid]
 			item.style.display = 'none'
 
-		if evt['booked'] or evt['paid']
+		if evt['booked'] and not evt['paid']
 			btnCancel.style.display = 'inline'
-			if evt['paid']
-				spPaid.style.display = 'inline'
-			else
-				spBooked.style.display = 'inline'
+			spBooked.style.display = 'inline'
+		else if evt['paid']
+			spPaid.style.display = 'inline'
 		else
 			if evt.limit?
 				for e in @eventsFreePlaces when e._id == evt._id
@@ -246,7 +245,7 @@ class AttendeeEditor
 				return
 			if callback?
 				callback()
-		rqRegister.open('PUT', "/attendees?id=#{@attendee._id}&registered=True", true)
+		rqRegister.open('PUT', "/attendees?id=#{@attendee._id}&registered=True&cash=#{@price}", true)
 		rqRegister.send(null)
 
 	showPostRegistrationMessage: () =>
@@ -267,6 +266,7 @@ class AttendeeEditor
 		price = 0
 		for evt in @events when evt.price? and evt['booked'] and not evt['paid']
 			price += evt['price']
+		@price = price
 		document.getElementById('spPrice').textContent = price
 
 	prepareItemsList: () =>

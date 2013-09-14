@@ -52,7 +52,7 @@
 
 {% block content %}
 	<div class="attendeeEditorBlock" id="dvInfo">
-		<table class="attendeeEditorTable">
+		<table class="attendeeEditorTable" style="width: 13cm; float: left">
 			<tbody>
 				{% for field in fields %}
 					<tr>
@@ -65,9 +65,19 @@
 				{% endfor %}
 			</tbody>
 		</table>
+		{% if reg_data %}
+			<div>
+				<h2>Реєстратор:</h2>
+				{{ reg_data.registrator.lastname }} {{ reg_data.registrator.firstname}}
+				<h2>Час реєстрації:</h2>
+				{{ reg_data.registered_on }}
+			</div>
+		{% endif %}
+		<div style="clear:both"></div>
 		<input type="button" value="Зберегти" id="btnSaveInfo" disabled>
 		<img src="/static/ajax-loader.gif" id="imgSaveLoader" style="display: none">
 	</div>
+	<div style="clear:both"></div>
 	<div class="attendeeEditorBlock" id="dvEvents">
 		<table class="attendeeEditorTable">
 			<thead>
@@ -100,17 +110,17 @@
 		<input type="button" id="btnFinishRegistration" value="Завершити реєстрацію">
 	</div>
 	<div class="modalPlaceholder" id="dvModalPlaceholder">
-	</div>	
+	</div>
 	<div id="dvPostRegistrationMessage">
 		<div class="messageContainer">
-			Прийміть в учасника <span id="spPrice"></span> грн і видайте йому наступні матеріали та квитки:
+			Прийміть в учасника <span id="spPrice"></span> грн і видайте йому:
 			<ul id="itemsList">
-				
+
 			</ul>
 		</div>
 		<div class="buttonsContainer">
-			<input type="button" value="Відмінити" id="btnCancelRegistration"/>
-			<input type="button" id="btnRegister" value="Завершити"/>
+			<input type="button" value="Відмінити" id="btnCancelRegistration" />
+			<input type="button" id="btnRegister" value="Завершити" />
 		</div>
 	</div>
 {% endblock %}

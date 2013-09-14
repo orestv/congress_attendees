@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}
+    {{ super() }}
+    Звіт
+{% endblock %}
+{% block head %}
+    {{ super() }}
+    <link rel="stylesheet" href="/static/report.css">
+    <script src="/static/report.js" type="text/javascript" charset="utf-8" async defer></script>
+{% endblock %}
+
+{% block content %}
+    <h2>Прибуло учасників: {{ registered_attendee_count }} </h2>
+    <h2>Всього учасників: {{ total_attendee_count }}</h2>
+    <h2>Розбиття по реєстраторах:</h2>
+    <table class="dashboardTable">
+        <thead>
+            <tr>
+                <th>Реєстратор</th>
+                <th>Прийняв учасників</th>
+                <th>Прийняв грошей</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in registrators %}
+                <tr>
+                    <td>{{r.lastname}} {{r.firstname}}</td>
+                    <td>
+                        {% if r.attendee_count %}
+                            {{r.attendee_count}}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if r.cash %}
+                            {{ r.cash }}
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}
