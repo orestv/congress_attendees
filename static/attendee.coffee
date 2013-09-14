@@ -214,10 +214,8 @@ class AttendeeEditor
 			@updateEventFreePlaces evt._id
 			@fillEventActions(evt)
 			loader.style.display = 'none'
-		request.open('DELETE', '/attendee_event')
-		request.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-		data = "eid=#{evt._id}&aid=#{@attendeeId}"
-		request.send(data)
+		request.open('DELETE', "/attendee_event?eid=#{evt._id}&aid=#{@attendeeId}", true)
+		request.send(null)
 
 	updateLocalAttendeeData: () =>
 		for inputId, objectKey of @fields
