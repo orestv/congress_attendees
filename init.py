@@ -75,7 +75,7 @@ EVENTS = [
 	{'caption': u'Обід 18.09 в 14 год.',
 		'import_id': 'dinner_18',
 		'limit': 300, 'default': True,
-		'item_caption': u'квиток на обід 19.09'},
+		'item_caption': u'квиток на обід 18.09'},
 	{'caption': u'Обід 19.09 в 13 год.',
 		'import_id': 'dinner_19',
 		'price': 50, 'limit': 600, 'default': True,
