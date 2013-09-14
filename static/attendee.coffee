@@ -161,12 +161,11 @@ class AttendeeEditor
 		for item in [btnCancel, btnBook, spBooked, spPaid]
 			item.style.display = 'none'
 
-		if evt['booked'] or evt['paid']
+		if evt['booked'] and not evt['paid']
 			btnCancel.style.display = 'inline'
-			if evt['paid']
-				spPaid.style.display = 'inline'
-			else
-				spBooked.style.display = 'inline'
+			spBooked.style.display = 'inline'
+		else if evt['paid']
+			spPaid.style.display = 'inline'
 		else
 			if evt.limit?
 				for e in @eventsFreePlaces when e._id == evt._id

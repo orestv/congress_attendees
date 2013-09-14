@@ -321,13 +321,11 @@
         item = _ref[_i];
         item.style.display = 'none';
       }
-      if (evt['booked'] || evt['paid']) {
+      if (evt['booked'] && !evt['paid']) {
         btnCancel.style.display = 'inline';
-        if (evt['paid']) {
-          return spPaid.style.display = 'inline';
-        } else {
-          return spBooked.style.display = 'inline';
-        }
+        return spBooked.style.display = 'inline';
+      } else if (evt['paid']) {
+        return spPaid.style.display = 'inline';
       } else {
         if (evt.limit != null) {
           _ref1 = this.eventsFreePlaces;
