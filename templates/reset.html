@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}
+    {{ super() }}
+    Очистка
+{% endblock %}
+{% block head %}
+    {{ super() }}
+    <script src="/static/reset.js" type="text/javascript" charset="utf-8" async defer></script>
+{% endblock %}
+
+{% block content %}
+	<h1>Відновлення бази!</h1>
+	<img src="/static/nuclear.jpg" width="250">
+	<form action="/admin/reset" method="post" id="resetForm">
+		<input type="button" value="Показати кнопку очистки"/ id="btnShowResetButton"/>
+		<div id="dvResetContainer" style="display: none">
+			<label for="chkEnableReset">Я впевнений, що хочу очистити БД</label> <input type="checkbox" id="chkEnableReset"/>
+			<input type="submit" value="Очистити!" id="btnReset" disabled style="display: block">
+		</div>
+	</form>
+{% endblock %}

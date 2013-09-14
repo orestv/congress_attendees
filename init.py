@@ -102,8 +102,7 @@ EVENTS = [
 ]
 
 
-def init_attendees(conn):
-	db = conn.congress
+def init_attendees(db):
 	db.attendees.drop()
 	events = {}
 	for field in EVENT_FIELDS:
@@ -132,8 +131,7 @@ def init_attendees(conn):
 			attendee['attended_events'] = attended_events
 			db.attendees.insert(attendee)
 
-def init_users(conn):
-	db = conn.congress
+def init_users(db):
 	db.users.drop()
 	fields = {'firstname': 1, 'lastname': 0, 'password': 2}
 
@@ -160,8 +158,7 @@ def init_users(conn):
 
 	file_users.close()
 
-def init_events(conn):
-	db = conn.congress
+def init_events(db):
 	db.attendees.update({},
 		{'$set':
 			{'attended_events': []}
@@ -172,6 +169,7 @@ def init_events(conn):
 
 if __name__ == '__main__':
 	conn = pymongo.MongoClient()
-	init_events(conn)
-	init_attendees(conn)
+	db = conn.congress
+	init_events(db)
+	init_attendees(db)
 	conn.close()

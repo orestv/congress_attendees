@@ -179,6 +179,21 @@ def attendees():
         result = {'attendee': attendee}
     return json.dumps(result, default=json_util.default)
 
+@app.route('/admin/reset', methods=['GET', 'POST'])
+@flask_login.login_required
+def reset():
+    if not flask_login.current_user.is_admin:
+        return login_manager.unauthorized()
+    if request.method == 'GET':
+        return render_template('reset.html',
+            user = flask_login.current_user)
+    else:
+        from init import init_events, init_attendees, init_users
+        init_events(get_db())
+        init_attendees(get_db())
+        init_users(get_db())
+        return redirect('/index')
+
 @app.route('/attendee_edit', methods=['GET'])
 @flask_login.login_required
 def edit_attendee():
