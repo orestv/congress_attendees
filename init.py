@@ -8,6 +8,7 @@ import pymongo
 from pymongo import MongoClient
 import re
 from string import digits
+import os
 import crypt
 
 INFO_FIELDS = [
@@ -102,13 +103,16 @@ EVENTS = [
 ]
 
 
-def init_attendees(db):
+def init_attendees(db, root=None):
 	db.attendees.drop()
 	events = {}
 	for field in EVENT_FIELDS:
 		event = db.events.find_one({'import_id': field['id']})
 		events[field['id']] = str(event['_id'])
-	with open('attendees.csv', 'r') as f:
+	path = 'attendees.csv'
+	if root:
+		path = os.path.join(root, path)
+	with open(path, 'r') as f:
 		for line in f:
 			if line.startswith('Прізвище'):
 				continue
@@ -118,8 +122,6 @@ def init_attendees(db):
 				if field.get('bool', False):
 					value = items[field['col']]
 					attendee[field['id']] = (value == 'Так')
-			# print attendee
-			# return
 			attended_events = []
 			for field in EVENT_FIELDS:
 				choice = items[field['col']].strip()
@@ -131,20 +133,22 @@ def init_attendees(db):
 			attendee['attended_events'] = attended_events
 			db.attendees.insert(attendee)
 
-def init_users(db):
+def init_users(db, root=None):
 	db.users.drop()
 	fields = {'firstname': 1, 'lastname': 0, 'password': 2}
+	path = 'users_pwds'
+	if root:
+		path = os.path.join(root, path)
 
-	file_users = open('users_pwds', 'r')
-
-	for line in file_users:
-		line = line.rstrip()
-		line_split = line.split()
-		user = {key : line_split[fields[key]] for key in fields}
-		user['password_hash'] = crypt.crypt(user['password'], 'sha2')
-		user['admin'] = (len(line_split) > 3 and line_split[3] == '*')
-		del user['password']
-		db.users.insert(user)
+	with open(path, 'r') as file_users:
+		for line in file_users:
+			line = line.rstrip()
+			line_split = line.split()
+			user = {key : line_split[fields[key]] for key in fields}
+			user['password_hash'] = crypt.crypt(user['password'], 'sha2')
+			user['admin'] = (len(line_split) > 3 and line_split[3] == '*')
+			del user['password']
+			db.users.insert(user)
 
 	db.attendees.update({},
 		{'$set': {
@@ -155,8 +159,6 @@ def init_users(db):
 			'registered_on': None,
 			'registered_by': None
 		}}, multi = True)
-
-	file_users.close()
 
 def init_events(db):
 	db.attendees.update({},

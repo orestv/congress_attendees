@@ -190,8 +190,8 @@ def reset():
     else:
         from init import init_events, init_attendees, init_users
         init_events(get_db())
-        init_attendees(get_db())
-        init_users(get_db())
+        init_attendees(get_db(), app.config['FILES_ROOT'])
+        init_users(get_db(), app.config['FILES_ROOT'])
         return redirect('/index')
 
 @app.route('/attendee_edit', methods=['GET'])
