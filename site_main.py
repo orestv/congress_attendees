@@ -37,7 +37,6 @@ try:
         app.config['EMAIL_LOGIN'], [app.config['EMAIL_RECIPIENT']], 
         app.config['EMAIL_SUBJECT'],
         (app.config['EMAIL_LOGIN'], app.config['EMAIL_PASSWORD']))
-    handler.setLevel(logging.ERROR)
     app.logger.addHandler(handler)
 except Exception as ex:
     app.logger.exception(ex)
@@ -88,8 +87,12 @@ def index():
 @app.route('/attendee_event', methods=['PUT', 'DELETE'])
 @flask_login.login_required
 def attendee_event():
-    event_id = request.form.get('eid', None)
-    attendee_id = request.form.get('aid', None)
+    event_id = request.args.get('eid', None)
+    if not event_id:
+        event_id = request.form.get('eid', None)
+    attendee_id = request.args.get('aid', None)
+    if not attendee_id:
+        attendee_id = request.form.get('aid', None)
     if not event_id or not attendee_id:
         return json.dumps({'success': False, 'error': {
             'type': 'exception',

@@ -379,7 +379,7 @@
     };
 
     AttendeeEditor.prototype.unbookEvent = function(evt) {
-      var data, loader, request,
+      var loader, request,
         _this = this;
       loader = this.getEventElement('imgLoader', evt);
       this.getEventElement('btnCancel', evt).style.display = 'none';
@@ -396,10 +396,8 @@
         _this.fillEventActions(evt);
         return loader.style.display = 'none';
       };
-      request.open('DELETE', '/attendee_event');
-      request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-      data = "eid=" + evt._id + "&aid=" + this.attendeeId;
-      return request.send(data);
+      request.open('DELETE', "/attendee_event?eid=" + evt._id + "&aid=" + this.attendeeId, true);
+      return request.send(null);
     };
 
     AttendeeEditor.prototype.updateLocalAttendeeData = function() {
