@@ -155,8 +155,8 @@ def get_attendee_count_by_registrators(db):
         item = {
             'firstname': user['firstname'],
             'lastname': user['lastname'],
-            'cash': user['cash'],
-            'attendee_count': get_attendee_count_by_registrator(db, str(user['_id']))
+            'cash': user.get('cash', 0),
+            'attendee_count': get_attendee_count_by_registrator(db, str(user['_id'])),
         }
         result.append(item)
     return result
