@@ -12,6 +12,7 @@
     {% endif %}
 	{{user.firstname}} {{user.lastname}}
     {% if user.is_admin %}
+        <a href="/admin/reset" class="customNavigationItem">Очистка БД</a>
     	<a href="/admin/events" class="customNavigationItem">Події</a>
         <a href="/admin/report" class="customNavigationItem">Звіт</a>
     {% endif %}
