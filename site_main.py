@@ -184,15 +184,23 @@ def attendees():
 def edit_attendee():
     aid = request.args.get('id', None)
     attendee = find_attendee_by_id(aid)
+    reg_data = None
+    r_id = attendee.get('registered_by', None)
+    if r_id:
+        reg_data = {
+            'registrator': model.get_user_by_id(get_db(), r_id),
+            'registered_on': attendee['registered_on'],
+        }
     if aid and not attendee:
         return redirect('/index')
     if not flask_login.current_user.is_admin \
             and attendee and attendee.get('registered', False):
         return redirect('/index')
-    return render_template('attendee.html', 
+    return render_template('attendee.html',
         fields = fields.INFO_FIELDS,
         user = flask_login.current_user,
-        events = get_all_events(), 
+        events = get_all_events(),
+        reg_data = reg_data,
         attendee_id = aid)
 
 @app.route('/admin/events')

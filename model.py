@@ -167,6 +167,9 @@ def get_all_attendee_count(db):
 def get_registered_attendee_count(db):
     return db.attendees.find({'registered': True}).count()
 
+def get_user_by_id(db, uid):
+    return db.users.find_one({'_id': ObjectId(uid)})
+
 def find_attendees(db, search_term, search_by_city = False):
     words = search_term.split(' ')
     words.sort(key=len, reverse=True)
