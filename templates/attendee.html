@@ -79,32 +79,45 @@
 	</div>
 	<div style="clear:both"></div>
 	<div class="attendeeEditorBlock" id="dvEvents">
-		<table class="attendeeEditorTable">
-			<thead>
+		<table style="width: 100%">
+			<colgroup>
+				<col></col>
+				<col style="width: 3cm"></col>
+			</colgroup>
+			<tbody>
 				<tr>
-					<th width="40%">Назва</th>
-					<th width="10%">Ціна</th>
-					<th width="25%">Вільних місць</th>
-					<th width="25%">Дії</th>
+					<td>
+						<table class="attendeeEditorTable" style="width: 100%">
+							<thead>
+								<tr>
+									<th width="40%">Назва</th>
+									<th width="20%">Вільних місць</th>
+									<th width="25%">Дії</th>
+								</tr>
+							</thead>
+							<tbody id="tbEvents">
+								{% for event in events %}
+									<tr>
+										<td>
+											<label for="{{event._id}}">{{event.caption}}</label>
+										</td>
+										<td style="text-align: center">
+											{{ event_places(event) }}
+										</td>
+										<td style="text-align: center">
+											{{ event_control(event) }}
+										</td>
+									</tr>
+								{% endfor %}
+							</tbody>
+						</table>
+					</td>
+					<td style="text-align: right">
+						<h2>
+							<span id="spTotalPrice"></span> грн
+						</h2>
+					</td>
 				</tr>
-			</thead>
-			<tbody id="tbEvents">
-				{% for event in events %}
-					<tr>
-						<td>
-							<label for="{{event._id}}">{{event.caption}}</label>
-						</td>
-						<td style="text-align: center">
-							{{ event_price(event) }}
-						</td>
-						<td style="text-align: center">
-							{{ event_places(event) }}
-						</td>
-						<td style="text-align: center">
-							{{ event_control(event) }}
-						</td>
-					</tr>
-				{% endfor %}
 			</tbody>
 		</table>
 		<input type="button" id="btnFinishRegistration" value="Завершити реєстрацію">

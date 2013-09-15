@@ -39,7 +39,7 @@ class AttendeeEditor
 				@fetchEvents()
 			else
 				@dvEvents.style.display = 'none'
-			)		
+			)
 
 	fetchAttendee: () =>
 		request = new XMLHttpRequest()
@@ -49,7 +49,7 @@ class AttendeeEditor
 				@attendee = response.attendee
 				@attendeeFetched = true
 				setTimeout @fillEventsActions, 1
-				setTimeout (() => 
+				setTimeout (() =>
 					@fillAttendeeDetails @attendee
 					, 1)
 		request.open('GET', "/attendees?id=#{@attendeeId}", true)
@@ -144,13 +144,13 @@ class AttendeeEditor
 			console.log "Attendee fetched: #{@attendeeFetched}, events fetched: #{@eventsFetched}"
 			return
 		@joinEventData()
-		@setDefaultActions = not @attendee.registered#(@attendee.attended_events.length == 0)
+		@setDefaultActions = not @attendee.registered
 		for evt in @events
 			@fillEventActions evt
-		if @setDefaultActions
-			@setDefaultActions = false
+		@setDefaultActions = false
 
 	fillEventActions: (evt) =>
+		console.log evt
 		btnCancel = @getEventElement 'btnCancel', evt
 		btnBook = @getEventElement 'btnBook', evt
 		spBooked = @getEventElement 'spBooked', evt
@@ -173,6 +173,7 @@ class AttendeeEditor
 			btnBook.style.display = 'inline'
 			if @setDefaultActions and evt.default
 				@bookEvent evt
+		@updatePrice()
 
 	bookEvent: (evt) =>
 		loader = @getEventElement 'imgLoader', evt
@@ -185,9 +186,8 @@ class AttendeeEditor
 			loader.style.display = 'none'
 			response = JSON.parse(request.responseText)
 			if response['success']
-				@getEventElement('spBooked', evt).style.display = 'inline'
-				@getEventElement('btnCancel', evt).style.display = 'inline'
 				evt['booked'] = true
+				@fillEventActions(evt)
 			else
 				error = response.error
 				if error.type == 'outofplaces'
@@ -250,7 +250,7 @@ class AttendeeEditor
 		@infoInputsEnable(false)
 		document.getElementById('dvModalPlaceholder').style.display = 'block'
 		document.getElementById('dvPostRegistrationMessage').style.display = 'block'
-		@preparePrice()
+		@updateRegistrationPrice()
 		@prepareItemsList()
 
 	hidePostRegistrationMessage: () =>
@@ -259,19 +259,26 @@ class AttendeeEditor
 		document.getElementById('dvModalPlaceholder').style.display = 'none'
 		document.getElementById('dvPostRegistrationMessage').style.display = 'none'
 
-	preparePrice: () =>
+	calculatePrice: () =>
 		price = 0
 		for evt in @events when evt.price? and evt['booked'] and not evt['paid']
 			price += evt['price']
-		@price = price
-		document.getElementById('spPrice').textContent = price
+		return price
+
+	updatePrice: () =>
+		price = @calculatePrice()
+		document.getElementById('spTotalPrice').textContent = price
+
+	updateRegistrationPrice: () =>
+		@price = @calculatePrice()
+		document.getElementById('spPrice').textContent = @price
 
 	prepareItemsList: () =>
 		ul = document.getElementById('itemsList')
 		while ul.hasChildNodes()
 			ul.removeChild ul.lastChild
-		for evt in @events when evt['item_caption']? 
-			if not evt['booked'] 
+		for evt in @events when evt['item_caption']?
+			if not evt['booked']
 				continue
 			if evt['paid'] and @attendee.registered
 				continue
@@ -280,7 +287,7 @@ class AttendeeEditor
 			ul.appendChild(li)
 
 	btnBook_clicked: (event) =>
-		btnBook = event.currentTarget		
+		btnBook = event.currentTarget
 		eventId = @getEventIdFromEvent event
 		evt = null
 		for e in @events when e['_id'] == eventId
@@ -303,7 +310,7 @@ class AttendeeEditor
 						document.getElementById('dvEvents').style.display = 'block'
 					)
 				)
-			)			
+			)
 		else
 			@saveAttendeeInfo()
 
