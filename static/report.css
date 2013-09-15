@@ -1,6 +1,7 @@
 .dashboardTable {
 	width: 13cm;
 	margin: 1cm;
+	border-collapse: collapse;
 }
 
 .dashboardTable td {
