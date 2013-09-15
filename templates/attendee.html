@@ -51,6 +51,33 @@
 
 
 {% block content %}
+	<datalist id="txtRegion_items">
+		<option value="Вінницька"></option>
+		<option value="Волинська"></option>
+		<option value="Дніпропетровська"></option>
+		<option value="Донецька"></option>
+		<option value="Житомирська"></option>
+		<option value="Закарпатська"></option>
+		<option value="Запорізька"></option>
+		<option value="Івано-Франківська"></option>
+		<option value="Київська"></option>
+		<option value="Кіровоградська"></option>
+		<option value="Крим"></option>
+		<option value="Луганська"></option>
+		<option value="Львівська"></option>
+		<option value="Миколаївська"></option>
+		<option value="Одеська"></option>
+		<option value="Полтавська"></option>
+		<option value="Рівненська"></option>
+		<option value="Сумська"></option>
+		<option value="Тернопільська"></option>
+		<option value="Харківська"></option>
+		<option value="Херсонська"></option>
+		<option value="Хмельницька"></option>
+		<option value="Черкаська"></option>
+		<option value="Чернівецька"></option>
+		<option value="Чернігівська"></option>
+	</datalist>
 	<div class="attendeeEditorBlock" id="dvInfo">
 		<table class="attendeeEditorTable" style="width: 13cm; float: left">
 			<tbody>
@@ -59,6 +86,9 @@
 						<td>{{field.caption}}</td>
 						<td>
 							<input type="{{field.type}}" id="{{field.input_id}}"
+							{% if field.list %}
+								list="{{field.input_id}}_items"
+							{% endif %}
 							>
 						</td>
 					</tr>

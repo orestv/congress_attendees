@@ -8,7 +8,7 @@ INFO_FIELDS = [
     {'caption': u'Ім’я', 'type': 'text', 'input_id': 'txtFirstname', 'fieldId': 'firstname'},
     {'caption': u'По батькові', 'type': 'text', 'input_id': 'txtMiddlename', 'fieldId': 'middlename'},
     {'caption': u'Місто', 'type': 'text', 'input_id': 'txtCity', 'fieldId': 'city'},
-    {'caption': u'Область', 'type': 'text', 'input_id': 'txtRegion', 'fieldId': 'region'},
+    {'caption': u'Область', 'type': 'text', 'input_id': 'txtRegion', 'fieldId': 'region', 'list': True},
     {'caption': u'Організація', 'type': 'text', 'input_id': 'txtOrganization', 'fieldId': 'organization'},
     {'caption': u'Посада', 'type': 'text', 'input_id': 'txtPosition', 'fieldId': 'position'},
     {'caption': u'Звання', 'type': 'text', 'input_id': 'txtRank', 'fieldId': 'rank'},
