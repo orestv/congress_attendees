@@ -1,6 +1,12 @@
 .attendeeEditorTable input[type=text],input[type=tel] {
 	width: 8cm;
 }
+.attendeeEditorTable {
+	border-collapse: collapse;
+}
+#tbEvents td {
+	border-bottom: 1px solid black;
+}
 
 .attendeeEditorBlock {
 	margin-left: 2.5%;

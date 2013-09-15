@@ -69,8 +69,14 @@
       this.prepareItemsList = function() {
         return AttendeeEditor.prototype.prepareItemsList.apply(_this, arguments);
       };
-      this.preparePrice = function() {
-        return AttendeeEditor.prototype.preparePrice.apply(_this, arguments);
+      this.updateRegistrationPrice = function() {
+        return AttendeeEditor.prototype.updateRegistrationPrice.apply(_this, arguments);
+      };
+      this.updatePrice = function() {
+        return AttendeeEditor.prototype.updatePrice.apply(_this, arguments);
+      };
+      this.calculatePrice = function() {
+        return AttendeeEditor.prototype.calculatePrice.apply(_this, arguments);
       };
       this.hidePostRegistrationMessage = function() {
         return AttendeeEditor.prototype.hidePostRegistrationMessage.apply(_this, arguments);
@@ -302,13 +308,12 @@
         evt = _ref[_i];
         this.fillEventActions(evt);
       }
-      if (this.setDefaultActions) {
-        return this.setDefaultActions = false;
-      }
+      return this.setDefaultActions = false;
     };
 
     AttendeeEditor.prototype.fillEventActions = function(evt) {
       var btnBook, btnCancel, e, item, spBooked, spPaid, _i, _j, _len, _len1, _ref, _ref1;
+      console.log(evt);
       btnCancel = this.getEventElement('btnCancel', evt);
       btnBook = this.getEventElement('btnBook', evt);
       spBooked = this.getEventElement('spBooked', evt);
@@ -322,9 +327,9 @@
       }
       if (evt['booked'] && !evt['paid']) {
         btnCancel.style.display = 'inline';
-        return spBooked.style.display = 'inline';
+        spBooked.style.display = 'inline';
       } else if (evt['paid']) {
-        return spPaid.style.display = 'inline';
+        spPaid.style.display = 'inline';
       } else {
         if (evt.limit != null) {
           _ref1 = this.eventsFreePlaces;
@@ -339,9 +344,10 @@
         }
         btnBook.style.display = 'inline';
         if (this.setDefaultActions && evt["default"]) {
-          return this.bookEvent(evt);
+          this.bookEvent(evt);
         }
       }
+      return this.updatePrice();
     };
 
     AttendeeEditor.prototype.bookEvent = function(evt) {
@@ -359,9 +365,8 @@
         loader.style.display = 'none';
         response = JSON.parse(request.responseText);
         if (response['success']) {
-          _this.getEventElement('spBooked', evt).style.display = 'inline';
-          _this.getEventElement('btnCancel', evt).style.display = 'inline';
           evt['booked'] = true;
+          _this.fillEventActions(evt);
         } else {
           error = response.error;
           if (error.type === 'outofplaces') {
@@ -457,7 +462,7 @@
       this.infoInputsEnable(false);
       document.getElementById('dvModalPlaceholder').style.display = 'block';
       document.getElementById('dvPostRegistrationMessage').style.display = 'block';
-      this.preparePrice();
+      this.updateRegistrationPrice();
       return this.prepareItemsList();
     };
 
@@ -468,7 +473,7 @@
       return document.getElementById('dvPostRegistrationMessage').style.display = 'none';
     };
 
-    AttendeeEditor.prototype.preparePrice = function() {
+    AttendeeEditor.prototype.calculatePrice = function() {
       var evt, price, _i, _len, _ref;
       price = 0;
       _ref = this.events;
@@ -478,8 +483,18 @@
           price += evt['price'];
         }
       }
-      this.price = price;
-      return document.getElementById('spPrice').textContent = price;
+      return price;
+    };
+
+    AttendeeEditor.prototype.updatePrice = function() {
+      var price;
+      price = this.calculatePrice();
+      return document.getElementById('spTotalPrice').textContent = price;
+    };
+
+    AttendeeEditor.prototype.updateRegistrationPrice = function() {
+      this.price = this.calculatePrice();
+      return document.getElementById('spPrice').textContent = this.price;
     };
 
     AttendeeEditor.prototype.prepareItemsList = function() {
