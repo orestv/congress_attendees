@@ -175,6 +175,8 @@ def init_events(db):
 if __name__ == '__main__':
 	conn = pymongo.MongoClient()
 	db = conn.congress
+	root = 'files'
+	init_users(db, root)
 	init_events(db)
-	init_attendees(db)
+	init_attendees(db, root)
 	conn.close()
