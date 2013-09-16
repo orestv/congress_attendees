@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# -*- coding: utf-8 -*-
-
 INFO_FIELDS = [
 	{'caption': u'Прізвище', 'type': 'text', 'input_id': 'txtLastname', 'fieldId': 'lastname'},
     {'caption': u'Ім’я', 'type': 'text', 'input_id': 'txtFirstname', 'fieldId': 'firstname'},

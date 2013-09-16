@@ -36,6 +36,9 @@ def get_comparer(fields):
         return 0
     return compare_records
 
+def get_attendees(db):
+    return db.attendees.find()
+
 def get_events(db):
     return db.events.find()
 
