@@ -26,7 +26,7 @@ def export_attendees(workbook, attendees, events, users):
 	row = 1
 	for attendee in attendees:
 		column = 0
-		items = [attendee[field['fieldId']] for field in fields.INFO_FIELDS]
+		items = [attendee.get(field['fieldId'], '') for field in fields.INFO_FIELDS]
 		items = map(format_field, items)
 		items += map(lambda evt: event_status(attendee['attended_events'], str(evt['_id'])), 
 			events)
