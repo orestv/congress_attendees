@@ -103,7 +103,6 @@ def attendee_event():
             db_evt = model.get_event(get_db(), event_id)
             if 'limit' in db_evt:
                 evt = model.get_event_free_places(get_db(), event_id)
-                print evt
                 if evt['free_places'] <= 0:
                     return json.dumps({'success': False, 'error': {
                         'type': 'outofplaces'
@@ -146,12 +145,8 @@ def update_attendee():
                 cash = request.args.get('cash', 0)
                 registered = bool(registered)
                 model.set_attendee_registered(get_db(), id, user_id, registered, cash)
-        # if flask_login.current_user.is_admin:
-        print 'Admin updating an attendee!'
         valid_field_ids = [field['fieldId'] for field in fields.INFO_FIELDS]
-        print valid_field_ids
         submitted_field_ids = filter(lambda x : x in request.form, valid_field_ids)
-        print submitted_field_ids
         if submitted_field_ids:
             attendee_info = {field: request.form[field] for field in submitted_field_ids}
             for field in fields.INFO_FIELDS:
@@ -159,7 +154,6 @@ def update_attendee():
                     value = attendee_info[field['fieldId']]
                     value = (value == u'true')
                     attendee_info[field['fieldId']] = value
-            print attendee_info
             model.set_attendee_info(get_db(), id, attendee_info)
     return json.dumps({})
 
@@ -248,7 +242,6 @@ def download_admin_report():
     attendees = list(model.get_attendees(db))
     sort_attendees_by_name(attendees)
     users = model.get_attendee_count_by_registrators(db)
-    print users
     sort_users_by_name(users)
 
     fname = export.export(attendees, events, users)
