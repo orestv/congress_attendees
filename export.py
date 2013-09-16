@@ -32,9 +32,9 @@ def export_attendees(workbook, attendees, events, users):
 			events)
 		uid = attendee.get('registered_by', None)
 		if uid:
-			user = [u['firstname'] + u['lastname'] for u in users
+			user = [u['firstname'] + ' ' + u['lastname'] for u in users
 				if str(u['_id']) == uid][0]
-			items += user
+			items += [user]
 		data_row(ws, row, items)
 		row += 1
 	ws.title = u'Учасники'
