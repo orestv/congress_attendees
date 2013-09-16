@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# -*- coding: utf-8 -*
-from flask import Flask, render_template, _app_ctx_stack, request, url_for, redirect, flash
+from flask import Flask, render_template, _app_ctx_stack, request, url_for, redirect, flash, send_file
 import pymongo
 import json
 import model, users
@@ -18,6 +17,7 @@ import logging
 from logging import FileHandler
 from TlsSMTPHandler import TlsSMTPHandler
 import sys
+import export
 
 from time import sleep
 
@@ -236,6 +236,24 @@ def admin_events():
         events = events,
         user = flask_login.current_user,
         fields = fields.INFO_FIELDS)
+
+@app.route('/admin/report/download')
+@flask_login.login_required
+def download_admin_report():
+    if not flask_login.current_user.is_admin:
+        return login_manager.unauthorized()
+    db = get_db()
+
+    events = list(model.get_events(db))
+    attendees = list(model.get_attendees(db))
+    sort_attendees_by_name(attendees)
+    users = model.get_attendee_count_by_registrators(db)
+    sort_users_by_name(users)
+
+    fname = export.export(attendees, events, users)
+    send_file(fname, as_attachment=True)
+    return send_file(fname, as_attachment=True)
+
 
 @app.route('/admin/report')
 @flask_login.login_required

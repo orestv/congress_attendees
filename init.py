@@ -15,21 +15,18 @@ INFO_FIELDS = [
 	{'col': 0, 'id': 'lastname'},
 	{'col': 1, 'id': 'firstname'},
 	{'col': 2, 'id': 'middlename'},
-	{'col': 3, 'id': 'city'},
-	{'col': 4, 'id': 'region'},
-	{'col': 5, 'id': 'organization'},
-	{'col': 6, 'id': 'position'},
-	{'col': 7, 'id': 'rank'},
-	{'col': 8, 'id': 'email'},
-	{'col': 9, 'id': 'phone'},
-	{'col': 11, 'id': 'delegate', 'bool': True}
+	{'col': 3, 'id': 'position'},
+	{'col': 4, 'id': 'rank'},
+	{'col': 5, 'id': 'city'},
+	{'col': 6, 'id': 'region'},
+	# {'col': 5, 'id': 'organization'},
+	{'col': 7, 'id': 'email'},
+	{'col': 8, 'id': 'phone'},
+	# {'col': 11, 'id': 'delegate', 'bool': True}
 ]
 EVENT_FIELDS = [
-	{'col': 12, 'id': 'registration'},
-	{'col': 13, 'id': 'materials'},
-	{'col': 14, 'id': 'ceremonial_dinner'},
-	{'col': 15, 'id': 'dinner_19'},
-	{'col': 16, 'id': 'dinner_20'},
+	{'col': 10, 'id': ['registration', 'doctor', 'materials', 'dinner_18', 'dinner_19', 'dinner_20']},
+	{'col': 11, 'id': ['ceremonial_dinner']},
 ]
 
 def read_names(filename):
@@ -70,7 +67,7 @@ EVENTS = [
 		'default': True,
 		'item_caption': u'сертифікат і бейджик'},
 	{'caption': u'Доплата лікаря',
-		'import_id': 'discount', 'price': 100, 
+		'import_id': 'doctor', 'price': 100,
 		'default': True},
 	{'caption': u'Пакет матеріалів',
 		'import_id': 'materials', 'price': 100,
@@ -97,7 +94,7 @@ EVENTS = [
 		'price': 40, 'limit': 90,
 		'item_caption': u'квиток на екскурсію 20.09'},
 	{'caption': u'Церемонія відкриття 18.09 в 19 год.',
-		'import_id': 'opening', 'limit': 500,
+		'import_id': 'opening', 'limit': 820,
 		'item_caption': u'квиток на церемонію відкриття'},
 	{'caption': u'Урочиста вечеря 19.09 в 19 год.',
 		'import_id': 'ceremonial_dinner',
@@ -109,9 +106,13 @@ EVENTS = [
 def init_attendees(db, root=None):
 	db.attendees.drop()
 	events = {}
+	free_events = []
 	for field in EVENT_FIELDS:
-		event = db.events.find_one({'import_id': field['id']})
-		events[field['id']] = str(event['_id'])
+		for import_id in field['id']:
+			event = db.events.find_one({'import_id': import_id})
+			if not event.get('price', None):
+				free_events.append(str(event['_id']))
+			events[import_id] = str(event['_id'])
 	path = 'attendees.csv'
 	if root:
 		path = os.path.join(root, path)
@@ -119,20 +120,23 @@ def init_attendees(db, root=None):
 		for line in f:
 			if line.startswith('Прізвище'):
 				continue
-			items = line.split(',')
+			items = line.split('/')
 			attendee = {field['id']: items[field['col']].decode('utf-8') for field in INFO_FIELDS}
 			for field in INFO_FIELDS:
 				if field.get('bool', False):
 					value = items[field['col']]
-					attendee[field['id']] = (value == 'Так')
+					attendee[field['id']] = (value == '1')
 			attended_events = []
 			for field in EVENT_FIELDS:
 				choice = items[field['col']].strip()
-				if choice != 'Так':
+				if choice != '1':
 					continue
-				eid = events[field['id']]
-				event = {'_id': eid, 'booked': True, 'paid': True}
-				attended_events.append(event)
+				for import_id in field['id']:
+					eid = events[import_id]
+					event = {'_id': eid, 'booked': True}
+					if not eid in free_events:
+						event['paid'] = True
+					attended_events.append(event)
 			attendee['attended_events'] = attended_events
 			db.attendees.insert(attendee)
 
