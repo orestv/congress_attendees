@@ -248,6 +248,7 @@ def download_admin_report():
     attendees = list(model.get_attendees(db))
     sort_attendees_by_name(attendees)
     users = model.get_attendee_count_by_registrators(db)
+    print users
     sort_users_by_name(users)
 
     fname = export.export(attendees, events, users)

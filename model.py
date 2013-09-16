@@ -156,6 +156,7 @@ def get_attendee_count_by_registrators(db):
     users = db.users.find()
     for user in users:
         item = {
+            '_id': user['_id'],
             'firstname': user['firstname'],
             'lastname': user['lastname'],
             'cash': user.get('cash', 0),
