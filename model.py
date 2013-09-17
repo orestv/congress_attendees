@@ -188,6 +188,7 @@ def find_attendees(db, search_term, search_by_city = False):
         conditions.append({'$or': word_condition})
 
     query = {'$and': conditions}
-    cursor = db.attendees.find(query, fields=['firstname', 'lastname', 'middlename', 'city', 'registered'])
+    cursor = db.attendees.find(query,
+        fields=['firstname', 'lastname', 'middlename', 'city', 'registered', 'vip'])
     attendees = [attendee for attendee in cursor]
     return attendees

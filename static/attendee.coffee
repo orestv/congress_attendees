@@ -120,6 +120,8 @@ class AttendeeEditor
 			input = document.getElementById(inputId)
 			if input? and @attendee[objectKey]?
 				@setInputValue input, @attendee[objectKey]
+		if attendee.vip
+			document.getElementById('dvVIPContainer').style.display = 'block'
 
 	fillEventsFreePlaces: (events) ->
 		for evt in events

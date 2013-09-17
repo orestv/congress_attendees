@@ -134,9 +134,9 @@
         _this = this;
       tr = document.createElement('tr');
       city = attendee.city != null ? attendee.city : 'N/A';
-      this.appendCell(tr, city);
+      this.appendCell(tr, city, false);
       attendeeName = "" + attendee.lastname + " " + attendee.firstname + " " + attendee.middlename;
-      this.appendCell(tr, attendeeName);
+      this.appendCell(tr, attendeeName, attendee.vip);
       if ((attendee.registered != null) && attendee.registered) {
         tr.className = 'registered';
       }
@@ -217,10 +217,16 @@
       return document.getElementById('searchListContainer').style.display = 'block';
     };
 
-    Index.prototype.appendCell = function(tr, text) {
-      var td;
+    Index.prototype.appendCell = function(tr, text, vip) {
+      var sp, td;
       td = document.createElement('td');
       td.appendChild(document.createTextNode(text));
+      if (vip) {
+        sp = document.createElement('span');
+        sp.className = 'vip';
+        sp.appendChild(document.createTextNode('		VIP'));
+        td.appendChild(sp);
+      }
       tr.appendChild(td);
       return td;
     };

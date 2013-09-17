@@ -252,19 +252,18 @@
     };
 
     AttendeeEditor.prototype.fillAttendeeDetails = function(attendee) {
-      var input, inputId, objectKey, _ref, _results;
+      var input, inputId, objectKey, _ref;
       _ref = this.fields;
-      _results = [];
       for (inputId in _ref) {
         objectKey = _ref[inputId];
         input = document.getElementById(inputId);
         if ((input != null) && (this.attendee[objectKey] != null)) {
-          _results.push(this.setInputValue(input, this.attendee[objectKey]));
-        } else {
-          _results.push(void 0);
+          this.setInputValue(input, this.attendee[objectKey]);
         }
       }
-      return _results;
+      if (attendee.vip) {
+        return document.getElementById('dvVIPContainer').style.display = 'block';
+      }
     };
 
     AttendeeEditor.prototype.fillEventsFreePlaces = function(events) {

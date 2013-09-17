@@ -67,9 +67,9 @@ class Index
 	createAttendeeRow: (attendee) =>
 		tr = document.createElement 'tr'
 		city = if attendee.city? then attendee.city else 'N/A'
-		@appendCell(tr, city)
+		@appendCell(tr, city, false)
 		attendeeName = "#{attendee.lastname} #{attendee.firstname} #{attendee.middlename}"
-		@appendCell(tr, attendeeName)
+		@appendCell(tr, attendeeName, attendee.vip)
 		if attendee.registered? and attendee.registered
 			tr.className = 'registered'
 		td = document.createElement 'td'
@@ -122,7 +122,7 @@ class Index
 			data += '&' + attendeeData
 		request.open('PUT', "/attendees?id=#{@editor.attendee._id}&registered=1", false)
 		request.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-		request.send(data)		
+		request.send(data)
 		@updateEditedAttendee(@editor.attendee._id)
 		@backToList()
 
@@ -130,9 +130,14 @@ class Index
 		@editor.hide()
 		document.getElementById('searchListContainer').style.display = 'block'
 
-	appendCell: (tr, text) ->
+	appendCell: (tr, text, vip) ->
 		td = document.createElement 'td'
 		td.appendChild document.createTextNode(text)
+		if vip
+			sp = document.createElement('span')
+			sp.className = 'vip'
+			sp.appendChild document.createTextNode('		VIP')
+			td.appendChild(sp)
 		tr.appendChild td
 		return td
 
