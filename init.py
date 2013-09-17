@@ -176,11 +176,25 @@ def init_events(db):
 	db.events.drop()
 	db.events.insert(EVENTS)
 
+def init_vip(db, root):
+	fields = filter(lambda f : f['id'] in ['firstname', 'lastname', 'middlename'], INFO_FIELDS)
+	print fields
+	path = 'vip.csv'
+	if root:
+		path = os.path.join(root, path)
+	with open(path) as f:
+		for line in f:
+			condition = {}
+			items = line.split('/')
+			for field in fields:
+				condition[field['id']] = items[field['col']]
+			db.attendees.update(condition,
+				{'$set': {'vip': True}},
+				multi=True)
+
 if __name__ == '__main__':
 	conn = pymongo.MongoClient()
 	db = conn.congress
 	root = 'files'
-	init_users(db, root)
-	init_events(db)
-	init_attendees(db, root)
+	init_vip(db, root)
 	conn.close()
